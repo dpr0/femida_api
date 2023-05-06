@@ -1,0 +1,19 @@
+section.hero.is-lower-alpha
+  .hero-head
+    .container
+      / nav.navbar aria-label=("main navigation") role="navigation"
+        / #navbarBasicExample.navbar-menu
+          / .navbar-start
+            / .navbar-item
+              / = link_to 'femida-search.online'
+
+          .navbar-end
+            .navbar-item
+              .has-text-primary = notice
+            .navbar-item
+              .has-text-danger = alert
+  .hero-body
+    .container.has-text-centered
+      h1.title
+        i.fa-solid.fa-scale-balanced
+        | &nbsp

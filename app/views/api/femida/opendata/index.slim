@@ -1,0 +1,52 @@
+.hero-body
+  .container.has-text-centered
+    .columns
+      .column.is-2
+      .column.is-8
+        h2.subtitle Список БД РКН
+    .columns
+      .column.is-12
+        table.table.is-fullwidth.is-striped
+          thead
+            th ID
+            th № БД
+            th Статус
+            th Кол-во записей
+            th Формат
+            th Создан
+            th Обновлен
+          tbody
+            - @opendata.each do |opendata|
+              tr
+                td = opendata.id
+                td = opendata.number
+                td = opendata.status
+                td = opendata.rows
+                td = opendata.filename.split('.').last if opendata.filename
+                td = opendata.created_at.strftime("%d.%m.%Y %H:%M")
+                td
+                  - if opendata.status != 'finished'
+                    = link_to 'Обновить', api_femida_opendatum_path(opendata.number), class: 'button is-small is-link'
+                  - else
+                    = opendata.updated_at.strftime("%d.%m.%Y %H:%M")
+    .columns
+      .column.is-12
+        table.table.is-fullwidth.is-striped
+          thead
+            th ID
+            th № БД
+            th Статус
+            th Кол-во записей
+            th Формат
+            th Создан
+            th Удален
+          tbody
+            - @opendata_deleted.each do |opendata|
+              tr
+                td = opendata.id
+                td = opendata.number
+                td = opendata.status
+                td = opendata.rows
+                td = opendata.filename.split('.').last if opendata.filename
+                td = opendata.created_at.strftime("%d.%m.%Y %H:%M")
+                td = opendata.deleted_at.strftime("%d.%m.%Y %H:%M")

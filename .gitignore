@@ -37,3 +37,20 @@ yarn-error.log
 
 # Ignore simplecov output
 /coverage
+
+/public/packs
+/public/packs-test
+yarn-debug.log*
+.yarn-integrity
+/.idea
+.idea
+.env
+.DS_Store
+ebash
+dump.rdb
+
+/config/credentials/development.key
+/config/credentials/production.key
+/yarn-error.log
+/config/cred.byebug_history
+.byebug_history
