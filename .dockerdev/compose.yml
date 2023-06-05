@@ -8,7 +8,7 @@ x-app: &app
   environment: &env
     NODE_ENV: ${NODE_ENV:-development}
     RAILS_ENV: ${RAILS_ENV:-development}
-  image: x-app-dev:6.0.git 2
+  image: x-app-dev:6.0.git
   tmpfs:
     - /tmp
     - /app/tmp/pids
