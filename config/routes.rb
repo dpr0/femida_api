@@ -28,9 +28,14 @@ Rails.application.routes.draw do
       resources :opendata,only: [:index, :show]
       resources :driver,  only: :index
       resources :sro,     only: :index
-      resources :whoosh,  only: :index
       resources :websbor, only: :index
       resources :bonalog, only: :index
+      resources :parser do
+        collection do
+          get :whoosh
+          get :phone_rates
+        end
+      end
       resources :esia,    only: :index do
         collection do
           get :passport

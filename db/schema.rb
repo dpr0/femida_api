@@ -10,8 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_03_28_080177) do
+ActiveRecord::Schema[7.0].define(version: 2023_06_22_130000) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "citext"
   enable_extension "plpgsql"
 
   create_table "active_storage_attachments", force: :cascade do |t|
@@ -439,6 +440,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_28_080177) do
     t.string "last_job_title"
     t.string "oif"
     t.string "rank"
+  end
+
+  create_table "phone_rates", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "phone"
+    t.float "rate"
+    t.string "status"
+    t.datetime "updated_at", null: false
   end
 
   create_table "sro", force: :cascade do |t|
