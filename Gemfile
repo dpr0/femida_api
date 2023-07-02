@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '~> 3.2.1'
+ruby '~> 3.0.5'
 gem 'apipie-rails'
 gem 'bootsnap', require: false
 gem 'cocoon'
@@ -9,7 +9,6 @@ gem 'cssbundling-rails'
 gem 'devise'
 gem 'doorkeeper'
 gem 'dotenv-rails'
-gem 'extracter'
 gem 'image_processing'
 gem 'jbuilder'
 gem 'jsbundling-rails'

@@ -160,8 +160,6 @@ GEM
       railties (>= 3.2)
     ed25519 (1.3.0)
     erubi (1.12.0)
-    extracter (1.2.23)
-      opn
     factory_bot (6.2.1)
       activesupport (>= 5.0.0)
     factory_bot_rails (6.2.0)
@@ -269,7 +267,6 @@ GEM
     omniauth-yandex (0.0.2)
       omniauth (~> 1.0)
       omniauth-oauth2 (~> 1.0)
-    opn (1.0.59)
     orm_adapter (0.5.0)
     parallel (1.23.0)
     parser (3.2.2.3)
@@ -488,7 +485,6 @@ DEPENDENCIES
   doorkeeper
   dotenv-rails
   ed25519
-  extracter
   factory_bot_rails
   image_processing
   jbuilder
@@ -523,7 +519,7 @@ DEPENDENCIES
   whenever
 
 RUBY VERSION
-   ruby 3.2.1p31
+   ruby 3.0.5p211
 
 BUNDLED WITH
-   2.4.14
+   2.3.22
