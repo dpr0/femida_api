@@ -62,9 +62,9 @@ class ApplicationController < ActionController::Base
   end
 
 
-  def get(path, headers: {}, parse: true, key: :str)
-    puts path
-    resp = RestClient.get(HOST + path, headers)
+  def get(path, headers: {}, parse: true, key: :str, host: HOST)
+    puts host + path
+    resp = RestClient.get(host + path, headers)
     parse ? JSON.parse(resp) : resp
   rescue RestClient::NotFound, RestClient::BadRequest => e
     { key => false }
