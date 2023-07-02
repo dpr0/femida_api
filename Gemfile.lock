@@ -421,6 +421,8 @@ GEM
       railties (>= 6.0.0)
     strong_migrations (1.5.0)
       activerecord (>= 5.2)
+    sucker_punch (3.1.0)
+      concurrent-ruby (~> 1.0)
     temple (0.10.2)
     thor (1.2.2)
     tilt (2.2.0)
@@ -514,6 +516,7 @@ DEPENDENCIES
   standard
   stimulus-rails
   strong_migrations
+  sucker_punch
   turbo-rails
   web-console
   whenever

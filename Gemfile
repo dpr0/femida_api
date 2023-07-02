@@ -26,6 +26,7 @@ gem 'sentry-ruby'
 gem 'sentry-rails'
 gem 'slim-rails'
 gem 'stimulus-rails'
+gem 'sucker_punch'
 gem 'turbo-rails'
 gem 'whenever', require: false
 gem 'sprockets-rails'
