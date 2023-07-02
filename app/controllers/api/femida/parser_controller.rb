@@ -144,7 +144,7 @@ class Api::Femida::ParserController < ApplicationController
   def narod
     with_error_handling do
       array = []
-      File.readlines(Rails.root.join('tmp', 'parser', 'narod', 'med.txt')).each do |line|
+      File.readlines(Rails.root.join('tmp', 'narod', 'med.txt')).each do |line|
         z = line.chomp.split("\t")
         name = z.first.split(' ')
         array << { last_name: name[0],
@@ -164,7 +164,7 @@ class Api::Femida::ParserController < ApplicationController
 
   def expired_passports
     with_error_handling do
-      File.readlines(Rails.root.join('tmp', 'parser', 'narod', 'expired_passports.csv')).each do |line|
+      File.readlines(Rails.root.join('tmp', 'narod', 'expired_passports.csv')).each do |line|
         series, number = line.chomp.split(',')
         pasp = ExpiredPassport.find_or_initialize_by(passp_series: series, passp_number: number)
         pasp.save unless pasp.id
