@@ -1,12 +1,11 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '~> 3.2.1'
+ruby '~> 3.0.5'
 gem 'apipie-rails'
 gem 'bootsnap', require: false
 gem 'cocoon'
 gem 'cssbundling-rails'
-gem 'dates_from_string'
 gem 'devise'
 gem 'doorkeeper'
 gem 'dotenv-rails'
@@ -30,9 +29,10 @@ gem 'stimulus-rails'
 gem 'turbo-rails'
 gem 'whenever', require: false
 gem 'sprockets-rails'
-gem 'puma', '~> 6'
+gem 'puma', '4.3.10'
 gem 'strong_migrations'
 gem 'sidekiq'
+gem 'rtesseract'
 
 group :development, :test do
   gem 'debug'
@@ -44,6 +44,20 @@ group :development, :test do
   gem 'standard'
   gem 'rspec-rails'
   gem 'factory_bot_rails'
+
+  gem 'bcrypt_pbkdf'
+  gem 'capistrano3-puma', '4.0.0', require: false
+  gem 'capistrano',         require: false
+  gem 'capistrano-bundler', require: false
+  gem 'capistrano-nvm',     require: false
+  gem 'capistrano-rails',   require: false
+  gem 'capistrano-rbenv',   require: false
+  gem 'capistrano-yarn',    require: false
+  gem 'ed25519'
+  gem 'listen'
+  gem 'rubocop'
+  gem 'web-console'
+
 end
 
 group :test do

@@ -3,11 +3,16 @@
 class ApplicationController < ActionController::Base
   RETRY = 30
   URL = 'http://rucaptcha.com'
+  URL2 = 'http://cptch.net'
   ERROR = 'ERROR_CAPTCHA_UNSOLVABLE'
+  KEY1 = 'RUCAPTCHA_KEY'
+  KEY2 = 'CPTCH_NET_KEY'
+  HOST = 'https://esia.gosuslugi.ru'
+
   private
 
   def post_rucaptcha(body, attrs = {})
-    params = { key: ENV['RUCAPTCHA_KEY'], body: body, method: 'base64' }
+    params = { key: ENV[KEY1], body: body, method: 'base64' }
     rucaptcha = RestClient.post("#{URL}/in.php", params.merge(attrs))
     id = rucaptcha.body.split('|').last
     x = 0
@@ -23,7 +28,7 @@ class ApplicationController < ActionController::Base
   end
 
   def get_rucaptcha(id)
-    RestClient.get("#{URL}/res.php?key=#{ENV['RUCAPTCHA_KEY']}&action=get&id=#{id}")
+    RestClient.get("#{URL}/res.php?key=#{ENV[KEY1]}&action=get&id=#{id}")
   end
 
   def with_error_handling
@@ -54,5 +59,14 @@ class ApplicationController < ActionController::Base
     sum = 0
     inn[0..array.size-1].each_char.with_index { |x, i| sum += array[i] * x.to_i }
     sum % 11 % 10
+  end
+
+
+  def get(path, headers: {}, parse: true, key: :str, host: HOST)
+    puts host + path
+    resp = RestClient.get(host + path, headers)
+    parse ? JSON.parse(resp) : resp
+  rescue RestClient::NotFound, RestClient::BadRequest => e
+    { key => false }
   end
 end

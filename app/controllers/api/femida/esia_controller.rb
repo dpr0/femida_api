@@ -3,7 +3,8 @@
 class Api::Femida::EsiaController < ApplicationController
   protect_from_forgery with: :null_session
 
-  HOST = 'https://esia.gosuslugi.ru'
+  attr_reader :token, :headers
+
   PATH = 'api/public/v2'
 
   before_action :get_token
@@ -16,9 +17,9 @@ class Api::Femida::EsiaController < ApplicationController
       hash.each do |key, value|
         z1 = get("/esia-rs/#{PATH}/recovery/find?#{value}&verifyToken=#{@token}", key: key)
         req_id ||= z1['requestId']
-        json.merge!( key => (z1['description'] == 'Найдена стандартная/подтвержденная УЗ' && z1['status'] == 2))
+        json.merge!(key => (z1['description'] == 'Найдена стандартная/подтвержденная УЗ' && z1['status'] == 2))
         z2 = get("/esia-rs/#{PATH}/recovery/find?#{value}&requestId=#{req_id}", headers: @headers, key: key)
-        json.merge!( "#{key}_info" => z2)
+        json.merge!("#{key}_info" => z2)
       end
       json
     end
@@ -58,13 +59,15 @@ class Api::Femida::EsiaController < ApplicationController
   end
 
   def get_token
+    @token = nil
     type = get("/captcha/#{PATH}/type")
     headers = { captchaSession: type['captchaSession'] }
+    @headers = { 'Content-Type' => 'application/json' }.merge(headers)
     capcha = get("/captcha/#{PATH}/image", headers: headers, parse: false)
-    @resp = post_rucaptcha(Base64.encode64(capcha), phrase: 0, regsense: 0, numeric: 0, language: 1)
+    @resp = post_rucaptcha(Base64.encode64(capcha), phrase: 0, regsense: 0, numeric: 0, language: 1, lang: :ru)
+    byebug
     return if @resp == ApplicationController::ERROR
 
-    @headers = { 'Content-Type' => 'application/json', 'captchaSession' => type['captchaSession'] }
     @token = JSON.parse(RestClient.post(
       "#{HOST}/captcha/#{PATH}/verify",
       { captchaType: type['captchaType'], answer: @resp.split('|').last }.to_json,
@@ -94,13 +97,5 @@ class Api::Femida::EsiaController < ApplicationController
     h[:inn]      =    "inn=#{params[:inn]}"                                                     if params[:inn]
     h[:snils]    =  "snils=#{params[:snils]}"                                                   if params[:snils]
     h
-  end
-
-  def get(path, headers: {}, parse: true, key: :str)
-    puts path
-    resp = RestClient.get(HOST + path, headers)
-    parse ? JSON.parse(resp) : resp
-  rescue RestClient::NotFound, RestClient::BadRequest => e
-    { key => false }
   end
 end
