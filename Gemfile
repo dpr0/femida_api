@@ -6,10 +6,10 @@ gem 'apipie-rails'
 gem 'bootsnap', require: false
 gem 'cocoon'
 gem 'cssbundling-rails'
-gem 'dates_from_string'
 gem 'devise'
 gem 'doorkeeper'
 gem 'dotenv-rails'
+gem 'extracter'
 gem 'image_processing'
 gem 'jbuilder'
 gem 'jsbundling-rails'
@@ -33,6 +33,7 @@ gem 'sprockets-rails'
 gem 'puma', '~> 6'
 gem 'strong_migrations'
 gem 'sidekiq'
+gem 'rtesseract'
 
 group :development, :test do
   gem 'debug'
@@ -44,6 +45,20 @@ group :development, :test do
   gem 'standard'
   gem 'rspec-rails'
   gem 'factory_bot_rails'
+
+  gem 'bcrypt_pbkdf'
+  gem 'capistrano3-puma', '4.0.0', require: false
+  gem 'capistrano',         require: false
+  gem 'capistrano-bundler', require: false
+  gem 'capistrano-nvm',     require: false
+  gem 'capistrano-rails',   require: false
+  gem 'capistrano-rbenv',   require: false
+  gem 'capistrano-yarn',    require: false
+  gem 'ed25519'
+  gem 'listen'
+  gem 'rubocop'
+  gem 'web-console'
+
 end
 
 group :test do

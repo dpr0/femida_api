@@ -10,8 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_03_28_080177) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_02_190000) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "citext"
   enable_extension "plpgsql"
 
   create_table "active_storage_attachments", force: :cascade do |t|
@@ -73,6 +74,19 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_28_080177) do
     t.string "passp_number"
     t.string "passp_series"
     t.index ["passp_series"], name: "expired_passports_passp_series_index"
+  end
+
+  create_table "femida_retro_users", force: :cascade do |t|
+    t.string "birth_date"
+    t.datetime "created_at", null: false
+    t.string "first_name"
+    t.string "is_passport_verified"
+    t.string "is_phone_verified"
+    t.string "last_name"
+    t.string "middle_name"
+    t.string "passport"
+    t.string "phone"
+    t.datetime "updated_at", null: false
   end
 
   create_table "fssp_wanted", force: :cascade do |t|
@@ -432,6 +446,19 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_28_080177) do
     t.string "type"
   end
 
+  create_table "parsed_users", force: :cascade do |t|
+    t.string "address"
+    t.string "birth_date"
+    t.datetime "created_at", null: false
+    t.string "first_name"
+    t.string "is_phone_verified"
+    t.string "last_name"
+    t.string "middle_name"
+    t.string "passport"
+    t.string "phone"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "pdl", id: false, force: :cascade do |t|
     t.string "dob"
     t.serial "id", null: false
@@ -439,6 +466,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_28_080177) do
     t.string "last_job_title"
     t.string "oif"
     t.string "rank"
+  end
+
+  create_table "phone_rates", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "phone"
+    t.float "rate"
+    t.string "status"
+    t.datetime "updated_at", null: false
   end
 
   create_table "sro", force: :cascade do |t|
@@ -478,6 +513,105 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_28_080177) do
     t.string "first_name"
     t.string "last_name"
     t.string "middlename"
+  end
+
+  create_table "turbozaim_user_data", force: :cascade do |t|
+    t.string "actual_date"
+    t.string "address"
+    t.string "birthdate"
+    t.string "birthplace"
+    t.string "citizenship"
+    t.datetime "created_at", null: false
+    t.string "credit_sum"
+    t.string "credit_type"
+    t.string "date"
+    t.string "date_from"
+    t.string "delo_article"
+    t.string "delo_date"
+    t.string "delo_date2"
+    t.string "delo_initiator"
+    t.string "delo_num"
+    t.string "email"
+    t.string "fact_address"
+    t.string "fact_region"
+    t.string "field0"
+    t.string "field1"
+    t.string "field2"
+    t.string "field3"
+    t.string "field4"
+    t.string "field5"
+    t.string "field6"
+    t.string "field7"
+    t.string "field8"
+    t.string "field9"
+    t.string "ifns"
+    t.string "info"
+    t.string "inn"
+    t.string "insurance"
+    t.string "kbm"
+    t.string "limitation"
+    t.string "model"
+    t.string "name"
+    t.string "nationality"
+    t.string "ogrn"
+    t.string "old_address"
+    t.string "old_birthdate"
+    t.string "old_first_name"
+    t.string "old_last_name"
+    t.string "old_middle_name"
+    t.string "organization"
+    t.string "organization_inn"
+    t.string "overdue_days"
+    t.string "passport"
+    t.string "passport_date"
+    t.string "passport_organ"
+    t.string "phone"
+    t.string "phone2"
+    t.string "phone3"
+    t.string "polis"
+    t.string "premium_sum"
+    t.string "registration_address"
+    t.string "registration_region"
+    t.string "snils"
+    t.string "source"
+    t.string "sum"
+    t.string "target"
+    t.string "turbozaim_user_id"
+    t.datetime "updated_at", null: false
+    t.string "vin"
+    t.string "workplace"
+    t.string "workplace_address"
+    t.string "workplace_phone"
+    t.string "workplace_position"
+  end
+
+  create_table "turbozaim_users", force: :cascade do |t|
+    t.string "archive_fssp"
+    t.string "birth_date"
+    t.datetime "created_at", null: false
+    t.string "dateopen"
+    t.string "femida_id"
+    t.string "first_name"
+    t.string "has_double_citizenship"
+    t.string "is_18"
+    t.string "is_expired_passport"
+    t.string "is_in_black_list"
+    t.string "is_massive_supervisors"
+    t.string "is_passport_verified"
+    t.string "is_pdl"
+    t.string "is_phone_verified"
+    t.string "is_terrorist"
+    t.string "last_name"
+    t.string "middlename"
+    t.string "os_inns"
+    t.string "os_passports"
+    t.string "os_phones"
+    t.string "os_snils"
+    t.string "os_status"
+    t.string "passport"
+    t.string "phone"
+    t.string "turbozaim_id"
+    t.datetime "updated_at", null: false
   end
 
   create_table "users", force: :cascade do |t|

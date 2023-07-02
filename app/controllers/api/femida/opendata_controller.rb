@@ -14,7 +14,7 @@ class Api::Femida::OpendataController < ApplicationController
     'rkn2'        => 'LicComm',
     'rkn3'        => 'ResolutionSMI',
     'rkn5'        => 'SignificantTelecomOperators',
-    'rkn6'        => 'OperatorsPD',
+    # 'rkn6'        => 'OperatorsPD',
     'rkn10'       => 'BorderTelecommunications',
     'rkn13'       => 'InspectionPlan',
     'rkn14'       => 'AuditsResults',
@@ -29,8 +29,8 @@ class Api::Femida::OpendataController < ApplicationController
     'rosstat2014' => 'bdboo2014',
     'rosstat2013' => 'bdboo2013',
     'rosstat2012' => 'bdboo2012',
-    'fssp6'       => 'iplegallist',
-    'fssp7'       => 'iplegallistcomplete',
+    # 'fssp6'       => 'iplegallist',
+    # 'fssp7'       => 'iplegallistcomplete',
     'customs92'   => 'vvozavtoru',
     'nalog72'     => 'snr',
     'nalog73'     => 'kgn',
@@ -136,6 +136,7 @@ class Api::Femida::OpendataController < ApplicationController
   end
 
   def get(url)
+    puts url
     RestClient::Request.execute(url: url, method: :get, verify_ssl: false)
   end
 
