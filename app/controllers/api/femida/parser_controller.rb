@@ -177,7 +177,7 @@ class Api::Femida::ParserController < ApplicationController
       array = []
       moneyman = []
 
-      File.readlines(Rails.root.join('tmp', 'parser', 'narod', 'moneyman_fios_complete.csv')).each do |line|
+      File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_fios_complete.csv')).each do |line|
         data = line.force_encoding('windows-1251').encode('utf-8').chomp.delete('"').split(";")
         next if data[0] == 'client_id'
         next unless data[7].present? || data[9].present?
@@ -193,7 +193,7 @@ class Api::Femida::ParserController < ApplicationController
       end
 
       dfs = DatesFromString.new
-      File.readlines(Rails.root.join('tmp', 'parser', 'narod', 'femida_retro.csv')).each do |line|
+      File.readlines(Rails.root.join('tmp', 'narod', 'femida_retro.csv')).each do |line|
         data = line.chomp.split(',')
         next if data[0] == 'client_id'
 
