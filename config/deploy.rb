@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-lock '3.17.2'
+lock '3.17.3'
 
 server '80.68.7.92', port: 22, roles: %w(app db web), primary: true
 
 set :rbenv_ruby,      '3.0.5'
 set :application,     'ruby_pub'
-set :repo_url,        'gitlab.com:femida1/ruby_pub.git'
+set :repo_url,        'git@github.com:dpr0/femida_api.git'
 set :linked_files,    fetch(:linked_files, []).push('config/cable.yml', 'config/database.yml', 'config/secrets.yml', 'config/master.key', 'config/credentials.yml.enc', '.env')
 set :linked_dirs,     fetch(:linked_dirs, []).push('log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'tmp/session_store', 'vendor/bundle', 'public/system', 'public/uploads')
 set :keep_releases,   5
