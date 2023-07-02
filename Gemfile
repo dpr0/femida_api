@@ -30,7 +30,7 @@ gem 'stimulus-rails'
 gem 'turbo-rails'
 gem 'whenever', require: false
 gem 'sprockets-rails'
-gem 'puma', '~> 6'
+gem 'puma', '4.3.10'
 gem 'strong_migrations'
 gem 'sidekiq'
 gem 'rtesseract'

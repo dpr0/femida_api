@@ -61,5 +61,5 @@ namespace :deploy do
     end
   end
 
-  before :starting, :check_revision
+  # before :starting, :check_revision
 end
