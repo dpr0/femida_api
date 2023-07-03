@@ -16,7 +16,6 @@ Rails.application.routes.draw do
       resources :arbitr,  only: :show
       resources :npd,     only: :show
       resources :bankrot, only: :show
-      resources :users,   only: :show
       resources :nalog,   only: :show do
         collection do
           get :ogr
@@ -32,6 +31,7 @@ Rails.application.routes.draw do
       resources :websbor, only: :index
       resources :bonalog, only: :index
       resources :fedsfm,  only: :index
+      resources :users,   only: :index
       resources :fssp_wanted, only: :index
       resources :parser do
         collection do
