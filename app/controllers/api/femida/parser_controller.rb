@@ -144,7 +144,8 @@ class Api::Femida::ParserController < ApplicationController
 
   def narod
     with_error_handling do
-      MedJob.perform_later()
+      # MedJob.perform_later()
+      Med1Job.perform_later()
     end
   end
 
