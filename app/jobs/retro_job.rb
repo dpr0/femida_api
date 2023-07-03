@@ -48,7 +48,6 @@ class RetroJob
         is_phone_verified: arr.find { |x| [x[:phone], "7#{x[:phone]}"].include? data[4] }.present?
       }
 
-      byebug
       if array.size == 1000
         FemidaRetroUser.insert_all(array)
         array = []
