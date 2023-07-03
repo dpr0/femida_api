@@ -1,6 +1,4 @@
-class RetroJob
-  include Sidekiq::Job
-
+class RetroJob < ApplicationJob
   queue_as :default
 
   def perform()
@@ -8,7 +6,7 @@ class RetroJob
     moneyman_array = []
     # moneyman_array2 = []
 
-    File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_test.csv')).each do |line|
+    File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_fios_complete.csv')).each do |line|
       data = line.force_encoding('windows-1251').encode('utf-8').chomp.delete('"').split(";")
       next if data[0] == 'client_id'
       next unless data[8].present? || data[10].present?
