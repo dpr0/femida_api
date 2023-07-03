@@ -6,27 +6,25 @@ class RetroJob < ApplicationJob
     moneyman_array = []
     # moneyman_array2 = []
 
-    if false
-      File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_fios_complete.csv')).each do |line|
-        data = line.force_encoding('windows-1251').encode('utf-8').chomp.delete('"').split(";")
-        next if data[0] == 'client_id'
-        next unless data[8].present? || data[10].present?
+    File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_fios_complete.csv')).each do |line|
+      data = line.force_encoding('windows-1251').encode('utf-8').chomp.delete('"').split(";")
+      next if data[0] == 'client_id'
+      next unless data[8].present? || data[10].present?
 
-        hash = {
-          first_name: data[2],
-          middle_name: data[3],
-          last_name: data[1],
-          phone: data[8],
-          passport: data[10]
-        }
-        moneyman_array << hash
-        # moneyman_array2 << hash
-        #
-        # if moneyman_array2.size == 1000
-        #   MoneymanUser.insert_all(moneyman_array2)
-        #   moneyman_array2 = []
-        # end
-      end
+      hash = {
+        first_name: data[2],
+        middle_name: data[3],
+        last_name: data[1],
+        phone: data[8],
+        passport: data[10]
+      }
+      moneyman_array << hash
+      # moneyman_array2 << hash
+      #
+      # if moneyman_array2.size == 1000
+      #   MoneymanUser.insert_all(moneyman_array2)
+      #   moneyman_array2 = []
+      # end
     end
 
     puts "======================================================================="
@@ -37,16 +35,16 @@ class RetroJob < ApplicationJob
       next if data[0] == 'client_id'
 
       # arr = moneyman_array.select { |x| x[:last_name] == data[3] && x[:first_name] == data[1] && x[:middle_name] == data[2] }
-      arr = MoneymanUser.where(last_name: data[3], first_name: data[1], middle_name: data[2]).to_a
+      # arr = MoneymanUser.where(last_name: data[3], first_name: data[1], middle_name: data[2]).to_a
       array << {
         first_name: data[1],
         middle_name: data[2],
         last_name: data[3],
         phone: data[4],
         birth_date: dfs.find_date(data[5]).first&.to_date&.strftime('%d.%m.%Y'),
-        passport: data[6],
-        is_passport_verified: arr.find { |x| x.passport == data[6] }.present?,
-        is_phone_verified: arr.find { |x| [x.phone, "7#{x.phone}"].include? data[4] }.present?
+        passport: data[6]
+        # is_passport_verified: arr.find { |x| x.passport == data[6] }.present?,
+        # is_phone_verified: arr.find { |x| [x.phone, "7#{x.phone}"].include? data[4] }.present?
       }
 
       if array.size == 1000

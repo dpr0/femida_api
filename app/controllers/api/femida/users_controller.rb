@@ -9,6 +9,7 @@ class Api::Femida::UsersController < ApplicationController
       mm_users = MoneymanUser.where(first_name: params[:first_name], middle_name: params[:middle_name], last_name: params[:last_name])
       fr_user = FemidaRetroUser.find_or_initialize_by(first_name: params[:first_name], middle_name: params[:middle_name], last_name: params[:last_name])
 
+      byebug
       {
         first_name: fr_user[1],
         middle_name: fr_user[2],
