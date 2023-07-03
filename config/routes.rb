@@ -31,7 +31,7 @@ Rails.application.routes.draw do
       resources :websbor, only: :index
       resources :bonalog, only: :index
       resources :fedsfm,  only: :index
-      resources :users,   only: :index
+      resources :users,   only: [:index, :show]
       resources :fssp_wanted, only: :index
       resources :parser do
         collection do
