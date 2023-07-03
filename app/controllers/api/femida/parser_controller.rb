@@ -156,7 +156,7 @@ class Api::Femida::ParserController < ApplicationController
 
   def retro
     with_error_handling do
-      RetroJob.perform_later()
+      RetroJob.perform_async()
     end
   end
 

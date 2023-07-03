@@ -9,10 +9,8 @@ class CreateFemidaRetroUsers < ActiveRecord::Migration[7.0]
       t.string :phone
       t.string :birth_date
       t.string :passport
-      t.string :is_passport_verified
-      t.string :is_phone_verified
-
-      t.timestamps null: false
+      t.boolean :is_passport_verified
+      t.boolean :is_phone_verified
     end
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_02_190000) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_03_080000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -78,15 +78,13 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_02_190000) do
 
   create_table "femida_retro_users", force: :cascade do |t|
     t.string "birth_date"
-    t.datetime "created_at", null: false
     t.string "first_name"
-    t.string "is_passport_verified"
-    t.string "is_phone_verified"
+    t.boolean "is_passport_verified"
+    t.boolean "is_phone_verified"
     t.string "last_name"
     t.string "middle_name"
     t.string "passport"
     t.string "phone"
-    t.datetime "updated_at", null: false
   end
 
   create_table "fssp_wanted", force: :cascade do |t|
@@ -95,6 +93,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_02_190000) do
     t.string "last_name"
     t.string "patronymic"
     t.string "region_id"
+  end
+
+  create_table "moneyman_users", force: :cascade do |t|
+    t.string "first_name"
+    t.string "last_name"
+    t.string "middle_name"
+    t.string "passport"
+    t.string "phone"
   end
 
   create_table "oauth_access_grants", force: :cascade do |t|
