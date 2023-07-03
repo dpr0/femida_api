@@ -7,18 +7,13 @@ class Api::Femida::UsersController < ApplicationController
   def index
     with_error_handling do
       mm_users = MoneymanUser.where(first_name: params[:first_name], middle_name: params[:middle_name], last_name: params[:last_name])
-      fr_user = FemidaRetroUser.find_or_initialize_by(first_name: params[:first_name], middle_name: params[:middle_name], last_name: params[:last_name])
+      fr_user = FemidaRetroUser.find_by(first_name: params[:first_name], middle_name: params[:middle_name], last_name: params[:last_name])
+      return {} unless fr_user
 
-      {
-        first_name: fr_user[1],
-        middle_name: fr_user[2],
-        last_name: fr_user[3],
-        phone: fr_user[4],
-        birth_date: fr_user[5],
-        passport: fr_user[6],
-        is_passport_verified: mm_users.find { |x| x[:passport] == fr_user[6] }.present?,
-        is_phone_verified: mm_users.find { |x| [x[:phone], "7#{x[:phone]}"].include? fr_user[4] }.present?
-      }
+      passport = mm_users.find { |x| x.passport == fr_user.passport }.present?
+      phone = mm_users.find { |x| [x.phone, "7#{x.phone}"].include? fr_user.phone }.present?
+      fr_user.update(is_passport_verified: passport, is_phone_verified: phone)
+      fr_user
     end
   end
 end

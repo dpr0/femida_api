@@ -34,7 +34,7 @@ class RetroJob < ApplicationJob
       data = line.chomp.split(',')
       next if data[0] == 'client_id'
 
-      # arr = moneyman_array.select { |x| x[:last_name] == data[3] && x[:first_name] == data[1] && x[:middle_name] == data[2] }
+      arr = moneyman_array.select { |x| x[:last_name] == data[3] && x[:first_name] == data[1] && x[:middle_name] == data[2] }
       # arr = MoneymanUser.where(last_name: data[3], first_name: data[1], middle_name: data[2]).to_a
       array << {
         first_name: data[1],
@@ -42,9 +42,9 @@ class RetroJob < ApplicationJob
         last_name: data[3],
         phone: data[4],
         birth_date: dfs.find_date(data[5]).first&.to_date&.strftime('%d.%m.%Y'),
-        passport: data[6]
-        # is_passport_verified: arr.find { |x| x.passport == data[6] }.present?,
-        # is_phone_verified: arr.find { |x| [x.phone, "7#{x.phone}"].include? data[4] }.present?
+        passport: data[6],
+        is_passport_verified: arr.find { |x| x.passport == data[6] }.present?,
+        is_phone_verified: arr.find { |x| [x.phone, "7#{x.phone}"].include? data[4] }.present?
       }
 
       if array.size == 1000
