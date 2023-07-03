@@ -11,10 +11,9 @@ class RetroJob < ApplicationJob
       next unless data[8].present? || data[10].present?
 
       moneyman_array << {
-        fio: "#{data[1]} #{data[2]} #{data[3]}",
-        # f: data[1],
-        # i: data[2],
-        # o: data[3],
+        f: data[1],
+        i: data[2],
+        o: data[3],
         # bd: "#{data[4]}.#{data[5]}.#{data[6]}",
         phone: data[8],
         pasp: data[10]
@@ -29,7 +28,7 @@ class RetroJob < ApplicationJob
       data = line.chomp.split(',')
       next if data[0] == 'client_id'
 
-      arr = moneyman_array.select { |x| x[:fio] == "#{data[3]} #{data[1]} #{data[2]}" }
+      arr = moneyman_array.select { |x| x[:f] == data[3] && x[:i] == data[1] && x[:o] == data[2] }
       array << {
         first_name: data[1],
         middle_name: data[2],
@@ -40,7 +39,8 @@ class RetroJob < ApplicationJob
         is_passport_verified: arr.find { |x| x[:pasp] == data[6] }.present?,
         is_phone_verified: arr.find { |x| [x[:phone], "7#{x[:phone]}"].include? data[4] }.present?
       }
-      if array.size == 1000
+
+      if array.size == 10
         FemidaRetroUser.insert_all(array)
         array = []
       end

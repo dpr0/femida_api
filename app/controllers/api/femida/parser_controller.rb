@@ -112,33 +112,34 @@ class Api::Femida::ParserController < ApplicationController
         zz.save
       end
     end
-    TurbozaimUser.where(is_phone_verified: 'false', os_status: nil).each do |u|
-      headers = { 'Authorization': 'Basic b2R5c3NleTo0VVZxbGVoIw==' }
-      search = "last_name=#{u.last_name}&first_name=#{u.first_name}&mobile_phone=#{u.phone}&sources%5Bgoogle%5D=on&sources%5Bgoogleplus%5D=on&async=on&mode=xml"
-      r1 = Nokogiri::HTML(RestClient.post('https://i-sphere.ru/2.00/check.php', search, headers).body)
-      resp = r1.css('response')[0].values
-      r2 = Nokogiri::HTML(RestClient.get("https://i-sphere.ru/2.00/showresult.php?id=#{resp[0]}&mode=xml", headers))
-      while r2.css('response')[0].values[1] != '1'
-        sleep 1
-        r = RestClient.get("https://i-sphere.ru/2.00/showresult.php?id=#{resp[0]}&mode=xml", headers)
-        r2 = Nokogiri::HTML(r)
-      end
-      Hash.from_xml(r2.to_xml).dig('html', 'body', 'response', 'source').each do |zx|
-        resp = zx.dig('record', 'field')&.second&.dig('fieldvalue')
-        if resp
-          puts "#{u.phone} - #{resp}"
-          response << u
+
+    if false
+      TurbozaimUser.where(is_phone_verified: 'false', os_status: nil).each do |u|
+        headers = { 'Authorization': 'Basic b2R5c3NleTo0VVZxbGVoIw==' }
+        search = "last_name=#{u.last_name}&first_name=#{u.first_name}&mobile_phone=#{u.phone}&sources%5Bgoogle%5D=on&sources%5Bgoogleplus%5D=on&async=on&mode=xml"
+        r1 = Nokogiri::HTML(RestClient.post('https://i-sphere.ru/2.00/check.php', search, headers).body)
+        resp = r1.css('response')[0].values
+        r2 = Nokogiri::HTML(RestClient.get("https://i-sphere.ru/2.00/showresult.php?id=#{resp[0]}&mode=xml", headers))
+        while r2.css('response')[0].values[1] != '1'
+          sleep 1
+          r = RestClient.get("https://i-sphere.ru/2.00/showresult.php?id=#{resp[0]}&mode=xml", headers)
+          r2 = Nokogiri::HTML(r)
         end
-        u.os_status = resp || 'not_found'
-        u.save
+        Hash.from_xml(r2.to_xml).dig('html', 'body', 'response', 'source').each do |zx|
+          resp = zx.dig('record', 'field')&.second&.dig('fieldvalue')
+          if resp
+            puts "#{u.phone} - #{resp}"
+            response << u
+          end
+          u.os_status = resp || 'not_found'
+          u.save
+        end
       end
     end
 
-    array = CSV.generate do |csv|
-      csv << ['phone', 'id']
-      response.each { |x| csv << [x.phone, x.id] }
+    TurbozaimUser.where(is_phone_verified: 'false', os_status: nil).each do |u|
+
     end
-    send_data(array, filename: 'response.csv', type: 'text/csv')
   end
 
   def narod
