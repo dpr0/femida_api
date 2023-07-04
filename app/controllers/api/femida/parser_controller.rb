@@ -63,10 +63,10 @@ class Api::Femida::ParserController < ApplicationController
 
   api :GET, '/turbozaim', 'Пользователи turbozaim - csv'
   def turbozaim
-    filename = 'turbozaim.csv'
-    file = File.read(Rails.root.join('tmp', 'parser', filename))
-    data = CSV.parse(file, headers: true, col_sep: ';')
-    response = []
+    # filename = 'turbozaim.csv'
+    # file = File.read(Rails.root.join('tmp', 'parser', filename))
+    # data = CSV.parse(file, headers: true, col_sep: ';')
+    # response = []
     if false
       data.each do |d|
         next if TurbozaimUser.find_by(phone: d['phone'])
@@ -138,7 +138,10 @@ class Api::Femida::ParserController < ApplicationController
     end
 
     TurbozaimUser.where(is_phone_verified: 'false', os_status: nil).each do |u|
-
+      users = ParsedUser.where('phone is not null and lower(last_name) = ? and lower(first_name) = ?', u.last_name.downcase, u.first_name.downcase).to_a
+      bool = users.map { |u| u.phone.presence&.last(10) }.compact.uniq.include?(u.phone.last(10))
+      puts "=================================================== #{bool}"
+      u.update(os_status: bool)
     end
   end
 
