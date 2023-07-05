@@ -6,7 +6,6 @@ class Api::Femida::UsersController < ApplicationController
   api :GET, '/users', 'api/femida/users'
   def index
     with_error_handling do
-      FemidaRetroUser.where(is_passport_verified: nil, is_phone_verified: nil).joins('left join moneyman_users m on femida_retro_users.first_name = m.first_name and femida_retro_users.middle_name = m.middle_name and femida_retro_users.last_name = m.last_name')
       FemidaRetroUser.where(is_passport_verified: nil, is_phone_verified: nil).each do |fr_user|
         mm_users = MoneymanUser.where(first_name: fr_user.first_name, middle_name: fr_user.middle_name, last_name: fr_user.last_name).to_a
         next unless fr_user
