@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_03_080000) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_05_050000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -463,6 +463,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_03_080000) do
     t.string "passport"
     t.string "phone"
     t.datetime "updated_at", null: false
+    t.index ["phone"], name: "index_parsed_users_on_phone"
   end
 
   create_table "pdl", id: false, force: :cascade do |t|

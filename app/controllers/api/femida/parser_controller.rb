@@ -137,9 +137,11 @@ class Api::Femida::ParserController < ApplicationController
       end
     end
 
-    TurbozaimUser.where(is_phone_verified: 'false', os_status: nil).each do |u|
-      users = ParsedUser.where('phone is not null and lower(last_name) = ? and lower(first_name) = ?', u.last_name.downcase, u.first_name.downcase).to_a
-      bool = users.map { |u| u.phone.presence&.last(10) }.compact.uniq.include?(u.phone.last(10))
+    TurbozaimUser.where(is_phone_verified: 'false', os_status: [nil, 'f', 'not_found']).each do |u|
+      f = u.phone.last(10)
+      users = ParsedUser.where(phone: ["7#{f}", f])
+
+      bool = users.select { |user| user.last_name.downcase == u.last_name.downcase && user.first_name.downcase == u.first_name.downcase }
       puts "=================================================== #{bool}"
       u.update(os_status: bool)
     end
