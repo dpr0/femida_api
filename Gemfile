@@ -48,7 +48,7 @@ group :development, :test do
   gem 'factory_bot_rails'
 
   gem 'bcrypt_pbkdf'
-  gem 'capistrano3-puma', '4.0.0', require: false
+  gem 'capistrano3-puma', '5.2.0', require: false
   gem 'capistrano',         require: false
   gem 'capistrano-bundler', require: false
   gem 'capistrano-nvm',     require: false
