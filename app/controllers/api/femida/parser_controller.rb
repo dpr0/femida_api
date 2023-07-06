@@ -137,26 +137,47 @@ class Api::Femida::ParserController < ApplicationController
     #   end
     # end
 
-    TurbozaimUser.where(is_phone_verified: ['false', nil]).each do |u|
-      f = u.phone.last(10)
-      users = ParsedUser.where(phone: ["7#{f}", f])
-
-      bool = users.select { |user| user.last_name&.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
-      puts '==================================================== ' if bool
-      u.update(os_status: bool) if bool
-    end
-
     # TurbozaimUser.where(is_phone_verified: ['false', nil]).each do |u|
     #   f = u.phone.last(10)
-    #   # 5 users = Leaks1.where('Telephone' => ["7#{f}", f])
-    #   users = Leaks8.where(phone: ["7#{f}", f])
+    #   users = ParsedUser.where(phone: ["7#{f}", f])
     #
-    #   # bool = users.select { |user| user.surname.downcase == u.last_name.downcase && user.name.downcase == u.first_name.downcase }.present?
-    #   # bool = users.select { |user| user.LastName.downcase == u.last_name.downcase && user.FirstName.downcase == u.first_name.downcase }.present?
-    #   bool = users.select { |user| user.surname&.downcase == u.last_name.downcase && user.name&.downcase == u.first_name.downcase }.present?
+    #   bool = users.select { |user| user.last_name&.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
     #   puts '==================================================== ' if bool
     #   u.update(os_status: bool) if bool
     # end
+
+    # TurbozaimUser.where(is_phone_verified: ['false', nil]).each do |u|
+    #   f = u.phone.last(10)
+    #   # users = Leaks5.where('Telephone' => ["7#{f}", f])
+    #   users = Leaks2.where(phone: ["7#{f}", f])
+    #
+    #   bool = users.select { |user| user.last_name.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
+    #   # bool = users.select { |user| user['LastName']&.downcase == u.last_name.downcase && user['FirstName']&.downcase == u.first_name.downcase }.present?
+    #   # bool = users.select { |user| user.surname&.downcase == u.last_name.downcase && user.name&.downcase == u.first_name.downcase }.present?
+    #   puts '==================================================== ' if bool
+    #   u.update(os_status: bool) if bool
+    # end
+
+    FemidaRetroUser.where.not(is_phone_verified: true).each do |u|
+      f = u.phone.last(10)
+      # users = Leaks5.where('Telephone' => ["7#{f}", f])
+      users = ParsedUser.where(phone: ["7#{f}", f])
+
+      bool = users.select { |user| user.last_name.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
+      # bool = users.select { |user| user['LastName']&.downcase == u.last_name.downcase && user['FirstName']&.downcase == u.first_name.downcase }.present?
+      # bool = users.select { |user| user.surname&.downcase == u.last_name.downcase && user.name&.downcase == u.first_name.downcase }.present?
+      puts '==================================================== ' if bool
+      u.update(is_phone_verified: bool) if bool
+    end
+
+    # z = CSV.generate do |csv|
+    #   csv << ['id', 'turbozaim_id', 'femida_id', 'phone', 'is_phone_verified']
+    #   TurbozaimUser.all.each do |data|
+    #     csv << [data.id, data.turbozaim_id, data.femida_id, data.phone, (data.is_phone_verified == 'true' || data.os_status == 't') ? 'true' :  'false']
+    #   end
+    # end
+    # send_data(z, filename: 'response.csv', type: 'text/csv')
+
   end
 
   def narod

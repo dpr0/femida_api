@@ -13,14 +13,6 @@
 #  surname     :text
 #  yearbirth   :integer
 #
-# name
-# surname
-# middlename
-# email
-# daybirth
-# monthbirth
-# yearbirth
-# information
 class Leaks3 < ApplicationRecord
   self.table_name = :bookmate_all
 end
