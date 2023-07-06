@@ -149,7 +149,7 @@ class Api::Femida::ParserController < ApplicationController
     TurbozaimUser.where(is_phone_verified: ['false', nil]).each do |u|
       f = u.phone.last(10)
       # 5 users = Leaks1.where('Telephone' => ["7#{f}", f])
-      users = Leaks6.where(phone: ["7#{f}", f])
+      users = Leaks8.where(phone: ["7#{f}", f])
 
       # bool = users.select { |user| user.surname.downcase == u.last_name.downcase && user.name.downcase == u.first_name.downcase }.present?
       # bool = users.select { |user| user.LastName.downcase == u.last_name.downcase && user.FirstName.downcase == u.first_name.downcase }.present?
