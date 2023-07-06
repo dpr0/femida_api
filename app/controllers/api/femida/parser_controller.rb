@@ -67,81 +67,93 @@ class Api::Femida::ParserController < ApplicationController
     # file = File.read(Rails.root.join('tmp', 'parser', filename))
     # data = CSV.parse(file, headers: true, col_sep: ';')
     # response = []
-    if false
-      data.each do |d|
-        next if TurbozaimUser.find_by(phone: d['phone'])
+    # if false
+    #   data.each do |d|
+    #     next if TurbozaimUser.find_by(phone: d['phone'])
+    #
+    #     zz = TurbozaimUser.new
+    #     zz.turbozaim_id = d['id']
+    #     zz.dateopen = d['dateopen']
+    #     zz.last_name = d['last_name']
+    #     zz.first_name = d['first_name']
+    #     zz.middlename = d['middlename']
+    #     zz.birth_date = d['birth_date']
+    #     zz.passport = d['passport']
+    #     zz.phone = d['phone']
+    #     zz.femida_id = d['femida_id']
+    #     zz.is_expired_passport = d['is_expired_passport']
+    #     zz.is_massive_supervisors = d['is_massive_supervisors']
+    #     zz.is_terrorist = d['is_terrorist']
+    #     zz.is_phone_verified = d['is_phone_verified']
+    #     zz.is_18 = d['is_18']
+    #     zz.is_in_black_list = d['is_in_black_list']
+    #     zz.has_double_citizenship = d['has_double_citizenship']
+    #     zz.is_pdl = d['is_pdl']
+    #     zz.os_inns = d['os_inns']
+    #     zz.os_phones = d['os_phones']
+    #     zz.os_passports = d['os_passports']
+    #     zz.os_snils = d['os_snils']
+    #     zz.archive_fssp = d['archive_fssp']
+    #     zz.is_passport_verified = d['is_passport_verified']
+    #     # json = JSON.parse(d['os_data'])
+    #     # zz.os_status = json['status']
+    #     # json['data']&.each do |x|
+    #     #   z2 = zz.turbozaim_user_datas.new
+    #     #   x.keys.each_with_index do |key, index|
+    #     #     z2.send("#{field_by(key, index)}=", x[key])
+    #     #   rescue
+    #     #     begin
+    #     #     z2.send("field#{index}=", x[key])
+    #     #     rescue
+    #     #       puts "------------------------------------------------ > #{key}"
+    #     #     end
+    #     #   end
+    #     # end
+    #     zz.save
+    #   end
+    # end
+    #
+    # if false
+    #   TurbozaimUser.where(is_phone_verified: 'false', os_status: nil).each do |u|
+    #     headers = { 'Authorization': 'Basic b2R5c3NleTo0VVZxbGVoIw==' }
+    #     search = "last_name=#{u.last_name}&first_name=#{u.first_name}&mobile_phone=#{u.phone}&sources%5Bgoogle%5D=on&sources%5Bgoogleplus%5D=on&async=on&mode=xml"
+    #     r1 = Nokogiri::HTML(RestClient.post('https://i-sphere.ru/2.00/check.php', search, headers).body)
+    #     resp = r1.css('response')[0].values
+    #     r2 = Nokogiri::HTML(RestClient.get("https://i-sphere.ru/2.00/showresult.php?id=#{resp[0]}&mode=xml", headers))
+    #     while r2.css('response')[0].values[1] != '1'
+    #       sleep 1
+    #       r = RestClient.get("https://i-sphere.ru/2.00/showresult.php?id=#{resp[0]}&mode=xml", headers)
+    #       r2 = Nokogiri::HTML(r)
+    #     end
+    #     Hash.from_xml(r2.to_xml).dig('html', 'body', 'response', 'source').each do |zx|
+    #       resp = zx.dig('record', 'field')&.second&.dig('fieldvalue')
+    #       if resp
+    #         puts "#{u.phone} - #{resp}"
+    #         response << u
+    #       end
+    #       u.os_status = resp || 'not_found'
+    #       u.save
+    #     end
+    #   end
+    # end
 
-        zz = TurbozaimUser.new
-        zz.turbozaim_id = d['id']
-        zz.dateopen = d['dateopen']
-        zz.last_name = d['last_name']
-        zz.first_name = d['first_name']
-        zz.middlename = d['middlename']
-        zz.birth_date = d['birth_date']
-        zz.passport = d['passport']
-        zz.phone = d['phone']
-        zz.femida_id = d['femida_id']
-        zz.is_expired_passport = d['is_expired_passport']
-        zz.is_massive_supervisors = d['is_massive_supervisors']
-        zz.is_terrorist = d['is_terrorist']
-        zz.is_phone_verified = d['is_phone_verified']
-        zz.is_18 = d['is_18']
-        zz.is_in_black_list = d['is_in_black_list']
-        zz.has_double_citizenship = d['has_double_citizenship']
-        zz.is_pdl = d['is_pdl']
-        zz.os_inns = d['os_inns']
-        zz.os_phones = d['os_phones']
-        zz.os_passports = d['os_passports']
-        zz.os_snils = d['os_snils']
-        zz.archive_fssp = d['archive_fssp']
-        zz.is_passport_verified = d['is_passport_verified']
-        # json = JSON.parse(d['os_data'])
-        # zz.os_status = json['status']
-        # json['data']&.each do |x|
-        #   z2 = zz.turbozaim_user_datas.new
-        #   x.keys.each_with_index do |key, index|
-        #     z2.send("#{field_by(key, index)}=", x[key])
-        #   rescue
-        #     begin
-        #     z2.send("field#{index}=", x[key])
-        #     rescue
-        #       puts "------------------------------------------------ > #{key}"
-        #     end
-        #   end
-        # end
-        zz.save
-      end
-    end
+    # TurbozaimUser.where(is_phone_verified: ['false', nil]).each do |u|
+    #   f = u.phone.last(10)
+    #   users = ParsedUser.where(phone: ["7#{f}", f])
+    #
+    #   bool = users.select { |user| user.last_name.downcase == u.last_name.downcase && user.first_name.downcase == u.first_name.downcase }.present?
+    #   puts "=================================================== #{bool}"
+    #   u.update(os_status: bool)
+    # end
 
-    if false
-      TurbozaimUser.where(is_phone_verified: 'false', os_status: nil).each do |u|
-        headers = { 'Authorization': 'Basic b2R5c3NleTo0VVZxbGVoIw==' }
-        search = "last_name=#{u.last_name}&first_name=#{u.first_name}&mobile_phone=#{u.phone}&sources%5Bgoogle%5D=on&sources%5Bgoogleplus%5D=on&async=on&mode=xml"
-        r1 = Nokogiri::HTML(RestClient.post('https://i-sphere.ru/2.00/check.php', search, headers).body)
-        resp = r1.css('response')[0].values
-        r2 = Nokogiri::HTML(RestClient.get("https://i-sphere.ru/2.00/showresult.php?id=#{resp[0]}&mode=xml", headers))
-        while r2.css('response')[0].values[1] != '1'
-          sleep 1
-          r = RestClient.get("https://i-sphere.ru/2.00/showresult.php?id=#{resp[0]}&mode=xml", headers)
-          r2 = Nokogiri::HTML(r)
-        end
-        Hash.from_xml(r2.to_xml).dig('html', 'body', 'response', 'source').each do |zx|
-          resp = zx.dig('record', 'field')&.second&.dig('fieldvalue')
-          if resp
-            puts "#{u.phone} - #{resp}"
-            response << u
-          end
-          u.os_status = resp || 'not_found'
-          u.save
-        end
-      end
-    end
-
-    TurbozaimUser.where(is_phone_verified: 'false').each do |u|
+    TurbozaimUser.where(is_phone_verified: ['false', nil]).each do |u|
       f = u.phone.last(10)
-      users = ParsedUser.where(phone: ["7#{f}", f])
+      # 5 users = Leaks1.where('Telephone' => ["7#{f}", f])
+      users = Leaks5.where(phone: ["7#{f}", f])
 
-      bool = users.select { |user| user.last_name.downcase == u.last_name.downcase && user.first_name.downcase == u.first_name.downcase }.present?
+      # 6 8 bool = users.select { |user| user.surname.downcase == u.last_name.downcase && user.name.downcase == u.first_name.downcase }.present?
+      bool = users.select { |user| user.LastName.downcase == u.last_name.downcase && user.FirstName.downcase == u.first_name.downcase }.present?
+      # bool = users.select { |user| user.surname&.downcase == u.last_name.downcase && user.name&.downcase == u.first_name.downcase }.present?
       puts "=================================================== #{bool}"
       u.update(os_status: bool)
     end

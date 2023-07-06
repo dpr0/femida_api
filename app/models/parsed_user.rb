@@ -18,7 +18,8 @@
 #
 # Indexes
 #
-#  index_parsed_users_on_phone  (phone)
+#  index_parsed_users_on_passport  (passport)
+#  index_parsed_users_on_phone     (phone)
 #
 class ParsedUser < ApplicationRecord
 end
