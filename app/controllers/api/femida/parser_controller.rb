@@ -162,7 +162,7 @@ class Api::Femida::ParserController < ApplicationController
       f = u.phone.last(10)
       next if f.blank?
 
-      users = Leaks6.where('phone' => ["7#{f}", f])
+      users = Leaks8.where('phone' => ["7#{f}", f])
       # users = ParsedUser.where(phone: ["7#{f}", f])
 
       # bool = users.select { |user| user.last_name.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
