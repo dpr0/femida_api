@@ -160,12 +160,14 @@ class Api::Femida::ParserController < ApplicationController
 
     FemidaRetroUser.where.not(is_phone_verified: true).each do |u|
       f = u.phone.last(10)
-      # users = Leaks5.where('Telephone' => ["7#{f}", f])
-      users = ParsedUser.where(phone: ["7#{f}", f])
+      next if f.blank?
 
-      bool = users.select { |user| user.last_name.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
+      users = Leaks1.where('phone' => ["7#{f}", f])
+      # users = ParsedUser.where(phone: ["7#{f}", f])
+
+      # bool = users.select { |user| user.last_name.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
       # bool = users.select { |user| user['LastName']&.downcase == u.last_name.downcase && user['FirstName']&.downcase == u.first_name.downcase }.present?
-      # bool = users.select { |user| user.surname&.downcase == u.last_name.downcase && user.name&.downcase == u.first_name.downcase }.present?
+      bool = users.select { |user| user.surname&.downcase == u.last_name.downcase && user.name&.downcase == u.first_name.downcase }.present?
       puts '==================================================== ' if bool
       u.update(is_phone_verified: bool) if bool
     end
