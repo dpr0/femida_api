@@ -162,11 +162,11 @@ class Api::Femida::ParserController < ApplicationController
       f = u.phone.last(10)
       next if f.blank?
 
-      users = Leaks5.where('Telephone' => ["7#{f}", f])
+      users = Leaks2.where('phone' => ["7#{f}", f])
       # users = ParsedUser.where(phone: ["7#{f}", f])
 
-      # bool = users.select { |user| user.last_name.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
-      bool = users.select { |user| user['LastName']&.downcase == u.last_name.downcase && user['FirstName']&.downcase == u.first_name.downcase }.present?
+      bool = users.select { |user| user.last_name.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
+      # bool = users.select { |user| user['LastName']&.downcase == u.last_name.downcase && user['FirstName']&.downcase == u.first_name.downcase }.present?
       # bool = users.select { |user| user.surname&.downcase == u.last_name.downcase && user.name&.downcase == u.first_name.downcase }.present?
       puts '==================================================== ' if bool
       u.update(is_phone_verified: bool) if bool
@@ -180,6 +180,43 @@ class Api::Femida::ParserController < ApplicationController
     # end
     # send_data(z, filename: 'response.csv', type: 'text/csv')
 
+  end
+
+  def start_csv
+    with_error_handling do
+      hash1 = {}
+      File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_is_os_phone_req.csv')).each do |line|
+        key, value = line.chomp.delete('"').split(",")
+        next if key == 'Phone_search'
+        hash1[key.last(10)] = value
+      end
+      hash2 = {}
+      File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_scored_adjusted_score.csv')).each do |line|
+        key, value = line.chomp.delete('"').split(",")
+        next if key == 'phone'
+        hash2[key.last(10)] = value
+      end
+
+      z = CSV.generate do |csv|
+        csv << %w[first_name middle_name last_name phone birth_date passport is_passport_verified is_phone_verified is_os_phone_req adjusted_score]
+        FemidaRetroUser.all.each do |data|
+          array = [
+            data.first_name,
+            data.middle_name,
+            data.last_name,
+            data.phone,
+            data.birth_date,
+            data.passport,
+            data.is_passport_verified,
+            data.is_phone_verified,
+            hash1[data.phone.last(10)],
+            hash2[data.phone.last(10)]
+          ]
+          csv << array
+        end
+      end
+      send_data(z, filename: 'response.csv', type: 'text/csv')
+    end
   end
 
   def narod
