@@ -17,7 +17,7 @@ class Med1Job < ApplicationJob
       end
     end
 
-    File.readlines(Rails.root.join('tmp', 'itog_1', '1 Анкетные данные 2021-2022.csv')).each do |line|
+    File.readlines(Rails.root.join('tmp', 'info', '1')).each do |line|
       z = line.chomp.split("\t")
       next if z[0] == 'Фамилия' || (z[0].blank? && z[1].blank? && z[2].blank?)
 
@@ -26,16 +26,20 @@ class Med1Job < ApplicationJob
              rescue
                ''
              end
-      array << { last_name: z[0]&.downcase,
-                 first_name: z[1]&.downcase,
-                 middle_name: z[2]&.downcase,
-                 birth_date: date,
-                 # phone: z[6],
-                 address: z[6]&.downcase }
-      if array.size == 2000 || z[6] == 'NIK_6_80@MAIL.RU'
-        ParsedUser.insert_all(array)
-        array = []
-      end
+      array << {
+        last_name: z[0]&.downcase,
+        first_name: z[1]&.downcase,
+        middle_name: z[2]&.downcase,
+        birth_date: date,
+        phone: z[6],
+        # passport: JSON.parse(z[8])['Документ'],
+        # address: z[7]&.downcase
+      }
+      # if array.size == 2000 || z[6] == '9125330641'
+      #   ParsedUser.insert_all(array)
+      #   array = []
+      # end
     end
+    ParsedUser.insert_all(array)
   end
 end

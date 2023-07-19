@@ -183,46 +183,109 @@ class Api::Femida::ParserController < ApplicationController
   end
 
   def start_csv
-    with_error_handling do
-      hash1 = {}
-      File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_is_os_phone_req.csv')).each do |line|
-        key, value = line.chomp.delete('"').split(",")
-        next if key == 'Phone_search'
-        hash1[key.last(10)] = value
-      end
-      hash2 = {}
-      File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_scored_adjusted_score.csv')).each do |line|
-        key, value = line.chomp.delete('"').split(",")
-        next if key == 'phone'
-        hash2[key.last(10)] = value
-      end
-
-      z = CSV.generate do |csv|
-        csv << %w[first_name middle_name last_name phone birth_date passport is_passport_verified is_phone_verified is_os_phone_req adjusted_score]
-        FemidaRetroUser.all.each do |data|
-          array = [
-            data.first_name,
-            data.middle_name,
-            data.last_name,
-            data.phone,
-            data.birth_date,
-            data.passport,
-            data.is_passport_verified,
-            data.is_phone_verified,
-            hash1[data.phone.last(10)],
-            hash2[data.phone.last(10)]
-          ]
-          csv << array
-        end
-      end
-      send_data(z, filename: 'response.csv', type: 'text/csv')
+    hash1 = {}
+    File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_is_os_phone_req.csv')).each do |line|
+      key, value = line.chomp.delete('"').split(",")
+      next if key == 'Phone_search'
+      hash1[key.last(10)] = value
     end
+    hash2 = {}
+    File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_scored_adjusted_score.csv')).each do |line|
+      key, value = line.chomp.delete('"').split(",")
+      next if key == 'phone'
+      hash2[key.last(10)] = value
+    end
+
+    z = CSV.generate do |csv|
+      csv << %w[first_name middle_name last_name phone birth_date passport is_passport_verified is_phone_verified is_os_phone_req adjusted_score]
+      FemidaRetroUser.all.each do |data|
+        array = [
+          data.first_name,
+          data.middle_name,
+          data.last_name,
+          data.phone,
+          data.birth_date,
+          data.passport,
+          data.is_passport_verified,
+          data.is_phone_verified,
+          hash1[data.phone.last(10)],
+          hash2[data.phone.last(10)]
+        ]
+        csv << array
+      end
+    end
+    send_data(z, filename: 'response.csv', type: 'text/csv')
   end
 
   def narod
     with_error_handling do
       # MedJob.perform_later()
-      Med1Job.perform_later()
+      # Med1Job.perform_later()
+      # Leaks1.where.not(phone: nil).all.to_a.each_slice(50000) do |slice|
+      #   ParsedUser.upsert_all(slice.map { |x| { last_name: x.surname, first_name: x.name, middle_name: x.middlename, phone: x.phone } } )
+      # end
+      # dfs = DatesFromString.new
+      # Leaks2.where.not(phone: nil).all.to_a.each_slice(50000) do |slice|
+      #   ParsedUser.upsert_all(
+      #     slice.map do |x|
+      #       date = begin
+      #                dfs.find_date("#{x.birth_day}.#{x.birth_month}.#{x.birth_year}").first&.to_date&.strftime('%d.%m.%Y')
+      #              rescue
+      #                ''
+      #              end
+      #
+      #       { last_name: x.last_name, first_name: x.first_name, middle_name: x.second_name, phone: x.phone, address: x.email, birth_date: date }
+      #     end
+      #   )
+      # end
+      # Leaks4.where.not(phone: nil).all.to_a.each_slice(50000) do |slice|
+      #   ParsedUser.upsert_all(
+      #     slice.map do |x|
+      #       date = begin
+      #                dfs.find_date("#{x.daybirth}.#{x.monthbirth}.#{x.yearbirth}").first&.to_date&.strftime('%d.%m.%Y')
+      #              rescue
+      #                ''
+      #              end
+      #       { last_name: x.surname, first_name: x.name, phone: x.phone, birth_date: date }
+      #     end
+      #   )
+      # end
+      # Leaks5.all.to_a.each_slice(50000) do |slice|
+      #   sleep 3000
+      #   puts '===='
+      #   ParsedUser.upsert_all(
+      #     slice.map do |x|
+      #       date = begin
+      #                dfs.find_date("#{x['DayBirth']}.#{x['MonthBirth']}.#{x['YearBirth']}").first&.to_date&.strftime('%d.%m.%Y')
+      #              rescue
+      #                ''
+      #              end
+      #       { last_name: x['LastName'], first_name: x['FirstName'], phone: x['Telephone'], birth_date: date, middle_name: x['MiddleName'], passport: ['Passport'] }
+      #     end
+      #   )
+      #   puts '=== ==='
+      # end
+      # Leaks8.where.not(phone: nil).all.to_a.each_slice(50000) do |slice|
+      #   ParsedUser.upsert_all(
+      #     slice.map do |x|
+      #       date = begin
+      #                dfs.find_date("#{x.daybirth}.#{x.monthbirth}.#{x.yearbirth}").first&.to_date&.strftime('%d.%m.%Y')
+      #              rescue
+      #                ''
+      #              end
+      #       { last_name: x.surname, middle_name: x.middlename, first_name: x.name, address: x.email, phone: x.phone, birth_date: date }
+      #     end
+      #   )
+      # end
+      regexp = /\d{10}$/
+      batch_size = 50_000
+      (982..(ParsedUser.count.to_f / batch_size).ceil).each do |num|
+        ParsedUser.upsert_all(
+          ParsedUser.limit(batch_size).offset(batch_size * num).all.map { |x| { id: x.id, phone: x.phone&.match(regexp).to_s } },
+          update_only: [:phone]
+        )
+        sleep 0.2
+      end
     end
   end
 
