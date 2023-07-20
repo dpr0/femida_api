@@ -279,9 +279,9 @@ class Api::Femida::ParserController < ApplicationController
       # end
       regexp = /\d{10}$/
       batch_size = 50_000
-      (982..(ParsedUser.count.to_f / batch_size).ceil).each do |num|
+      (0..(ParsedUser.count.to_f / batch_size).ceil).each do |num|
         ParsedUser.upsert_all(
-          ParsedUser.limit(batch_size).offset(batch_size * num).all.map { |x| { id: x.id, phone: x.phone&.match(regexp).to_s } },
+          ParsedUser.order(:id).limit(batch_size).offset(batch_size * num).all.map { |x| { id: x.id, phone: x.phone&.match(regexp).to_s } },
           update_only: [:phone]
         )
         sleep 0.2
