@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_06_090800) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_23_210000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -60,17 +60,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_090800) do
     t.string "patronymic"
   end
 
-  create_table "bookmate_all", id: false, force: :cascade do |t|
-    t.integer "daybirth"
-    t.text "email"
-    t.json "information"
-    t.text "middlename"
-    t.integer "monthbirth"
-    t.text "name"
-    t.text "surname"
-    t.integer "yearbirth"
-  end
-
   create_table "clients", id: false, force: :cascade do |t|
     t.string "config"
     t.string "description"
@@ -104,21 +93,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_090800) do
     t.string "last_name"
     t.string "patronymic"
     t.string "region_id"
-  end
-
-  create_table "kinokassa_ru_orders", id: false, force: :cascade do |t|
-    t.text "email"
-    t.json "information"
-    t.text "phone"
-    t.index ["phone"], name: "index_kinokassa_ru_orders_on_phone"
-  end
-
-  create_table "lukoil_txt", id: false, force: :cascade do |t|
-    t.text "middlename"
-    t.text "name"
-    t.text "phone"
-    t.text "surname"
-    t.index ["phone"], name: "index_lukoil_txt_on_phone"
   end
 
   create_table "moneyman_users", force: :cascade do |t|
@@ -169,24 +143,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_090800) do
     t.string "uid", null: false
     t.datetime "updated_at", null: false
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
-  end
-
-  create_table "one_more_lz2", id: false, force: :cascade do |t|
-    t.text "Car"
-    t.text "DayBirth"
-    t.text "FirstName"
-    t.text "Info"
-    t.text "Inn"
-    t.text "LastName"
-    t.text "MiddleName"
-    t.text "MonthBirth"
-    t.text "Passport"
-    t.text "Snils"
-    t.text "Telephone"
-    t.text "YearBirth"
-    t.text "index"
-    t.index ["Telephone"], name: "index_one_more_lz2_on_Telephone"
-    t.index ["index"], name: "ix_lz2_index"
   end
 
   create_table "opendata", force: :cascade do |t|
@@ -496,17 +452,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_090800) do
     t.string "type"
   end
 
-  create_table "oriflame_ru", id: false, force: :cascade do |t|
-    t.integer "daybirth"
-    t.text "email"
-    t.json "information"
-    t.text "middlename"
-    t.integer "monthbirth"
-    t.text "name"
-    t.text "phone"
-    t.text "surname"
-    t.integer "yearbirth"
-    t.index ["phone"], name: "index_oriflame_ru_on_phone"
+  create_table "otk_table_1", id: false, force: :cascade do |t|
+    t.string "dob"
+    t.string "femidav1"
+    t.string "femidav2"
+    t.string "fio"
+    t.serial "id", null: false
+    t.string "idx"
+    t.string "phone"
+    t.string "status"
   end
 
   create_table "parsed_users", force: :cascade do |t|
@@ -541,29 +495,27 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_090800) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "skyeng_full_csv", id: false, force: :cascade do |t|
-    t.integer "daybirth"
-    t.text "email"
-    t.json "information"
-    t.integer "monthbirth"
-    t.text "name"
-    t.text "phone"
-    t.text "surname"
-    t.integer "yearbirth"
-    t.index ["phone"], name: "index_skyeng_full_csv_on_phone"
+  create_table "retro_mc_femida_ext_complete_users", force: :cascade do |t|
+    t.string "birth_date"
+    t.string "first_name"
+    t.string "info"
+    t.string "last_name"
+    t.string "middle_name"
+    t.string "passport"
+    t.string "passport_old"
+    t.string "phone"
+    t.string "phone_old"
   end
 
-  create_table "sogaz", id: false, force: :cascade do |t|
-    t.text "birth_day"
-    t.text "birth_month"
-    t.text "birth_year"
-    t.text "email"
-    t.text "first_name"
-    t.text "information"
-    t.text "last_name"
-    t.text "phone"
-    t.text "second_name"
-    t.index ["phone"], name: "index_sogaz_on_phone"
+  create_table "retro_mc_femida_ext_users", force: :cascade do |t|
+    t.string "birth_date"
+    t.string "first_name"
+    t.boolean "is_passport_verified"
+    t.boolean "is_phone_verified"
+    t.string "last_name"
+    t.string "middle_name"
+    t.string "passport"
+    t.string "phone"
   end
 
   create_table "sro", force: :cascade do |t|
@@ -731,19 +683,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_06_090800) do
     t.string "g3"
     t.string "g4"
     t.string "g5"
-  end
-
-  create_table "xfit_users", id: false, force: :cascade do |t|
-    t.integer "daybirth"
-    t.text "email"
-    t.json "information"
-    t.text "middlename"
-    t.integer "monthbirth"
-    t.text "name"
-    t.text "phone"
-    t.text "surname"
-    t.integer "yearbirth"
-    t.index ["phone"], name: "index_xfit_users_on_phone"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

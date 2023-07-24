@@ -224,7 +224,7 @@ class Api::Femida::ParserController < ApplicationController
       # Leaks1.where.not(phone: nil).all.to_a.each_slice(50000) do |slice|
       #   ParsedUser.upsert_all(slice.map { |x| { last_name: x.surname, first_name: x.name, middle_name: x.middlename, phone: x.phone } } )
       # end
-      # dfs = DatesFromString.new
+      dfs = DatesFromString.new
       # Leaks2.where.not(phone: nil).all.to_a.each_slice(50000) do |slice|
       #   ParsedUser.upsert_all(
       #     slice.map do |x|
@@ -265,27 +265,65 @@ class Api::Femida::ParserController < ApplicationController
       #   )
       #   puts '=== ==='
       # end
-      # Leaks8.where.not(phone: nil).all.to_a.each_slice(50000) do |slice|
-      #   ParsedUser.upsert_all(
-      #     slice.map do |x|
-      #       date = begin
-      #                dfs.find_date("#{x.daybirth}.#{x.monthbirth}.#{x.yearbirth}").first&.to_date&.strftime('%d.%m.%Y')
-      #              rescue
-      #                ''
-      #              end
-      #       { last_name: x.surname, middle_name: x.middlename, first_name: x.name, address: x.email, phone: x.phone, birth_date: date }
-      #     end
-      #   )
+      hash = {}
+      # File.readlines(Rails.root.join('tmp', 'info_parser', 'spasibosberbank.csv')).each do |line|
+      #   data = line.force_encoding('windows-1251').encode('utf-8').chomp.delete('"').split(";")
+      #   next if data[0] == 'APPLICATION_ID'
+      #   phone = data[10].present? ? data[10] : data[2]
+      #   next if phone.blank?
+      #
+      #   date = begin
+      #            dfs.find_date("#{data[7]}.#{data[8]}.#{data[9]}").first&.to_date&.strftime('%d.%m.%Y')
+      #          rescue
+      #            ''
+      #          end
+      #
+      #   z = {
+      #     last_name: data[4],
+      #     first_name: data[5],
+      #     middle_name: data[6],
+      #     birth_date: date,
+      #     passport: data[12].present? ? data[12] : data[3],
+      #     phone: phone.last(10),
+      #     address: data[15]
+      #   }
+      #   hash[phone.last(10)] = z
       # end
-      regexp = /\d{10}$/
-      batch_size = 50_000
-      (0..(ParsedUser.count.to_f / batch_size).ceil).each do |num|
-        ParsedUser.upsert_all(
-          ParsedUser.order(:id).limit(batch_size).offset(batch_size * num).all.map { |x| { id: x.id, phone: x.phone&.match(regexp).to_s } },
-          update_only: [:phone]
-        )
-        sleep 0.2
+      File.readlines(Rails.root.join('tmp', 'info_parser', 'spasibosberbank.csv')).each do |line|
+        data = line.split("\t")
+        next if data[0] == 'День'
+        phone = data[10].present? ? data[10] : data[2]
+        next if phone.blank?
+
+        date = begin
+                 dfs.find_date("#{data[0]}.#{data[1]}.#{data[2]}").first&.to_date&.strftime('%d.%m.%Y')
+               rescue
+                 ''
+               end
+
+        z = {
+          last_name: data[4],
+          first_name: data[5],
+          middle_name: data[6],
+          birth_date: date,
+          passport: data[12].present? ? data[12] : data[3],
+          phone: data[3].last(10),
+          address: data[14]
+        }
+        hash[phone.last(10)] = z
       end
+
+      hash.values.each_slice(20000) { |slice| ParsedUser.upsert_all(slice) }
+
+      # regexp = /\d{10}$/
+      # batch_size = 50_000
+      # (0..(ParsedUser.count.to_f / batch_size).ceil).each do |num|
+      #   ParsedUser.upsert_all(
+      #     ParsedUser.order(:id).limit(batch_size).offset(batch_size * num).all.map { |x| { id: x.id, phone: x.phone&.match(regexp).to_s } },
+      #     update_only: [:phone]
+      #   )
+      #   sleep 0.2
+      # end
     end
   end
 
@@ -297,7 +335,50 @@ class Api::Femida::ParserController < ApplicationController
 
   def retro
     with_error_handling do
-      RetroJob.perform_later()
+      # RetroJob.perform_later()
+      array = []
+
+      # (1..92000).to_a.each do |id|
+      #   sql = <<-SQL.squish
+      #     SELECT
+      #     r1.last_name as f,
+      #     r1.first_name as i,
+      #     r1.middle_name as o,
+      #     r1.phone as tel,
+      #     r1.birth_date as dr,
+      #     r1.passport as pasp,
+      #     r2.id,
+      #     r2.last_name as f2,
+      #     r2.first_name as i2,
+      #     r2.middle_name as o2,
+      #     r2.phone as tel2,
+      #     r2.birth_date as dr2,
+      #     r2.phone,
+      #     r2.phone_old,
+      #     r2.passport,
+      #     r2.passport_old
+      #     FROM retro_mc_femida_ext_users r1
+      #     LEFT JOIN retro_mc_femida_ext_complete_users r2 on r2.phone_old = r1.phone
+      #     WHERE r1.id = '#{id}'
+      #   SQL
+      #   z = ActiveRecord::Base.connection.execute(sql).to_a
+      # end
+
+      keys = %i[first_name middle_name last_name phone birth_date passport]
+      z1 = RetroMcFemidaExtUser.where(is_phone_verified: nil).select(keys + [:id]).all.to_a
+      z2 = RetroMcFemidaExtCompleteUser.select(keys + [:phone_old, :passport_old]).all.to_a
+      z1.each do |z|
+        zz = z2.select { |x| z.first_name == x.first_name && z.middle_name == x.middle_name && z.last_name == x.last_name && z.birth_date == x.birth_date }
+        ver1 = zz.select { |x| [x.phone, x.phone_old].compact.include?(z.phone) }.present?
+        ver2 = zz.select { |x| [x.passport, x.passport_old].compact.include?(z.passport) }.present?
+        array << { id: z.id, is_phone_verified: ver1, is_passport_verified: ver2 }
+
+        if array.size == 1000 || z.id == 92000
+          RetroMcFemidaExtUser.upsert_all(array, update_only: [:is_passport_verified, :is_phone_verified])
+          puts "============================================================= #{z.id}"
+          array = []
+        end
+      end
     end
   end
 
@@ -363,3 +444,9 @@ class Api::Femida::ParserController < ApplicationController
     end
   end
 end
+
+# ParsedUser.select(:id).where('id > XXX').find_in_batches(batch_size: 10000) { |x| ParsedUser.where(id: x.map(&:id)).delete_all }
+
+# 'info_parser/retro_mc_femida_ext.csv' В нем даны ФИО-ДР-Паспорт
+# сравнить совпадают ли там Паспорта и Номера по ключу ФИО-ДР
+# is_phone_verified, is_passport_verified
