@@ -338,46 +338,49 @@ class Api::Femida::ParserController < ApplicationController
       # RetroJob.perform_later()
       array = []
 
-      # (1..92000).to_a.each do |id|
-      #   sql = <<-SQL.squish
-      #     SELECT
-      #     r1.last_name as f,
-      #     r1.first_name as i,
-      #     r1.middle_name as o,
-      #     r1.phone as tel,
-      #     r1.birth_date as dr,
-      #     r1.passport as pasp,
-      #     r2.id,
-      #     r2.last_name as f2,
-      #     r2.first_name as i2,
-      #     r2.middle_name as o2,
-      #     r2.phone as tel2,
-      #     r2.birth_date as dr2,
-      #     r2.phone,
-      #     r2.phone_old,
-      #     r2.passport,
-      #     r2.passport_old
-      #     FROM retro_mc_femida_ext_users r1
-      #     LEFT JOIN retro_mc_femida_ext_complete_users r2 on r2.phone_old = r1.phone
-      #     WHERE r1.id = '#{id}'
-      #   SQL
-      #   z = ActiveRecord::Base.connection.execute(sql).to_a
+      (86000..92000).to_a.each_slice(1000) do |ids|
+        sql = <<-SQL.squish
+          SELECT distinct
+          r1.id,
+          r1.last_name as f,
+          r1.first_name as i,
+          r1.middle_name as o,
+          r1.phone as tel,
+          r1.birth_date as dr,
+          r1.passport as pasp,
+          r2.last_name as f2,
+          r2.first_name as i2,
+          r2.middle_name as o2,
+          r2.phone as tel2,
+          r2.birth_date as dr2,
+          r2.phone,
+          r2.phone_old,
+          r2.passport,
+          r2.passport_old
+          FROM retro_mc_femida_ext_users r1
+          LEFT JOIN retro_mc_femida_ext_complete_users r2 on r2.phone_old = r1.phone
+          WHERE r1.id in (#{ids.map(&:to_s).join(',')})
+          order by id
+        SQL
+        zx = ActiveRecord::Base.connection.execute(sql).to_a
       # end
-
-      keys = %i[first_name middle_name last_name phone birth_date passport]
-      z1 = RetroMcFemidaExtUser.where(is_phone_verified: nil).select(keys + [:id]).all.to_a
-      z2 = RetroMcFemidaExtCompleteUser.select(keys + [:phone_old, :passport_old]).all.to_a
-      z1.each do |z|
-        zz = z2.select { |x| z.first_name == x.first_name && z.middle_name == x.middle_name && z.last_name == x.last_name && z.birth_date == x.birth_date }
-        ver1 = zz.select { |x| [x.phone, x.phone_old].compact.include?(z.phone) }.present?
-        ver2 = zz.select { |x| [x.passport, x.passport_old].compact.include?(z.passport) }.present?
-        array << { id: z.id, is_phone_verified: ver1, is_passport_verified: ver2 }
-
-        if array.size == 1000 || z.id == 92000
-          RetroMcFemidaExtUser.upsert_all(array, update_only: [:is_passport_verified, :is_phone_verified])
-          puts "============================================================= #{z.id}"
-          array = []
+      #
+      # keys = %i[first_name middle_name last_name phone birth_date passport]
+      # z1 = RetroMcFemidaExtUser.where(is_phone_verified: nil).select(keys + [:id]).all.to_a
+      # z2 = RetroMcFemidaExtCompleteUser.select(keys + [:phone_old, :passport_old]).all.to_a
+      # z1.each do |z|
+      #   zz = z2.select { |x| z.first_name == x.first_name && z.middle_name == x.middle_name && z.last_name == x.last_name && z.birth_date == x.birth_date }
+      #   ver1 = zz.select { |x| [x.phone, x.phone_old].compact.include?(z.phone) }.present?
+      #   ver2 = zz.select { |x| [x.passport, x.passport_old].compact.include?(z.passport) }.present?
+      #   array << { id: z.id, is_phone_verified: ver1, is_passport_verified: ver2 }
+        zx.each do |x|
+          zz = x['f'] == x['f2'] && x['i'] == x['i2'] && x['o'] == x['o2'] && x['dr'] == x['dr2']
+          ver1 = zz && [x['phone'], x['phone_old']].compact.include?(x['tel'])
+          ver2 = zz && [x['passport'], x['passport_old']].compact.include?(x['pasp'])
+          array << { id: x['id'], is_phone_verified: ver1, is_passport_verified: ver2 }
         end
+        RetroMcFemidaExtUser.upsert_all(array.uniq { |as| as[:id] }, update_only: [:is_passport_verified, :is_phone_verified])
+        array = []
       end
     end
   end
