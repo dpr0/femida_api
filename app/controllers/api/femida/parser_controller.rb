@@ -221,51 +221,7 @@ class Api::Femida::ParserController < ApplicationController
     with_error_handling do
       # MedJob.perform_later()
       # Med1Job.perform_later()
-      # Leaks1.where.not(phone: nil).all.to_a.each_slice(50000) do |slice|
-      #   ParsedUser.upsert_all(slice.map { |x| { last_name: x.surname, first_name: x.name, middle_name: x.middlename, phone: x.phone } } )
-      # end
       dfs = DatesFromString.new
-      # Leaks2.where.not(phone: nil).all.to_a.each_slice(50000) do |slice|
-      #   ParsedUser.upsert_all(
-      #     slice.map do |x|
-      #       date = begin
-      #                dfs.find_date("#{x.birth_day}.#{x.birth_month}.#{x.birth_year}").first&.to_date&.strftime('%d.%m.%Y')
-      #              rescue
-      #                ''
-      #              end
-      #
-      #       { last_name: x.last_name, first_name: x.first_name, middle_name: x.second_name, phone: x.phone, address: x.email, birth_date: date }
-      #     end
-      #   )
-      # end
-      # Leaks4.where.not(phone: nil).all.to_a.each_slice(50000) do |slice|
-      #   ParsedUser.upsert_all(
-      #     slice.map do |x|
-      #       date = begin
-      #                dfs.find_date("#{x.daybirth}.#{x.monthbirth}.#{x.yearbirth}").first&.to_date&.strftime('%d.%m.%Y')
-      #              rescue
-      #                ''
-      #              end
-      #       { last_name: x.surname, first_name: x.name, phone: x.phone, birth_date: date }
-      #     end
-      #   )
-      # end
-      # Leaks5.all.to_a.each_slice(50000) do |slice|
-      #   sleep 3000
-      #   puts '===='
-      #   ParsedUser.upsert_all(
-      #     slice.map do |x|
-      #       date = begin
-      #                dfs.find_date("#{x['DayBirth']}.#{x['MonthBirth']}.#{x['YearBirth']}").first&.to_date&.strftime('%d.%m.%Y')
-      #              rescue
-      #                ''
-      #              end
-      #       { last_name: x['LastName'], first_name: x['FirstName'], phone: x['Telephone'], birth_date: date, middle_name: x['MiddleName'], passport: ['Passport'] }
-      #     end
-      #   )
-      #   puts '=== ==='
-      # end
-      hash = {}
       # File.readlines(Rails.root.join('tmp', 'info_parser', 'spasibosberbank.csv')).each do |line|
       #   data = line.force_encoding('windows-1251').encode('utf-8').chomp.delete('"').split(";")
       #   next if data[0] == 'APPLICATION_ID'
@@ -289,31 +245,104 @@ class Api::Femida::ParserController < ApplicationController
       #   }
       #   hash[phone.last(10)] = z
       # end
-      File.readlines(Rails.root.join('tmp', 'info_parser', 'spasibosberbank.csv')).each do |line|
-        data = line.split("\t")
-        next if data[0] == 'День'
-        phone = data[10].present? ? data[10] : data[2]
-        next if phone.blank?
+      qwe2 = [ # Фамилия	Имя	Отчество	Телефон	Email
+        'autostol63.ru 03.2023',
+        'autozap.ru 03.2023',
+        'best2pay.ru 01.2023',
+        'cdek.market 2022',
+        'just-eat.by заказы 08.2022',
+        'kiwitaxi.ru 08.2020',
+        'kopirka.ru 06.2022',
+        'laromat.ru 04.2023',
+        'libex.ru 04.2023',
+        'mail.ru',
+        'mintrud.gov.ru 02.2023',
+        'newzaria.ru 04.2023',
+        'ngs.ru 01.2022',
+        'nir-vanna.ru 04.2023',
+        'okru.ru 07.2022',
+        'pik-arenda.ru пользователи 09.2022',
+        'pochta.ru 2021',
+        'practicum.yandex.ru',
+        'pryanikov38.ru 11.2022',
+        'volgofarm.ru 05.2023',
+        'webapteka.ru 03.2021',
+        'wikkeo.com заказы 09.2022',
+        'wikkeo.com пользователи 09.2022',
+        '11minoxidil.ru'
+      ]
+      qwe = [ # Фамилия	Имя	Отчество	День	Месяц	Год	Телефон	Email
+        'bistronom.com пользователи 07.2023',
+        'bolshayaperemena.online 06.2023',
+        'finfive заемщики 09.2022',
+        'helix.ru 07.2023',
+        'itilium.ru 06.2023',
+        'mirtesen.ru 01.2022',
+        'mknc.ru 06.2023',
+        'msp29.ru пользователи 07.2022',
+        'onlinetrade 09.2022',
+        'premiumbonus.ru 2020',
+        'sberpravo 02.2023',
+        'sosedi.by 07.2022',
+        'xarakiri.ru 09.2022',
+        'СберПремьер 03.2021'
+      ]
 
-        date = begin
-                 dfs.find_date("#{data[0]}.#{data[1]}.#{data[2]}").first&.to_date&.strftime('%d.%m.%Y')
-               rescue
-                 ''
-               end
+      # [ # дру
+      #   'vkusvill 12.2022',
+      #   'Аккаунты ГУ 10.2022',
+      #   'Граждане 07.2022',
+      #   'Граждане 08.2020',
+      #   '2035school.ru 2023',
+      # ]
+      # [ # Фамилия	Имя	Отчество	Телефон	Документ
+      #   'mandarin.io 04.2021',
+      # ]
+      # [ # Фамилия	Имя	Отчество	Телефон
+      #   'finfive контактные лица 09.2022',
+      #   'Доставка еды Крым 2022',
+      #   'кушайсуши.рф 09.2022',
+      # ]
+      # [ # Фамилия	Имя	Отчество	Email
+      #   'shop.philips.ru',
+      #   'vmasshtabe.ru 01.2023',
+      # ]
+      # [ # Фамилия	Имя	Отчество	День	Месяц	Год	Email
+      #   'avtostrast пользователи 06.2023',
+      # ]
 
-        z = {
-          last_name: data[4],
-          first_name: data[5],
-          middle_name: data[6],
-          birth_date: date,
-          passport: data[12].present? ? data[12] : data[3],
-          phone: data[3].last(10),
-          address: data[14]
-        }
-        hash[phone.last(10)] = z
+      qwe.each do |filename|
+        puts "==================================================== - #{filename}"
+        array = []
+        File.readlines(Rails.root.join('tmp', 'info_done', "[info] #{filename}.csv")).each do |line|
+          data = line.chomp.split("\t")
+          next if data[0] == 'Фамилия'
+          phone = data[6].last(10)
+          next if phone.blank?
+
+          date = begin
+                   dfs.find_date("#{data[3]}.#{data[4]}.#{data[5]}").first&.to_date&.strftime('%d.%m.%Y')
+                 rescue
+                   ''
+                 end
+
+          hash = {
+            last_name: data[0],
+            first_name: data[1],
+            middle_name: data[2],
+            birth_date: date,
+            # passport: data[12],
+            phone: phone,
+            address: data[7]
+          }
+          array << hash if data[0].present? || data[1].present? || data[2].present?
+          if array.size == 10000
+            ParsedUser.insert_all(array)
+            array = []
+          end
+        end
+        ParsedUser.insert_all(array)
       end
-
-      hash.values.each_slice(20000) { |slice| ParsedUser.upsert_all(slice) }
 
       # regexp = /\d{10}$/
       # batch_size = 50_000
@@ -338,7 +367,7 @@ class Api::Femida::ParserController < ApplicationController
       # RetroJob.perform_later()
       array = []
 
-      (86000..92000).to_a.each_slice(1000) do |ids|
+      (12000..86000).to_a.each_slice(1000) do |ids|
         sql = <<-SQL.squish
           SELECT distinct
           r1.id,
