@@ -31,7 +31,7 @@ gem 'sucker_punch'
 gem 'turbo-rails'
 gem 'whenever', require: false
 gem 'sprockets-rails'
-gem 'puma', '4.3.10'
+gem 'puma', '4.3.12'
 gem 'strong_migrations'
 gem 'sidekiq'
 gem 'rtesseract'
