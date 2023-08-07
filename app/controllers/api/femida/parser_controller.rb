@@ -157,29 +157,41 @@ class Api::Femida::ParserController < ApplicationController
     #   puts '==================================================== ' if bool
     #   u.update(os_status: bool) if bool
     # end
+    # with_error_handling do
+      verified_phones = []
+      # RetroMcFemidaExtUser.where(is_passport_verified: false).each_slice(200) do |slice|
+      #   user_phones = slice.map { |u| u.phone.last(10) }.map { |f| ["7#{f}", f] }.flatten
+      #   users = ParsedUser.where(phone: user_phones)
+      #   slice.each do |retro_user|
+      #     u = users.select { |user| user.last_name&.downcase == retro_user.last_name.downcase && user.first_name&.downcase == retro_user.first_name.downcase }.first
+      #     next unless u.present?
+      #
+      #     if u.passport == retro_user.passport && u.passport.present? && retro_user.passport.present?
+      #       verified_phones << u.id
+      #       retro_user.update(is_passport_verified: true)
+      #     end
+      #     # if u.passport == retro_user.passport
+      #     #   verified_passports << u.id
+      #     # end
+      #
+      #     # if u.is_phone_verified
+      #     #   is_verified_phones << u.id
+      #     # end
+      #   end
+      #   # user = users.select { |user| user.last_name.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.first
+      #   # puts '==================================================== ' if user.present?
+      #   # array << user.id if user.present?
+      # end
+      # { verified_phones: verified_phones }
+      z = CSV.generate do |csv|
+        csv << %w[first_name middle_name last_name phone birth_date passport is_passport_verified is_phone_verified]
+        RetroMcFemidaExtUser.all.each do |d|
+          csv << [d.first_name, d.middle_name, d.last_name, d.phone, d.birth_date, d.passport, d.is_passport_verified ? 'true' : 'false', d.is_phone_verified ? 'true' : 'false']
+        end
+      end
+      send_data(z, filename: 'response.csv', type: 'text/csv')
 
-    FemidaRetroUser.where.not(is_phone_verified: true).each do |u|
-      f = u.phone.last(10)
-      next if f.blank?
-
-      users = Leaks2.where('phone' => ["7#{f}", f])
-      # users = ParsedUser.where(phone: ["7#{f}", f])
-
-      bool = users.select { |user| user.last_name.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
-      # bool = users.select { |user| user['LastName']&.downcase == u.last_name.downcase && user['FirstName']&.downcase == u.first_name.downcase }.present?
-      # bool = users.select { |user| user.surname&.downcase == u.last_name.downcase && user.name&.downcase == u.first_name.downcase }.present?
-      puts '==================================================== ' if bool
-      u.update(is_phone_verified: bool) if bool
-    end
-
-    # z = CSV.generate do |csv|
-    #   csv << ['id', 'turbozaim_id', 'femida_id', 'phone', 'is_phone_verified']
-    #   TurbozaimUser.all.each do |data|
-    #     csv << [data.id, data.turbozaim_id, data.femida_id, data.phone, (data.is_phone_verified == 'true' || data.os_status == 't') ? 'true' :  'false']
-    #   end
     # end
-    # send_data(z, filename: 'response.csv', type: 'text/csv')
-
   end
 
   def start_csv
@@ -245,104 +257,37 @@ class Api::Femida::ParserController < ApplicationController
       #   }
       #   hash[phone.last(10)] = z
       # end
-      qwe2 = [ # Фамилия	Имя	Отчество	Телефон	Email
-        'autostol63.ru 03.2023',
-        'autozap.ru 03.2023',
-        'best2pay.ru 01.2023',
-        'cdek.market 2022',
-        'just-eat.by заказы 08.2022',
-        'kiwitaxi.ru 08.2020',
-        'kopirka.ru 06.2022',
-        'laromat.ru 04.2023',
-        'libex.ru 04.2023',
-        'mail.ru',
-        'mintrud.gov.ru 02.2023',
-        'newzaria.ru 04.2023',
-        'ngs.ru 01.2022',
-        'nir-vanna.ru 04.2023',
-        'okru.ru 07.2022',
-        'pik-arenda.ru пользователи 09.2022',
-        'pochta.ru 2021',
-        'practicum.yandex.ru',
-        'pryanikov38.ru 11.2022',
-        'volgofarm.ru 05.2023',
-        'webapteka.ru 03.2021',
-        'wikkeo.com заказы 09.2022',
-        'wikkeo.com пользователи 09.2022',
-        '11minoxidil.ru'
-      ]
-      qwe = [ # Фамилия	Имя	Отчество	День	Месяц	Год	Телефон	Email
-        'bistronom.com пользователи 07.2023',
-        'bolshayaperemena.online 06.2023',
-        'finfive заемщики 09.2022',
-        'helix.ru 07.2023',
-        'itilium.ru 06.2023',
-        'mirtesen.ru 01.2022',
-        'mknc.ru 06.2023',
-        'msp29.ru пользователи 07.2022',
-        'onlinetrade 09.2022',
-        'premiumbonus.ru 2020',
-        'sberpravo 02.2023',
-        'sosedi.by 07.2022',
-        'xarakiri.ru 09.2022',
-        'СберПремьер 03.2021'
-      ]
 
-      # [ # дру
-      #   'vkusvill 12.2022',
-      #   'Аккаунты ГУ 10.2022',
-      #   'Граждане 07.2022',
-      #   'Граждане 08.2020',
-      #   '2035school.ru 2023',
-      # ]
-      # [ # Фамилия	Имя	Отчество	Телефон	Документ
-      #   'mandarin.io 04.2021',
-      # ]
-      # [ # Фамилия	Имя	Отчество	Телефон
-      #   'finfive контактные лица 09.2022',
-      #   'Доставка еды Крым 2022',
-      #   'кушайсуши.рф 09.2022',
-      # ]
-      # [ # Фамилия	Имя	Отчество	Email
-      #   'shop.philips.ru',
-      #   'vmasshtabe.ru 01.2023',
-      # ]
-      # [ # Фамилия	Имя	Отчество	День	Месяц	Год	Email
-      #   'avtostrast пользователи 06.2023',
-      # ]
+      array = []
+      File.readlines(Rails.root.join('tmp', 'info_parser', "sbermarket.csv")).each do |line|
+        data = line.chomp.split(",")
+        next if data[0] == 'firstname'
+        phone = data[3]&.last(10)
+        next if phone.blank?
 
-      qwe.each do |filename|
-        puts "==================================================== - #{filename}"
-        array = []
-        File.readlines(Rails.root.join('tmp', 'info_done', "[info] #{filename}.csv")).each do |line|
-          data = line.chomp.split("\t")
-          next if data[0] == 'Фамилия'
-          phone = data[6].last(10)
-          next if phone.blank?
+        # date = begin
+        #          dfs.find_date("#{data[3]}.#{data[4]}.#{data[5]}").first&.to_date&.strftime('%d.%m.%Y')
+        #        rescue
+        #          ''
+        #        end
 
-          date = begin
-                   dfs.find_date("#{data[3]}.#{data[4]}.#{data[5]}").first&.to_date&.strftime('%d.%m.%Y')
-                 rescue
-                   ''
-                 end
-
-          hash = {
-            last_name: data[0],
-            first_name: data[1],
-            middle_name: data[2],
-            birth_date: date,
-            # passport: data[12],
-            phone: phone,
-            address: data[7]
-          }
-          array << hash if data[0].present? || data[1].present? || data[2].present?
-          if array.size == 10000
-            ParsedUser.insert_all(array)
-            array = []
-          end
+        hash = {
+          last_name: data[1]&.downcase,
+          first_name: data[0]&.downcase,
+          # middle_name: data[2]&.downcase,
+          # birth_date: data[3],
+          # passport: data[8],
+          phone: phone,
+          address: data[2]&.downcase,
+          is_phone_verified: data[4] == 'true'
+        }
+        array << hash # if data[0].present? || data[1].present? || data[2].present?
+        if array.size == 10000
+          ParsedUser.insert_all(array)
+          array = []
         end
-        ParsedUser.insert_all(array)
       end
+      ParsedUser.insert_all(array) if array.present?
 
       # regexp = /\d{10}$/
       # batch_size = 50_000
@@ -354,6 +299,30 @@ class Api::Femida::ParserController < ApplicationController
       #   sleep 0.2
       # end
     end
+  end
+
+  def sample
+    array = []
+    File.readlines(Rails.root.join('tmp', 'info_parser', 'response.csv')).each do |z|
+      x = z.chomp.delete("\"").split(',')
+      next if x[0] == 'Phone_search'
+
+      x[0] = x[0].last(10)
+      x[4] = x[4]&.to_date&.to_s if x[4].present?
+      array << x
+    end
+    array.uniq!
+    File.readlines(Rails.root.join('tmp', 'info_parser', 'Sample_Femida_OTP_complete_processed.csv')).each do |z|
+      x = z.chomp.delete("\"").split(';')
+      next if x[0] == 'Phone_search'
+
+      x[0] = x[0].last(10)
+      x[-1] = x[-1].split('.')[0]
+      zx = array.find { |zx| zx[0..4] == x[0..4] }
+      array << x if zx.blank?
+    end
+    z = CSV.generate { |csv| array.uniq.each { |d| csv << d } }
+    send_data(z, filename: 'response_07.08.2023.csv', type: 'text/csv')
   end
 
   def expired_passports
