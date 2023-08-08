@@ -2,7 +2,8 @@
 
 lock '3.17.3'
 
-server fetch(:srv), port: 22, roles: %w(app db web), primary: true
+server 'femida-search.online', port: 22, roles: %w(app db web), primary: true # '80.68.7.92'
+server 'femida-dev.ru', port: 22, roles: %w(app db web), primary: true # '178.185.206.198'
 
 set :rbenv_ruby,      '3.0.5'
 set :application,     'ruby_pub'
@@ -13,9 +14,6 @@ set :keep_releases,   5
 set :user,            'support'
 set :use_sudo,        false
 set :stage,           :production
-set :default_stage,   :staging
-set :stages,          %i(production staging)
-
 set :deploy_to,       "/home/#{fetch(:user)}/#{fetch(:application)}"
 set :whenever_identifier, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
 set :ruby_string,     '$HOME/.rbenv/bin/rbenv exec bundle exec'

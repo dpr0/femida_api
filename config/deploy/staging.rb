@@ -1,1 +1,0 @@
-set :srv, 'femida-dev.ru' # '178.185.206.198'
