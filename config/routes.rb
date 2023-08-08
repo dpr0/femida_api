@@ -31,6 +31,7 @@ Rails.application.routes.draw do
       resources :websbor, only: :index
       resources :bonalog, only: :index
       resources :fedsfm,  only: :index
+      resources :users,   only: [:index, :show]
       resources :fssp_wanted, only: :index
       resources :parser do
         collection do
@@ -40,6 +41,8 @@ Rails.application.routes.draw do
           get :narod
           get :expired_passports
           get :retro
+          get :start_csv
+          get :sample
         end
       end
       resources :esia, only: :index do

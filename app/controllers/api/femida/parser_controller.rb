@@ -3,7 +3,6 @@
 class Api::Femida::ParserController < ApplicationController
   protect_from_forgery with: :null_session
 
-  api :GET, '/whoosh', 'Пользователи whoosh - csv'
   def whoosh
     file = File.read(Rails.root.join('tmp', 'whoosh', 'whoosh-small-users.json'))
     data = JSON.parse(file)
@@ -18,7 +17,6 @@ class Api::Femida::ParserController < ApplicationController
     send_data(file, filename: 'response.csv', type: 'text/csv')
   end
 
-  api :GET, '/phone_rates', 'Пользователи retro_mc_femida_complete_scored - csv'
   def phone_rates
     filename = 'sql1.csv''retro_mc_femida_complete_scored.csv'
     file = File.read(Rails.root.join('tmp', 'parser', filename))
@@ -61,157 +59,349 @@ class Api::Femida::ParserController < ApplicationController
     send_data(array, filename: 'response.csv', type: 'text/csv')
   end
 
-  api :GET, '/turbozaim', 'Пользователи turbozaim - csv'
   def turbozaim
-    filename = 'turbozaim.csv'
-    file = File.read(Rails.root.join('tmp', 'parser', filename))
-    data = CSV.parse(file, headers: true, col_sep: ';')
-    response = []
-    if false
-      data.each do |d|
-        next if TurbozaimUser.find_by(phone: d['phone'])
+    # filename = 'turbozaim.csv'
+    # file = File.read(Rails.root.join('tmp', 'parser', filename))
+    # data = CSV.parse(file, headers: true, col_sep: ';')
+    # response = []
+    # if false
+    #   data.each do |d|
+    #     next if TurbozaimUser.find_by(phone: d['phone'])
+    #
+    #     zz = TurbozaimUser.new
+    #     zz.turbozaim_id = d['id']
+    #     zz.dateopen = d['dateopen']
+    #     zz.last_name = d['last_name']
+    #     zz.first_name = d['first_name']
+    #     zz.middlename = d['middlename']
+    #     zz.birth_date = d['birth_date']
+    #     zz.passport = d['passport']
+    #     zz.phone = d['phone']
+    #     zz.femida_id = d['femida_id']
+    #     zz.is_expired_passport = d['is_expired_passport']
+    #     zz.is_massive_supervisors = d['is_massive_supervisors']
+    #     zz.is_terrorist = d['is_terrorist']
+    #     zz.is_phone_verified = d['is_phone_verified']
+    #     zz.is_18 = d['is_18']
+    #     zz.is_in_black_list = d['is_in_black_list']
+    #     zz.has_double_citizenship = d['has_double_citizenship']
+    #     zz.is_pdl = d['is_pdl']
+    #     zz.os_inns = d['os_inns']
+    #     zz.os_phones = d['os_phones']
+    #     zz.os_passports = d['os_passports']
+    #     zz.os_snils = d['os_snils']
+    #     zz.archive_fssp = d['archive_fssp']
+    #     zz.is_passport_verified = d['is_passport_verified']
+    #     # json = JSON.parse(d['os_data'])
+    #     # zz.os_status = json['status']
+    #     # json['data']&.each do |x|
+    #     #   z2 = zz.turbozaim_user_datas.new
+    #     #   x.keys.each_with_index do |key, index|
+    #     #     z2.send("#{field_by(key, index)}=", x[key])
+    #     #   rescue
+    #     #     begin
+    #     #     z2.send("field#{index}=", x[key])
+    #     #     rescue
+    #     #       puts "------------------------------------------------ > #{key}"
+    #     #     end
+    #     #   end
+    #     # end
+    #     zz.save
+    #   end
+    # end
+    #
+    # if false
+    #   TurbozaimUser.where(is_phone_verified: 'false', os_status: nil).each do |u|
+    #     headers = { 'Authorization': 'Basic b2R5c3NleTo0VVZxbGVoIw==' }
+    #     search = "last_name=#{u.last_name}&first_name=#{u.first_name}&mobile_phone=#{u.phone}&sources%5Bgoogle%5D=on&sources%5Bgoogleplus%5D=on&async=on&mode=xml"
+    #     r1 = Nokogiri::HTML(RestClient.post('https://i-sphere.ru/2.00/check.php', search, headers).body)
+    #     resp = r1.css('response')[0].values
+    #     r2 = Nokogiri::HTML(RestClient.get("https://i-sphere.ru/2.00/showresult.php?id=#{resp[0]}&mode=xml", headers))
+    #     while r2.css('response')[0].values[1] != '1'
+    #       sleep 1
+    #       r = RestClient.get("https://i-sphere.ru/2.00/showresult.php?id=#{resp[0]}&mode=xml", headers)
+    #       r2 = Nokogiri::HTML(r)
+    #     end
+    #     Hash.from_xml(r2.to_xml).dig('html', 'body', 'response', 'source').each do |zx|
+    #       resp = zx.dig('record', 'field')&.second&.dig('fieldvalue')
+    #       if resp
+    #         puts "#{u.phone} - #{resp}"
+    #         response << u
+    #       end
+    #       u.os_status = resp || 'not_found'
+    #       u.save
+    #     end
+    #   end
+    # end
 
-        zz = TurbozaimUser.new
-        zz.turbozaim_id = d['id']
-        zz.dateopen = d['dateopen']
-        zz.last_name = d['last_name']
-        zz.first_name = d['first_name']
-        zz.middlename = d['middlename']
-        zz.birth_date = d['birth_date']
-        zz.passport = d['passport']
-        zz.phone = d['phone']
-        zz.femida_id = d['femida_id']
-        zz.is_expired_passport = d['is_expired_passport']
-        zz.is_massive_supervisors = d['is_massive_supervisors']
-        zz.is_terrorist = d['is_terrorist']
-        zz.is_phone_verified = d['is_phone_verified']
-        zz.is_18 = d['is_18']
-        zz.is_in_black_list = d['is_in_black_list']
-        zz.has_double_citizenship = d['has_double_citizenship']
-        zz.is_pdl = d['is_pdl']
-        zz.os_inns = d['os_inns']
-        zz.os_phones = d['os_phones']
-        zz.os_passports = d['os_passports']
-        zz.os_snils = d['os_snils']
-        zz.archive_fssp = d['archive_fssp']
-        zz.is_passport_verified = d['is_passport_verified']
-        # json = JSON.parse(d['os_data'])
-        # zz.os_status = json['status']
-        # json['data']&.each do |x|
-        #   z2 = zz.turbozaim_user_datas.new
-        #   x.keys.each_with_index do |key, index|
-        #     z2.send("#{field_by(key, index)}=", x[key])
-        #   rescue
-        #     begin
-        #     z2.send("field#{index}=", x[key])
-        #     rescue
-        #       puts "------------------------------------------------ > #{key}"
-        #     end
-        #   end
-        # end
-        zz.save
-      end
-    end
-    TurbozaimUser.where(is_phone_verified: 'false', os_status: nil).each do |u|
-      headers = { 'Authorization': 'Basic b2R5c3NleTo0VVZxbGVoIw==' }
-      search = "last_name=#{u.last_name}&first_name=#{u.first_name}&mobile_phone=#{u.phone}&sources%5Bgoogle%5D=on&sources%5Bgoogleplus%5D=on&async=on&mode=xml"
-      r1 = Nokogiri::HTML(RestClient.post('https://i-sphere.ru/2.00/check.php', search, headers).body)
-      resp = r1.css('response')[0].values
-      r2 = Nokogiri::HTML(RestClient.get("https://i-sphere.ru/2.00/showresult.php?id=#{resp[0]}&mode=xml", headers))
-      while r2.css('response')[0].values[1] != '1'
-        sleep 1
-        r = RestClient.get("https://i-sphere.ru/2.00/showresult.php?id=#{resp[0]}&mode=xml", headers)
-        r2 = Nokogiri::HTML(r)
-      end
-      Hash.from_xml(r2.to_xml).dig('html', 'body', 'response', 'source').each do |zx|
-        resp = zx.dig('record', 'field')&.second&.dig('fieldvalue')
-        if resp
-          puts "#{u.phone} - #{resp}"
-          response << u
+    # TurbozaimUser.where(is_phone_verified: ['false', nil]).each do |u|
+    #   f = u.phone.last(10)
+    #   users = ParsedUser.where(phone: ["7#{f}", f])
+    #
+    #   bool = users.select { |user| user.last_name&.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
+    #   puts '==================================================== ' if bool
+    #   u.update(os_status: bool) if bool
+    # end
+
+    # TurbozaimUser.where(is_phone_verified: ['false', nil]).each do |u|
+    #   f = u.phone.last(10)
+    #   # users = Leaks5.where('Telephone' => ["7#{f}", f])
+    #   users = Leaks2.where(phone: ["7#{f}", f])
+    #
+    #   bool = users.select { |user| user.last_name.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
+    #   # bool = users.select { |user| user['LastName']&.downcase == u.last_name.downcase && user['FirstName']&.downcase == u.first_name.downcase }.present?
+    #   # bool = users.select { |user| user.surname&.downcase == u.last_name.downcase && user.name&.downcase == u.first_name.downcase }.present?
+    #   puts '==================================================== ' if bool
+    #   u.update(os_status: bool) if bool
+    # end
+    # with_error_handling do
+      verified_phones = []
+      # RetroMcFemidaExtUser.where(is_passport_verified: false).each_slice(200) do |slice|
+      #   user_phones = slice.map { |u| u.phone.last(10) }.map { |f| ["7#{f}", f] }.flatten
+      #   users = ParsedUser.where(phone: user_phones)
+      #   slice.each do |retro_user|
+      #     u = users.select { |user| user.last_name&.downcase == retro_user.last_name.downcase && user.first_name&.downcase == retro_user.first_name.downcase }.first
+      #     next unless u.present?
+      #
+      #     if u.passport == retro_user.passport && u.passport.present? && retro_user.passport.present?
+      #       verified_phones << u.id
+      #       retro_user.update(is_passport_verified: true)
+      #     end
+      #     # if u.passport == retro_user.passport
+      #     #   verified_passports << u.id
+      #     # end
+      #
+      #     # if u.is_phone_verified
+      #     #   is_verified_phones << u.id
+      #     # end
+      #   end
+      #   # user = users.select { |user| user.last_name.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.first
+      #   # puts '==================================================== ' if user.present?
+      #   # array << user.id if user.present?
+      # end
+      # { verified_phones: verified_phones }
+      z = CSV.generate do |csv|
+        csv << %w[first_name middle_name last_name phone birth_date passport is_passport_verified is_phone_verified]
+        RetroMcFemidaExtUser.all.each do |d|
+          csv << [d.first_name, d.middle_name, d.last_name, d.phone, d.birth_date, d.passport, d.is_passport_verified ? 'true' : 'false', d.is_phone_verified ? 'true' : 'false']
         end
-        u.os_status = resp || 'not_found'
-        u.save
       end
+      send_data(z, filename: 'response.csv', type: 'text/csv')
+
+    # end
+  end
+
+  def start_csv
+    hash1 = {}
+    File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_is_os_phone_req.csv')).each do |line|
+      key, value = line.chomp.delete('"').split(",")
+      next if key == 'Phone_search'
+      hash1[key.last(10)] = value
+    end
+    hash2 = {}
+    File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_scored_adjusted_score.csv')).each do |line|
+      key, value = line.chomp.delete('"').split(",")
+      next if key == 'phone'
+      hash2[key.last(10)] = value
     end
 
-    array = CSV.generate do |csv|
-      csv << ['phone', 'id']
-      response.each { |x| csv << [x.phone, x.id] }
+    z = CSV.generate do |csv|
+      csv << %w[first_name middle_name last_name phone birth_date passport is_passport_verified is_phone_verified is_os_phone_req adjusted_score]
+      FemidaRetroUser.all.each do |data|
+        array = [
+          data.first_name,
+          data.middle_name,
+          data.last_name,
+          data.phone,
+          data.birth_date,
+          data.passport,
+          data.is_passport_verified,
+          data.is_phone_verified,
+          hash1[data.phone.last(10)],
+          hash2[data.phone.last(10)]
+        ]
+        csv << array
+      end
     end
-    send_data(array, filename: 'response.csv', type: 'text/csv')
+    send_data(z, filename: 'response.csv', type: 'text/csv')
   end
 
   def narod
     with_error_handling do
+      # MedJob.perform_later()
+      # Med1Job.perform_later()
+      dfs = DatesFromString.new
+      # File.readlines(Rails.root.join('tmp', 'info_parser', 'spasibosberbank.csv')).each do |line|
+      #   data = line.force_encoding('windows-1251').encode('utf-8').chomp.delete('"').split(";")
+      #   next if data[0] == 'APPLICATION_ID'
+      #   phone = data[10].present? ? data[10] : data[2]
+      #   next if phone.blank?
+      #
+      #   date = begin
+      #            dfs.find_date("#{data[7]}.#{data[8]}.#{data[9]}").first&.to_date&.strftime('%d.%m.%Y')
+      #          rescue
+      #            ''
+      #          end
+      #
+      #   z = {
+      #     last_name: data[4],
+      #     first_name: data[5],
+      #     middle_name: data[6],
+      #     birth_date: date,
+      #     passport: data[12].present? ? data[12] : data[3],
+      #     phone: phone.last(10),
+      #     address: data[15]
+      #   }
+      #   hash[phone.last(10)] = z
+      # end
+
       array = []
-      File.readlines(Rails.root.join('tmp', 'parser', 'narod', 'med.txt')).each do |line|
-        z = line.chomp.split("\t")
-        name = z.first.split(' ')
-        array << { last_name: name[0],
-                    first_name: name[1],
-                    middle_name: name[2],
-                    birth_date: z[1],
-                    passport: z[3],
-                    phone: z[4],
-                    address: z[5] }
-        if array.size == 1000
+      File.readlines(Rails.root.join('tmp', 'info_parser', "sbermarket.csv")).each do |line|
+        data = line.chomp.split(",")
+        next if data[0] == 'firstname'
+        phone = data[3]&.last(10)
+        next if phone.blank?
+
+        # date = begin
+        #          dfs.find_date("#{data[3]}.#{data[4]}.#{data[5]}").first&.to_date&.strftime('%d.%m.%Y')
+        #        rescue
+        #          ''
+        #        end
+
+        hash = {
+          last_name: data[1]&.downcase,
+          first_name: data[0]&.downcase,
+          # middle_name: data[2]&.downcase,
+          # birth_date: data[3],
+          # passport: data[8],
+          phone: phone,
+          address: data[2]&.downcase,
+          is_phone_verified: data[4] == 'true'
+        }
+        array << hash # if data[0].present? || data[1].present? || data[2].present?
+        if array.size == 10000
           ParsedUser.insert_all(array)
           array = []
         end
       end
+      ParsedUser.insert_all(array) if array.present?
+
+      # regexp = /\d{10}$/
+      # batch_size = 50_000
+      # (0..(ParsedUser.count.to_f / batch_size).ceil).each do |num|
+      #   ParsedUser.upsert_all(
+      #     ParsedUser.order(:id).limit(batch_size).offset(batch_size * num).all.map { |x| { id: x.id, phone: x.phone&.match(regexp).to_s } },
+      #     update_only: [:phone]
+      #   )
+      #   sleep 0.2
+      # end
     end
+  end
+
+  def sample2
+    array1 = []
+    array2 = []
+    File.readlines(Rails.root.join('tmp', 'info_parser', 'response1.csv')).each do |z|
+      x = z.chomp.delete("\"").split(',')
+      next if x[0] == 'Phone_search'
+
+      x[0] = x[0].last(10)
+      x[4] = x[4]&.to_date&.to_s if x[4].present?
+
+      array1 << { phone: x[0],
+                  last_name: x[1],
+                  first_name: x[2],
+                  middle_name: x[3],
+                  birth_date: x[4],
+                  source: x[5],
+                  year: x[6] }
+    end
+    array1.uniq!
+    File.readlines(Rails.root.join('tmp', 'info_parser', 'Sample_Femida_OTP_complete_processed.csv')).each do |z|
+      x = z.chomp.delete("\"").split(';')
+      next if x[0] == 'Phone_search'
+
+      x[0] = x[0].last(10)
+      x[-1] = x[-1].split('.')[0]
+      # zx = array.find { |zx| zx[0..4] == x[0..4] }
+      array2 << { phone: x[0],
+                  last_name: x[1],
+                  first_name: x[2],
+                  middle_name: x[3],
+                  birth_date: x[4],
+                  source: x[5],
+                  year: x[6] }
+    end
+    array2.uniq!
+    array1.each_slice(10000) { |slice| Sample01.insert_all(slice) }
+    array2.each_slice(10000) { |slice| Sample01.insert_all(slice) }
+  end
+
+  def sample
+    array = Sample01.all.to_a.uniq { |d| [d.phone, d.last_name, d.first_name, d.middle_name, d.birth_date] }.sort_by { |d| d.phone }
+    z = CSV.generate do |csv|
+      csv << %w[Phone_search LastName FirstName MiddleName birthday Source Year]
+      array.each do |d|
+        csv << [d.phone, d.last_name, d.first_name, d.middle_name, d.birth_date, d.source, d.year]
+      end
+    end
+    send_data(z, filename: 'response_07.08.2023.csv', type: 'text/csv')
   end
 
   def expired_passports
     with_error_handling do
-      File.readlines(Rails.root.join('tmp', 'parser', 'narod', 'expired_passports.csv')).each do |line|
-        series, number = line.chomp.split(',')
-        pasp = ExpiredPassport.find_or_initialize_by(passp_series: series, passp_number: number)
-        pasp.save unless pasp.id
-      end
+      ExpiredPassportsJob.perform_later()
     end
   end
 
   def retro
     with_error_handling do
+      # RetroJob.perform_later()
       array = []
-      moneyman = []
 
-      File.readlines(Rails.root.join('tmp', 'parser', 'narod', 'moneyman_fios_complete.csv')).each do |line|
-        data = line.force_encoding('windows-1251').encode('utf-8').chomp.delete('"').split(";")
-        next if data[0] == 'client_id'
-        next unless data[7].present? || data[9].present?
-
-        moneyman << {
-          f: data[1],
-          i: data[2],
-          o: data[3],
-          # bd: "#{data[4]}.#{data[5]}.#{data[6]}",
-          phone: data[7],
-          pasp: data[9]
-        }
-      end
-
-      dfs = DatesFromString.new
-      File.readlines(Rails.root.join('tmp', 'parser', 'narod', 'femida_retro.csv')).each do |line|
-        data = line.chomp.split(',')
-        next if data[0] == 'client_id'
-
-        list = moneyman.select { |x| x[:f] == data[3] && x[:i] == data[2] && x[:o] == data[2] }
-        array << {
-          first_name: data[1],
-          middle_name: data[2],
-          last_name: data[3],
-          phone: data[4],
-          birth_date: dfs.find_date(data[5]).first&.to_date&.strftime('%d.%m.%Y'),
-          passport: data[6],
-          is_passport_verified: list.find { |x| x[:pasp] == data[6] }.present?,
-          is_phone_verified: list.find { |x| x[:phone] == data[4] }.present?
-        }
-        if array.size == 1000
-          FemidaRetroUser.insert_all(array)
-          array = []
+      (12000..86000).to_a.each_slice(1000) do |ids|
+        sql = <<-SQL.squish
+          SELECT distinct
+          r1.id,
+          r1.last_name as f,
+          r1.first_name as i,
+          r1.middle_name as o,
+          r1.phone as tel,
+          r1.birth_date as dr,
+          r1.passport as pasp,
+          r2.last_name as f2,
+          r2.first_name as i2,
+          r2.middle_name as o2,
+          r2.phone as tel2,
+          r2.birth_date as dr2,
+          r2.phone,
+          r2.phone_old,
+          r2.passport,
+          r2.passport_old
+          FROM retro_mc_femida_ext_users r1
+          LEFT JOIN retro_mc_femida_ext_complete_users r2 on r2.phone_old = r1.phone
+          WHERE r1.id in (#{ids.map(&:to_s).join(',')})
+          order by id
+        SQL
+        zx = ActiveRecord::Base.connection.execute(sql).to_a
+      # end
+      #
+      # keys = %i[first_name middle_name last_name phone birth_date passport]
+      # z1 = RetroMcFemidaExtUser.where(is_phone_verified: nil).select(keys + [:id]).all.to_a
+      # z2 = RetroMcFemidaExtCompleteUser.select(keys + [:phone_old, :passport_old]).all.to_a
+      # z1.each do |z|
+      #   zz = z2.select { |x| z.first_name == x.first_name && z.middle_name == x.middle_name && z.last_name == x.last_name && z.birth_date == x.birth_date }
+      #   ver1 = zz.select { |x| [x.phone, x.phone_old].compact.include?(z.phone) }.present?
+      #   ver2 = zz.select { |x| [x.passport, x.passport_old].compact.include?(z.passport) }.present?
+      #   array << { id: z.id, is_phone_verified: ver1, is_passport_verified: ver2 }
+        zx.each do |x|
+          zz = x['f'] == x['f2'] && x['i'] == x['i2'] && x['o'] == x['o2'] && x['dr'] == x['dr2']
+          ver1 = zz && [x['phone'], x['phone_old']].compact.include?(x['tel'])
+          ver2 = zz && [x['passport'], x['passport_old']].compact.include?(x['pasp'])
+          array << { id: x['id'], is_phone_verified: ver1, is_passport_verified: ver2 }
         end
+        RetroMcFemidaExtUser.upsert_all(array.uniq { |as| as[:id] }, update_only: [:is_passport_verified, :is_phone_verified])
+        array = []
       end
     end
   end

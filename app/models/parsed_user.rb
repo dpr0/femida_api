@@ -16,5 +16,10 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #
+# Indexes
+#
+#  index_parsed_users_on_passport  (passport)
+#  index_parsed_users_on_phone     (phone)
+#
 class ParsedUser < ApplicationRecord
 end

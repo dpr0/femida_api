@@ -2,7 +2,7 @@
 
 # == Schema Information
 #
-# Table name: femida_retro_users
+# Table name: retro_mc_femida_ext_users
 #
 #  id                   :bigint           not null, primary key
 #  birth_date           :string
@@ -14,5 +14,6 @@
 #  passport             :string
 #  phone                :string
 #
-class FemidaRetroUser < ApplicationRecord
+class RetroMcFemidaExtUser < ApplicationRecord
+  has_many :retro_mc_femida_ext_complete_users, foreign_key: :phone_old, primary_key: :phone
 end
