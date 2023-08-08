@@ -2,7 +2,7 @@
 
 lock '3.17.3'
 
-server '80.68.7.92', port: 22, roles: %w(app db web), primary: true
+server fetch(:srv), port: 22, roles: %w(app db web), primary: true
 
 set :rbenv_ruby,      '3.0.5'
 set :application,     'ruby_pub'
@@ -13,6 +13,9 @@ set :keep_releases,   5
 set :user,            'support'
 set :use_sudo,        false
 set :stage,           :production
+set :default_stage,   :staging
+set :stages,          %i(production staging)
+
 set :deploy_to,       "/home/#{fetch(:user)}/#{fetch(:application)}"
 set :whenever_identifier, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
 set :ruby_string,     '$HOME/.rbenv/bin/rbenv exec bundle exec'

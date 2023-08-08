@@ -3,7 +3,6 @@
 class Api::Femida::ParserController < ApplicationController
   protect_from_forgery with: :null_session
 
-  api :GET, '/whoosh', 'Пользователи whoosh - csv'
   def whoosh
     file = File.read(Rails.root.join('tmp', 'whoosh', 'whoosh-small-users.json'))
     data = JSON.parse(file)
@@ -18,7 +17,6 @@ class Api::Femida::ParserController < ApplicationController
     send_data(file, filename: 'response.csv', type: 'text/csv')
   end
 
-  api :GET, '/phone_rates', 'Пользователи retro_mc_femida_complete_scored - csv'
   def phone_rates
     filename = 'sql1.csv''retro_mc_femida_complete_scored.csv'
     file = File.read(Rails.root.join('tmp', 'parser', filename))
@@ -61,7 +59,6 @@ class Api::Femida::ParserController < ApplicationController
     send_data(array, filename: 'response.csv', type: 'text/csv')
   end
 
-  api :GET, '/turbozaim', 'Пользователи turbozaim - csv'
   def turbozaim
     # filename = 'turbozaim.csv'
     # file = File.read(Rails.root.join('tmp', 'parser', filename))
@@ -301,27 +298,53 @@ class Api::Femida::ParserController < ApplicationController
     end
   end
 
-  def sample
-    array = []
-    File.readlines(Rails.root.join('tmp', 'info_parser', 'response.csv')).each do |z|
+  def sample2
+    array1 = []
+    array2 = []
+    File.readlines(Rails.root.join('tmp', 'info_parser', 'response1.csv')).each do |z|
       x = z.chomp.delete("\"").split(',')
       next if x[0] == 'Phone_search'
 
       x[0] = x[0].last(10)
       x[4] = x[4]&.to_date&.to_s if x[4].present?
-      array << x
+
+      array1 << { phone: x[0],
+                  last_name: x[1],
+                  first_name: x[2],
+                  middle_name: x[3],
+                  birth_date: x[4],
+                  source: x[5],
+                  year: x[6] }
     end
-    array.uniq!
+    array1.uniq!
     File.readlines(Rails.root.join('tmp', 'info_parser', 'Sample_Femida_OTP_complete_processed.csv')).each do |z|
       x = z.chomp.delete("\"").split(';')
       next if x[0] == 'Phone_search'
 
       x[0] = x[0].last(10)
       x[-1] = x[-1].split('.')[0]
-      zx = array.find { |zx| zx[0..4] == x[0..4] }
-      array << x if zx.blank?
+      # zx = array.find { |zx| zx[0..4] == x[0..4] }
+      array2 << { phone: x[0],
+                  last_name: x[1],
+                  first_name: x[2],
+                  middle_name: x[3],
+                  birth_date: x[4],
+                  source: x[5],
+                  year: x[6] }
     end
-    z = CSV.generate { |csv| array.uniq.each { |d| csv << d } }
+    array2.uniq!
+    array1.each_slice(10000) { |slice| Sample01.insert_all(slice) }
+    array2.each_slice(10000) { |slice| Sample01.insert_all(slice) }
+  end
+
+  def sample
+    array = Sample01.all.to_a.uniq { |d| [d.phone, d.last_name, d.first_name, d.middle_name, d.birth_date] }.sort_by { |d| d.phone }
+    z = CSV.generate do |csv|
+      csv << %w[Phone_search LastName FirstName MiddleName birthday Source Year]
+      array.each do |d|
+        csv << [d.phone, d.last_name, d.first_name, d.middle_name, d.birth_date, d.source, d.year]
+      end
+    end
     send_data(z, filename: 'response_07.08.2023.csv', type: 'text/csv')
   end
 
@@ -445,9 +468,3 @@ class Api::Femida::ParserController < ApplicationController
     end
   end
 end
-
-# ParsedUser.select(:id).where('id > XXX').find_in_batches(batch_size: 10000) { |x| ParsedUser.where(id: x.map(&:id)).delete_all }
-
-# 'info_parser/retro_mc_femida_ext.csv' В нем даны ФИО-ДР-Паспорт
-# сравнить совпадают ли там Паспорта и Номера по ключу ФИО-ДР
-# is_phone_verified, is_passport_verified

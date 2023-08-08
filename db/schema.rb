@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_23_210000) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_07_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -516,6 +516,17 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_23_210000) do
     t.string "middle_name"
     t.string "passport"
     t.string "phone"
+  end
+
+  create_table "sample_01", force: :cascade do |t|
+    t.string "birth_date"
+    t.string "first_name"
+    t.string "last_name"
+    t.string "middle_name"
+    t.string "phone"
+    t.string "source"
+    t.string "year"
+    t.index ["phone"], name: "index_sample_01_on_phone"
   end
 
   create_table "sro", force: :cascade do |t|
