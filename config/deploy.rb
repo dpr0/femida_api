@@ -3,11 +3,11 @@
 lock '3.17.3'
 
 server 'femida-search.online', port: 22, roles: %w(app db web), primary: true # '80.68.7.92'
-server 'femida-dev.ru', port: 22, roles: %w(app db web), primary: true # '178.185.206.198'
+# server 'femida-dev.ru', port: 22, roles: %w(app db web), primary: true # '178.185.206.198'
 
 set :rbenv_ruby,      '3.0.5'
 set :application,     'ruby_pub'
-set :repo_url,        'gitlab.com:femida1/ruby_pub.git'
+set :repo_url,        'git@github.com:dpr0/femida_api.git' # 'gitlab.com:femida1/ruby_pub.git'
 set :linked_files,    fetch(:linked_files, []).push('config/cable.yml', 'config/database.yml', 'config/secrets.yml', 'config/master.key', 'config/credentials.yml.enc', '.env')
 set :linked_dirs,     fetch(:linked_dirs, []).push('log', 'tmp/parser', 'tmp/narod', 'tmp/itog_1', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'tmp/session_store', 'vendor/bundle', 'public/system', 'public/uploads')
 set :keep_releases,   5
@@ -29,7 +29,7 @@ namespace :deploy do
   desc 'Make sure local git is in sync with remote.'
   task :check_revision do
     on roles(:app) do
-      unless `git rev-parse HEAD` == `git rev-parse origin/master`
+      unless `git rev-parse HEAD` == `git rev-parse origin/development`
         puts 'WARNING: HEAD is not the same as origin/master'
         puts 'Run `git push` to sync changes.'
         exit
