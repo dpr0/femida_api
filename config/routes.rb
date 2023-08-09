@@ -8,6 +8,8 @@ Rails.application.routes.draw do
   devise_for :users, controllers: { omniauth_callbacks: 'callbacks' }
 
   resources :users
+  resources :files
+
   namespace :api do
     namespace :femida do
       resources :debtors, only: :show
