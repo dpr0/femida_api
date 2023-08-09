@@ -2,9 +2,6 @@
 
 lock '3.17.3'
 
-# server 'femida-search.online', port: 22, roles: %w(app db web), primary: true # '80.68.7.92'
-server 'femida-dev.ru', port: 22, roles: %w(app db web), primary: true # '178.185.206.198'
-
 set :rbenv_ruby,      '3.0.5'
 set :application,     'ruby_pub'
 set :repo_url,        'git@github.com:dpr0/femida_api.git' # 'gitlab.com:femida1/ruby_pub.git'
