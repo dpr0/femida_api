@@ -10,7 +10,7 @@ class Api::Femida::OkbController < ApplicationController
     with_error_handling do
       # #{PATH}certmgr -list -store umy
       # #{PATH}certmgr -list -store uroot
-      str = "
+      str = `
         #{PATH}curl -i -X POST -vvv \\
         --cert-type CERT_SHA1_HASH_PROP_ID:CERT_SYSTEM_STORE_CURRENT_USER:MY \\
         --cert 2fc4461b7e9705acc998203bf19df8296e252861:123 \\
@@ -20,13 +20,10 @@ class Api::Femida::OkbController < ApplicationController
         -d grant_type=client_credentials \\
         -d scope=openid \\
         https://idv-tst.bki-okb.com/auth
-      "
+      `
       resp = system str
-      Rails.logger.info("======================================================================")
       Rails.logger.info(resp)
-      data = JSON.parse(resp)
-      Rails.logger.info(data)
-      data
+      JSON.parse(resp)
     end
   end
 
