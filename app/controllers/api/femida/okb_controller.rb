@@ -22,10 +22,10 @@ class Api::Femida::OkbController < ApplicationController
         https://idv-tst.bki-okb.com/auth
       "
       resp = system str
-      Logger.info("======================================================================")
-      Logger.info(resp)
+      Rails.logger.info("======================================================================")
+      Rails.logger.info(resp)
       data = JSON.parse(resp)
-      Logger.info(data)
+      Rails.logger.info(data)
       data
     end
   end
