@@ -35,6 +35,7 @@ gem 'puma', '4.3.10'
 gem 'strong_migrations'
 gem 'sidekiq'
 gem 'rtesseract'
+gem 'sassc-rails'
 
 group :development, :test do
   gem 'debug'
