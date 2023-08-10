@@ -21,9 +21,8 @@ class Api::Femida::OkbController < ApplicationController
         -d scope=openid \\
         https://idv-tst.bki-okb.com/auth
       `
-      resp = system str
-      Rails.logger.info(resp)
-      JSON.parse(resp)
+      Rails.logger.info(str)
+      JSON.parse(str)
     end
   end
 
