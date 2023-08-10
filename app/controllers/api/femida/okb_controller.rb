@@ -20,7 +20,7 @@ class Api::Femida::OkbController < ApplicationController
     str = "#{curl} -H Content-Type:application/x-www-form-urlencoded #{hash_to_str(hash, 'd')} #{ENV['OKB_HOST']}auth"
     Rails.logger.info('========================================')
     Rails.logger.info(str)
-    auth = parse_json `#{str}`.split("<").last
+    auth = parse_json '{' + `#{str}`.split("{")[1..-1].join
 
     json = {
       submission: {
@@ -48,7 +48,7 @@ class Api::Femida::OkbController < ApplicationController
     str = "#{curl} #{hash_to_str(hash, 'H')} -d '#{json}' #{ENV['OKB_HOST']}verify"
     Rails.logger.info('========================================')
     Rails.logger.info(str)
-    resp = parse_json `#{str}`.split("\n\n").last
+    resp = parse_json '{' + `#{str}`.split("{")[1..-1].join
     render status: :ok, json: resp
     # end
   end
