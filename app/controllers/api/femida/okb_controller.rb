@@ -20,7 +20,7 @@ class Api::Femida::OkbController < ApplicationController
     str = "#{curl} -H Content-Type:application/x-www-form-urlencoded #{hash_to_str(hash, 'd')} #{ENV['OKB_HOST']}auth"
     Rails.logger.info('========================================')
     Rails.logger.info(str)
-    auth = parse_json `#{str}`.split("\n\n").last
+    auth = parse_json `#{str}`.split("<").last
 
     json = {
       submission: {
