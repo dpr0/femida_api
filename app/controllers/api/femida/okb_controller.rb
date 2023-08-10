@@ -40,9 +40,9 @@ class Api::Femida::OkbController < ApplicationController
       }
     }.to_json
     hash = {
-      'Content-Type:': 'application/json',
-      'Authorization:Bearer ': auth['access_token'],
-      'X-Request-Id:': ENV['OKB_CLIENT_SECRET']
+      '"Content-Type:': 'application/json"',
+      '"Authorization:Bearer ': auth['access_token'] + '"',
+      '"X-Request-Id:': ENV['OKB_CLIENT_SECRET'] + '"'
     }
 
     str = "#{curl} #{hash_to_str(hash, 'H')} -d '#{json}' #{ENV['OKB_HOST']}verify"
