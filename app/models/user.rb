@@ -31,6 +31,7 @@ class User < ApplicationRecord
   has_many :access_tokens, class_name: 'Doorkeeper::AccessToken', foreign_key: :resource_owner_id, dependent: :delete_all
   has_many :authorizations, dependent: :destroy
   has_many :devices, dependent: :destroy
+  has_many_attached :attachments
 
   def self.find_for_oauth(auth)
     authorization = Authorization.where(provider: auth[:provider], uid: auth[:uid]).first
