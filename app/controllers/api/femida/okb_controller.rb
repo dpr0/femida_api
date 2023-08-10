@@ -20,8 +20,8 @@ class Api::Femida::OkbController < ApplicationController
     str = "#{curl} -H Content-Type:application/x-www-form-urlencoded #{hash} #{ENV['OKB_HOST']}auth"
     Rails.logger.info '============================================='
     Rails.logger.info str
-    z = `#{str}`
-    auth = parse_json z
+    z1 = `#{str}`
+    auth = parse_json z1.split("r\n\r\n").last
 
     json = {
       submission: {
@@ -42,13 +42,13 @@ class Api::Femida::OkbController < ApplicationController
     }.to_json
     Rails.logger.info('json:')
     Rails.logger.info(json)
-
-    resp = parse_json `#{curl} -H Content-Type:application/json \\
+    z2 = `#{curl} -H Content-Type:application/json \\
       -H "Authorization:Bearer #{auth['access_token']}" \\
       -H "X-Request-Id:#{ENV['OKB_CLIENT_SECRET']}" \\
       -d '#{json}' \\
-      #{ENV['OKB_HOST']}verify
+    #{ENV['OKB_HOST']}verify
     `
+    resp = parse_json z2.split("r\n\r\n").last
     render status: :ok, json: resp
     # end
   end
@@ -57,6 +57,6 @@ class Api::Femida::OkbController < ApplicationController
 
   def parse_json(str)
     Rails.logger.info(str)
-    JSON.parse(str.split("r\n\r\n").last)
+    JSON.parse(str)
   end
 end
