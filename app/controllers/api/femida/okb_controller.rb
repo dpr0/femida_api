@@ -4,9 +4,6 @@ class Api::Femida::OkbController < ApplicationController
   protect_from_forgery with: :null_session
 
   PATH = '/opt/cprocsp/bin/amd64/'
-  HOST = 'https://idv-tst.bki-okb.com/'
-  CLIENT_ID = 'ucb.client.6529_generic'
-  CLIENT_SECRET = 'c2087e61-2c6c-4ed9-ace8-8703ab9f5bda'
 
   api :GET, '/okb/:id', "Проверка ОКБ"
   def show
@@ -43,7 +40,7 @@ class Api::Femida::OkbController < ApplicationController
       }.to_json
       parse_json `#{curl} -H Content-Type:application/json \\
         -H "Authorization:Bearer #{auth['access_token']}" \\
-        -H "X-Request-Id:#{CLIENT_SECRET}" \\
+        -H "X-Request-Id:#{ENV['OKB_CLIENT_SECRET']}" \\
         -d '#{json}' \\
         #{ENV['OKB_HOST']}verify
       `
