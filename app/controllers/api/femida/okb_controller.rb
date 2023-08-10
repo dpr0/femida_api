@@ -10,23 +10,17 @@ class Api::Femida::OkbController < ApplicationController
     # with_error_handling do
       # #{PATH}certmgr -list -store umy
       # #{PATH}certmgr -list -store uroot
-    curl = "#{PATH}curl -i -X POST -vvv --cert #{ENV['CERT_SHA1_THUMBPRINT']}:#{ENV['CERT_PASSWORD']} \\
-            --cert-type CERT_SHA1_HASH_PROP_ID:CERT_SYSTEM_STORE_CURRENT_USER:MY"
-    Rails.logger.info('curl:')
-    Rails.logger.info(curl)
-
+    curl = "#{PATH}curl -i -X POST -vvv --cert #{ENV['CERT_SHA1_THUMBPRINT']}:#{ENV['CERT_PASSWORD']} --cert-type CERT_SHA1_HASH_PROP_ID:CERT_SYSTEM_STORE_CURRENT_USER:MY"
     hash = {
       client_id:      ENV['OKB_CLIENT_ID'],
       client_secret:  ENV['OKB_CLIENT_SECRET'],
       grant_type:    'client_credentials',
       scope:         'openid'
-    }
-
-    Rails.logger.info('hash_map:')
-    Rails.logger.info(hash.map { |key, value| "-d #{key}=#{value} \\" }.join(' '))
-
-    auth = parse_json `#{curl} -H Content-Type:application/x-www-form-urlencoded \\
-      #{hash.map { |key, value| "-d #{key}=#{value} \\" }.join(' ')} #{ENV['OKB_HOST']}auth`
+    }.map { |key, value| "-d #{key}=#{value}" }.join(' ')
+    str = "#{curl} -H Content-Type:application/x-www-form-urlencoded #{hash} #{ENV['OKB_HOST']}auth"
+    Rails.logger.info '============================================='
+    Rails.logger.info str
+    auth = parse_json `#{str}`
 
     json = {
       submission: {
