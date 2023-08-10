@@ -16,12 +16,11 @@ class Api::Femida::OkbController < ApplicationController
       client_secret:  ENV['OKB_CLIENT_SECRET'],
       grant_type:    'client_credentials',
       scope:         'openid'
-    }.map { |key, value| "-d #{key}=#{value}" }.join(' ')
-    str = "#{curl} -H Content-Type:application/x-www-form-urlencoded #{hash} #{ENV['OKB_HOST']}auth"
-    Rails.logger.info '============================================='
-    Rails.logger.info str
-    z1 = `#{str}`
-    auth = parse_json z1.split("r\n\r\n").last
+    }
+    str = "#{curl} -H Content-Type:application/x-www-form-urlencoded #{hash_to_str(hash, 'd')} #{ENV['OKB_HOST']}auth"
+    Rails.logger.info('========================================')
+    Rails.logger.info(str)
+    auth = parse_json `#{str}`.split("\n\n").last
 
     json = {
       submission: {
@@ -40,20 +39,25 @@ class Api::Femida::OkbController < ApplicationController
         telephone_number: '+79031234567'
       }
     }.to_json
-    Rails.logger.info('json:')
-    Rails.logger.info(json)
-    z2 = `#{curl} -H Content-Type:application/json \\
-      -H "Authorization:Bearer #{auth['access_token']}" \\
-      -H "X-Request-Id:#{ENV['OKB_CLIENT_SECRET']}" \\
-      -d '#{json}' \\
-    #{ENV['OKB_HOST']}verify
-    `
-    resp = parse_json z2.split("r\n\r\n").last
+    hash = {
+      'Content-Type:': 'application/json',
+      'Authorization:Bearer ': auth['access_token'],
+      'X-Request-Id:': ENV['OKB_CLIENT_SECRET']
+    }
+
+    str = "#{curl} #{hash_to_str(hash, 'H')} -d '#{json}' #{ENV['OKB_HOST']}verify"
+    Rails.logger.info('========================================')
+    Rails.logger.info(str)
+    resp = parse_json `#{str}`.split("\n\n").last
     render status: :ok, json: resp
     # end
   end
 
   private
+
+  def hash_to_str(hash, letter)
+    hash.map { |key, value| "\"-#{letter} #{key}#{value}\"" }.join(' ')
+  end
 
   def parse_json(str)
     Rails.logger.info(str)
