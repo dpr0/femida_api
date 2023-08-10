@@ -20,7 +20,8 @@ class Api::Femida::OkbController < ApplicationController
     str = "#{curl} -H Content-Type:application/x-www-form-urlencoded #{hash} #{ENV['OKB_HOST']}auth"
     Rails.logger.info '============================================='
     Rails.logger.info str
-    auth = parse_json `#{str}`
+    z = `#{str}`
+    auth = parse_json z
 
     json = {
       submission: {
