@@ -56,7 +56,7 @@ class Api::Femida::OkbController < ApplicationController
   private
 
   def hash_to_str(hash, letter)
-    hash.map { |key, value| "\"-#{letter} #{key}#{letter == 'd' ? '=' : ''}#{value}\"" }.join(' ')
+    hash.map { |key, value| "-#{letter} #{key}#{letter == 'd' ? '=' : ''}#{value}" }.join(' ')
   end
 
   def parse_json(str)
