@@ -24,9 +24,9 @@ class Api::Femida::OkbController < ApplicationController
 
   def parse_json(method, str)
     url = "#{ENV['OKB_HOST']}#{method}"
-    Rails.logger.info("=========== #{method.capitalize} REQUEST: ============ \n #{str} #{url}")
+    # Rails.logger.info("=========== #{method.capitalize} REQUEST: ============ \n #{str} #{url}")
     s = "{#{`#{str} #{url}`.split('{')[1..].join}"
-    Rails.logger.info("=========== #{method.capitalize} RESPONSE: =========== \n #{s}")
+    # Rails.logger.info("=========== #{method.capitalize} RESPONSE: =========== \n #{s}")
     JSON.parse(s)
   end
 end

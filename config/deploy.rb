@@ -10,7 +10,6 @@ set :linked_dirs,     fetch(:linked_dirs, []).push('log', 'tmp/parser', 'tmp/nar
 set :keep_releases,   5
 set :user,            'support'
 set :use_sudo,        false
-set :stage,           :production
 set :deploy_to,       "/home/#{fetch(:user)}/#{fetch(:application)}"
 set :whenever_identifier, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
 set :ruby_string,     '$HOME/.rbenv/bin/rbenv exec bundle exec'
@@ -48,7 +47,7 @@ namespace :deploy do
   desc 'Runs rake assets:precompile'
   task :precompile do
     on roles(:app) do
-      execute("cd #{fetch(:application)}/current && RAILS_ENV=production #{fetch(:ruby_string)} rake assets:precompile") if fetch(:stage) == :production
+      execute("cd #{fetch(:application)}/current && RAILS_ENV=production #{fetch(:ruby_string)} rake assets:precompile")
     end
   end
 
