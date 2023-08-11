@@ -7,21 +7,21 @@ html
     // = javascript_include_tag 'application', 'data-turbo-track': 'reload', defer: true
     // = favicon_link_tag asset_path('favicon.png')
 
-    title femida-search.online
+    title #{ENV['HOST']}
     meta charset="utf-8"
     meta name="yandex-verification" content="b99dd95dd6cc6f01"
     meta name="viewport"            content="width=device-width,initial-scale=1"
-    meta name="description"         content="femida-search.online"
+    meta name="description"         content="#{ENV['HOST']}"
     meta name="twitter:card"        content="summary_large_image"
-    meta property="og:url"          content="https://femida-search.online/"
-    meta property="og:site_name"    content="femida-search.online"
+    meta property="og:url"          content="https://#{ENV['HOST']}/"
+    meta property="og:site_name"    content="#{ENV['HOST']}"
     meta property="og:type"         content="website"
-    meta property="og:title"        content="femida-search.online"
+    meta property="og:title"        content="#{ENV['HOST']}"
     meta property="og:locale"       content="ru_RU"
-    meta property="og:description"  content="femida-search.online"
-    meta property="og:image"        content="#{asset_path('og-image.png')}"
+    meta property="og:description"  content="#{ENV['HOST']}"
+    //meta property="og:image"        content="#{asset_path('og-image.png')}"
     meta content="IE=edge"          http-equiv="X-UA-Compatible"
-    link rel="canonical"  href="https://femida-search.online"
+    link rel="canonical"  href="https://#{ENV['HOST']}"
     link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;800&display=swap"
 
