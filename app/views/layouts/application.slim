@@ -3,9 +3,9 @@ html
   head
     = csrf_meta_tags
     = csp_meta_tag
-    // = stylesheet_link_tag 'application', 'data-turbo-track': 'reload'
-    // = javascript_include_tag 'application', 'data-turbo-track': 'reload', defer: true
-    // = favicon_link_tag asset_path('favicon.png')
+    = stylesheet_link_tag 'application', 'data-turbo-track': 'reload'
+    = javascript_include_tag 'application', 'data-turbo-track': 'reload', defer: true
+    = favicon_link_tag asset_path('favicon.png')
 
     title #{ENV['HOST']}
     meta charset="utf-8"
@@ -19,7 +19,7 @@ html
     meta property="og:title"        content="#{ENV['HOST']}"
     meta property="og:locale"       content="ru_RU"
     meta property="og:description"  content="#{ENV['HOST']}"
-    //meta property="og:image"        content="#{asset_path('og-image.png')}"
+    meta property="og:image"        content="#{asset_path('og-image.png')}"
     meta content="IE=edge"          http-equiv="X-UA-Compatible"
     link rel="canonical"  href="https://#{ENV['HOST']}"
     link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"

@@ -123,3 +123,11 @@ and to just run the system specs:
 ```sh
 $ dip rspec system
 ```
+
+
+# /opt/cprocsp/bin/amd64/certmgr -inst -store umy -pfx -pin 123 -file ~/cert/TestUser23.pfx
+# /opt/cprocsp/bin/amd64/certmgr -list -store umy
+# /opt/cprocsp/bin/amd64/certmgr -list -store uroot
+# SHA1 Thumbprint    : 2fc4461b7e9705acc998203bf19df8296e252861
+# CERT_SHA1_THUMBPRINT=2fc4461b7e9705acc998203bf19df8296e252861 # .env
+# CERT_PASSWORD=123                                             # .env
