@@ -12,7 +12,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :femida do
-      resources :okb,     only: :show
+      resources :okb,     only: :create
       resources :debtors, only: :show
       resources :fsin,    only: :show
       resources :egrul,   only: :show
