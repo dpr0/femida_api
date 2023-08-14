@@ -300,7 +300,7 @@ class Api::Femida::ParserController < ApplicationController
 
   def sample1
     array1 = []
-    File.readlines(Rails.root.join('tmp', 'info_parser', 'ekapusta_femida_sample.csv')).each do |z|
+    File.readlines(Rails.root.join('tmp', 'parser', 'ekapusta_femida_sample.csv')).each do |z|
       x = z.chomp.delete("\"").split(',')
       next if x[0] == 'customer_id'
 
