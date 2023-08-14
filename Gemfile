@@ -33,7 +33,6 @@ gem 'whenever', require: false
 gem 'sprockets-rails'
 gem 'puma', '4.3.10'
 gem 'strong_migrations'
-gem 'sidekiq'
 gem 'rtesseract'
 gem 'sassc-rails'
 
@@ -47,7 +46,6 @@ group :development, :test do
   gem 'standard'
   gem 'rspec-rails'
   gem 'factory_bot_rails'
-
   gem 'bcrypt_pbkdf'
   gem 'capistrano3-puma', '4.0.0', require: false
   gem 'capistrano',         require: false
@@ -60,7 +58,6 @@ group :development, :test do
   gem 'listen'
   gem 'rubocop'
   gem 'web-console'
-
 end
 
 group :test do

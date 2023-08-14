@@ -52,6 +52,18 @@ namespace :deploy do
     end
   end
 
+  task :yarn_build do
+    on roles(:app) do
+      execute("cd #{fetch(:application)}/current && yarn build --watch")
+    end
+  end
+
+  task :yarn_build_css do
+    on roles(:app) do
+      execute("cd #{fetch(:application)}/current && yarn build:css --watch")
+    end
+  end
+
   desc 'Initial Deploy'
   task :initial do
     on roles(:app) do
