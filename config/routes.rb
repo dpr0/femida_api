@@ -45,7 +45,8 @@ Rails.application.routes.draw do
           get :expired_passports
           get :retro
           get :start_csv
-          get :sample
+          get :sample1
+          get :sample2
         end
       end
       resources :esia, only: :index do

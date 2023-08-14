@@ -298,54 +298,56 @@ class Api::Femida::ParserController < ApplicationController
     end
   end
 
-  def sample2
+  def sample1
     array1 = []
-    array2 = []
-    File.readlines(Rails.root.join('tmp', 'info_parser', 'response1.csv')).each do |z|
+    File.readlines(Rails.root.join('tmp', 'info_parser', 'ekapusta_femida_sample.csv')).each do |z|
       x = z.chomp.delete("\"").split(',')
-      next if x[0] == 'Phone_search'
+      next if x[0] == 'customer_id'
 
-      x[0] = x[0].last(10)
-      x[4] = x[4]&.to_date&.to_s if x[4].present?
+      x[6] = x[6].last(10)
+      x[1] = x[1]&.to_date&.to_s if x[1].present?
 
-      array1 << { phone: x[0],
-                  last_name: x[1],
-                  first_name: x[2],
-                  middle_name: x[3],
-                  birth_date: x[4],
-                  source: x[5],
-                  year: x[6] }
+      array1 << {
+        customer_id: x[0],
+        last_name: x[2],
+        first_name: x[3],
+        middle_name: x[4],
+        phone: x[6],
+        passport: x[5],
+        birth_date: nil
+      }
     end
     array1.uniq!
-    File.readlines(Rails.root.join('tmp', 'info_parser', 'Sample_Femida_OTP_complete_processed.csv')).each do |z|
-      x = z.chomp.delete("\"").split(';')
-      next if x[0] == 'Phone_search'
-
-      x[0] = x[0].last(10)
-      x[-1] = x[-1].split('.')[0]
-      # zx = array.find { |zx| zx[0..4] == x[0..4] }
-      array2 << { phone: x[0],
-                  last_name: x[1],
-                  first_name: x[2],
-                  middle_name: x[3],
-                  birth_date: x[4],
-                  source: x[5],
-                  year: x[6] }
-    end
-    array2.uniq!
-    array1.each_slice(10000) { |slice| Sample01.insert_all(slice) }
-    array2.each_slice(10000) { |slice| Sample01.insert_all(slice) }
+    array1.each_slice(10000) { |slice| Sample02.insert_all(slice) }
   end
 
-  def sample
-    array = Sample01.all.to_a.uniq { |d| [d.phone, d.last_name, d.first_name, d.middle_name, d.birth_date] }.sort_by { |d| d.phone }
-    z = CSV.generate do |csv|
-      csv << %w[Phone_search LastName FirstName MiddleName birthday Source Year]
-      array.each do |d|
-        csv << [d.phone, d.last_name, d.first_name, d.middle_name, d.birth_date, d.source, d.year]
+  def sample2
+    array = Sample02.where(resp: nil).all
+    array.each do |sample|
+      data = {
+        key: ENV['ODYSSEY_KEY'],
+        firstname: sample.first_name,
+        lastname: sample.last_name,
+        middlename: sample.middle_name,
+        phone_number: sample.phone,
+        passport_series_and_number: sample.passport,
+      }
+      begin
+        resp = RestClient.post("#{ENV['ODYSSEY_HOST']}/v2.0/name_standart", data)
+        if resp.code == 200
+          z = JSON.parse resp.body
+          sample.update(resp: z['data']) if z['data'].present?
+        end
+      rescue Exception => e
       end
     end
-    send_data(z, filename: 'response_07.08.2023.csv', type: 'text/csv')
+    # z = CSV.generate do |csv|
+    #   csv << %w[Phone_search LastName FirstName MiddleName birthday Source Year]
+    #   array.each do |d|
+    #     csv << [d.phone, d.last_name, d.first_name, d.middle_name, d.birth_date, d.source, d.year]
+    #   end
+    # end
+    # send_data(z, filename: 'response_14.08.2023.csv', type: 'text/csv')
   end
 
   def expired_passports
