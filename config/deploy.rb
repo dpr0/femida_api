@@ -54,13 +54,13 @@ namespace :deploy do
 
   task :yarn_build do
     on roles(:app) do
-      execute("cd #{fetch(:application)}/current && yarn build --watch")
+      execute("cd #{fetch(:application)}/current && yarn build")
     end
   end
 
   task :yarn_build_css do
     on roles(:app) do
-      execute("cd #{fetch(:application)}/current && yarn build:css --watch")
+      execute("cd #{fetch(:application)}/current && yarn build:css")
     end
   end
 

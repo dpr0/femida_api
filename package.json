@@ -24,6 +24,6 @@
   "scripts": {
     "standard": "standard",
     "build": "node esbuild.config.mjs",
-    "build:css": "sass ./app/assets/stylesheets/application.scss ./app/assets/builds/application.css --no-source-map --load-path=node_modules"
+    "build:css": "sass ./app/assets/stylesheets/application.bulma.scss:./app/assets/builds/application.css --no-source-map --load-path=node_modules"
   }
 }
