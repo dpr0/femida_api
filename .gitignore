@@ -54,4 +54,3 @@ dump.rdb
 /yarn-error.log
 /config/cred.byebug_history
 .byebug_history
-package-lock.json
