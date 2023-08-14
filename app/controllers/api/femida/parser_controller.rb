@@ -322,8 +322,7 @@ class Api::Femida::ParserController < ApplicationController
   end
 
   def sample2
-    array = Sample02.where(resp: nil).all
-    array.each do |sample|
+    Sample02.where(resp: nil).order(id: :desc).each do |sample|
       data = {
         key: ENV['ODYSSEY_KEY'],
         firstname: sample.first_name,
