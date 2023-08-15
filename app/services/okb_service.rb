@@ -1,6 +1,5 @@
 class OkbService
   def self.call(params)
-    Rails.logger.info(params)
     if params[:document].present?
       params[:document] = params[:document].to_i
       params[:issued_at] = params[:issued_at].to_date.to_s if params[:issued_at].present?
@@ -14,7 +13,6 @@ class OkbService
     elsif params[:telephone_number].size == 11
       '+' + params[:telephone_number]
     end
-    Rails.logger.info(params)
 
     curl = "/opt/cprocsp/bin/amd64/curl -i -X POST -vvv --cert #{ENV['CERT_SHA1_THUMBPRINT']}:#{ENV['CERT_PASSWORD']} --cert-type CERT_SHA1_HASH_PROP_ID:CERT_SYSTEM_STORE_CURRENT_USER:MY"
     hash = { client_id: ENV['OKB_CLIENT_ID'], client_secret: ENV['OKB_CLIENT_SECRET'], grant_type: 'client_credentials', scope: 'openid' }

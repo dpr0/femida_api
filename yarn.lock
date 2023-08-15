@@ -624,7 +624,7 @@ esbuild-rails@^1.0.7:
   dependencies:
     fast-glob "^3.2.12"
 
-esbuild@^0.19.2:
+esbuild@^0.19.1:
   version "0.19.2"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.19.2.tgz#b1541828a89dfb6f840d38538767c6130dca2aac"
   integrity sha512-G6hPax8UbFakEj3hWO0Vs52LQ8k3lnBhxZWomUJDxfz3rZTLqF5k/FCzuNdLx2RbpBiQQF9H9onlDDH1lZsnjg==
