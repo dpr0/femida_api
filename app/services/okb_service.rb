@@ -6,6 +6,12 @@ class OkbService
       params.delete :document
       params.delete :issued_at
     end
+    params[:phone] = if params[:phone].size == 10
+      '+7' + params[:phone]
+    elsif params[:phone].size == 11
+      '+' + params[:phone]
+    end
+
     curl = "/opt/cprocsp/bin/amd64/curl -i -X POST -vvv --cert #{ENV['CERT_SHA1_THUMBPRINT']}:#{ENV['CERT_PASSWORD']} --cert-type CERT_SHA1_HASH_PROP_ID:CERT_SYSTEM_STORE_CURRENT_USER:MY"
     hash = { client_id: ENV['OKB_CLIENT_ID'], client_secret: ENV['OKB_CLIENT_SECRET'], grant_type: 'client_credentials', scope: 'openid' }
     auth = parse_json :auth, "#{curl} -H Content-Type:application/x-www-form-urlencoded #{hash_to_str(hash, 'd')}"
