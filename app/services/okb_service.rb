@@ -2,10 +2,12 @@ class OkbService
   def self.call(params)
     if params[:document].present?
       params[:document] = params[:document].to_i
+      params[:issued_at] = params[:issued_at].to_date.to_s if params[:issued_at].present?
     else
       params.delete :document
       params.delete :issued_at
     end
+    params[:birthday] = params[:birthday].to_date.to_s
     params[:telephone_number] = if params[:telephone_number].size == 10
       '+7' + params[:telephone_number]
     elsif params[:telephone_number].size == 11
