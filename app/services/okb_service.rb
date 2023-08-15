@@ -1,6 +1,11 @@
 class OkbService
   def self.call(params)
-    params[:document] = params[:document].to_i if params[:document].present?
+    if params[:document].present?
+      params[:document] = params[:document].to_i
+    else
+      params.delete :document
+      params.delete :issued_at
+    end
     curl = "/opt/cprocsp/bin/amd64/curl -i -X POST -vvv --cert #{ENV['CERT_SHA1_THUMBPRINT']}:#{ENV['CERT_PASSWORD']} --cert-type CERT_SHA1_HASH_PROP_ID:CERT_SYSTEM_STORE_CURRENT_USER:MY"
     hash = { client_id: ENV['OKB_CLIENT_ID'], client_secret: ENV['OKB_CLIENT_SECRET'], grant_type: 'client_credentials', scope: 'openid' }
     auth = parse_json :auth, "#{curl} -H Content-Type:application/x-www-form-urlencoded #{hash_to_str(hash, 'd')}"
