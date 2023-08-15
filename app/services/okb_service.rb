@@ -6,10 +6,10 @@ class OkbService
       params.delete :document
       params.delete :issued_at
     end
-    params[:phone] = if params[:phone].size == 10
-      '+7' + params[:phone]
-    elsif params[:phone].size == 11
-      '+' + params[:phone]
+    params[:telephone_number] = if params[:telephone_number].size == 10
+      '+7' + params[:telephone_number]
+    elsif params[:telephone_number].size == 11
+      '+' + params[:telephone_number]
     end
 
     curl = "/opt/cprocsp/bin/amd64/curl -i -X POST -vvv --cert #{ENV['CERT_SHA1_THUMBPRINT']}:#{ENV['CERT_PASSWORD']} --cert-type CERT_SHA1_HASH_PROP_ID:CERT_SYSTEM_STORE_CURRENT_USER:MY"
