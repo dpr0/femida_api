@@ -1,5 +1,6 @@
 class OkbService
   def self.call(params)
+    params[:document] = params[:document].to_i if params[:document].present?
     curl = "/opt/cprocsp/bin/amd64/curl -i -X POST -vvv --cert #{ENV['CERT_SHA1_THUMBPRINT']}:#{ENV['CERT_PASSWORD']} --cert-type CERT_SHA1_HASH_PROP_ID:CERT_SYSTEM_STORE_CURRENT_USER:MY"
     hash = { client_id: ENV['OKB_CLIENT_ID'], client_secret: ENV['OKB_CLIENT_SECRET'], grant_type: 'client_credentials', scope: 'openid' }
     auth = parse_json :auth, "#{curl} -H Content-Type:application/x-www-form-urlencoded #{hash_to_str(hash, 'd')}"
@@ -16,11 +17,11 @@ class OkbService
   end
 
   def self.parse_json(method, str)
-    # JSON.parse("{#{`#{str} #{ENV['OKB_HOST']}#{method}`.split('{')[1..].join}")
-    url = "#{ENV['OKB_HOST']}#{method}"
-    Rails.logger.info("=========== #{method.capitalize} REQUEST: ============ \n #{str} #{url}")
-    s = "{#{`#{str} #{url}`.split('{')[1..].join}"
-    Rails.logger.info("=========== #{method.capitalize} RESPONSE: =========== \n #{s}")
-    JSON.parse(s)
+    JSON.parse("{#{`#{str} #{ENV['OKB_HOST']}#{method}`.split('{')[1..].join}")
+    # url = "#{ENV['OKB_HOST']}#{method}"
+    # Rails.logger.info("=========== #{method.capitalize} REQUEST: ============ \n #{str} #{url}")
+    # s = "{#{`#{str} #{url}`.split('{')[1..].join}"
+    # Rails.logger.info("=========== #{method.capitalize} RESPONSE: =========== \n #{s}")
+    # JSON.parse(s)
   end
 end
