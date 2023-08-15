@@ -322,22 +322,26 @@ class Api::Femida::ParserController < ApplicationController
   end
 
   def sample2
-    Sample02.where(resp: nil).order(id: :desc).each do |sample|
-      data = {
-        key: ENV['ODYSSEY_KEY'],
-        firstname: sample.first_name,
-        lastname: sample.last_name,
-        middlename: sample.middle_name,
-        phone_number: sample.phone,
-        passport_series_and_number: sample.passport,
-      }
-      begin
-        resp = RestClient.post("#{ENV['ODYSSEY_HOST']}/v2.0/name_standart", data)
-        if resp.code == 200
-          z = JSON.parse resp.body
-          sample.update(resp: z['data']) if z['data'].present?
+    with_error_handling do
+      Sample02.where(resp: nil).order('id desc').each do |sample|
+        data = {
+          key: ENV['ODYSSEY_KEY'],
+          firstname: sample.first_name,
+          lastname: sample.last_name,
+          middlename: sample.middle_name,
+          phone_number: sample.phone,
+          passport_series_and_number: sample.passport,
+        }
+        begin
+          resp = RestClient::Request.execute(method: :post, url: "#{ENV['ODYSSEY_HOST']}/v2.0/name_standart", payload: data, timeout: 2, read_timeout: 2, open_timeout: 2)
+          if resp.code == 200
+            z = JSON.parse resp.body
+            sample.update(resp: z['data']) if z['data'].present?
+          else
+            sample.update(resp: '')
+          end
+        rescue Exception => e
         end
-      rescue Exception => e
       end
     end
     # z = CSV.generate do |csv|

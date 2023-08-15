@@ -5,7 +5,7 @@ class OkbService
     auth = parse_json :auth, "#{curl} -H Content-Type:application/x-www-form-urlencoded #{hash_to_str(hash, 'd')}"
     t = Time.now
     json = { applicant: params, submission: { identifier: t.to_i.to_s, date: t.to_date.to_s, app_date: t.to_date.to_s } }.to_json
-    hash = { 'Content-Type:': 'application/json', 'Authorization:Bearer ': auth['access_token'], 'X-Request-Id:': ENV['OKB_CLIENT_SECRET'] }
+    hash = { 'Content-Type:': 'application/json', 'Authorization:Bearer ': auth['access_token'], 'X-Request-Id:': Digest::UUID.uuid_v4 }
     parse_json :verify, "#{curl} #{hash_to_str(hash, 'H')} -d '#{json}'"
   end
 
