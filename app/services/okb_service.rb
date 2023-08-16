@@ -30,11 +30,11 @@ class OkbService
   end
 
   def self.parse_json(method, str)
-    JSON.parse("{#{`#{str} #{ENV['OKB_HOST']}#{method}`.split('{')[1..].join}")
-    # url = "#{ENV['OKB_HOST']}#{method}"
-    # Rails.logger.info("=========== #{method.capitalize} REQUEST: ============ \n #{str} #{url}")
-    # s = "{#{`#{str} #{url}`.split('{')[1..].join}"
-    # Rails.logger.info("=========== #{method.capitalize} RESPONSE: =========== \n #{s}")
-    # JSON.parse(s)
+    # JSON.parse("{#{`#{str} #{ENV['OKB_HOST']}#{method}`.split('{')[1..].join}")
+    url = "#{ENV['OKB_HOST']}#{method}"
+    Rails.logger.info("=========== #{method.capitalize} REQUEST: ============ \n #{str} #{url}")
+    s = "{#{`#{str} #{url}`.split('{')[1..].join}"
+    Rails.logger.info("=========== #{method.capitalize} RESPONSE: =========== \n #{s}")
+    JSON.parse(s)
   end
 end
