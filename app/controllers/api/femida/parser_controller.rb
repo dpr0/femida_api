@@ -323,7 +323,7 @@ class Api::Femida::ParserController < ApplicationController
 
   def sample2
     with_error_handling do
-      Sample02.where(resp: nil).order('id desc').each do |sample|
+      Sample02.where.not('resp is not null').each do |sample|
         data = {
           key: ENV['ODYSSEY_KEY'],
           firstname: sample.first_name,
