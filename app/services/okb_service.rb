@@ -37,6 +37,10 @@ class OkbService
     Rails.logger.info("=========== #{method.capitalize} REQUEST: ============ \n #{str} #{url}")
     s = "{#{`#{str} #{url}`.split('{')[1..].join}"
     Rails.logger.info("=========== #{method.capitalize} RESPONSE: =========== \n #{s}")
-    JSON.parse(s)
+    begin
+      JSON.parse(s)
+    rescue
+      { score: -5 } # 14866733913
+    end
   end
 end

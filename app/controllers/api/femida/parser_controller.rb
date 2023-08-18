@@ -148,7 +148,7 @@ class Api::Femida::ParserController < ApplicationController
             surname: u.first_name.downcase,
             patronymic: u.middlename.downcase,
             consent: 'Y',
-          )
+          ) if u.phone.present? && u.birth_date.present? && u.last_name.present? && u.first_name.present? && u.middlename.present?
           resp && resp['score'] > 2
         end
         puts '==================================================== ' if bool
