@@ -134,14 +134,19 @@ class Api::Femida::ParserController < ApplicationController
     #   end
     # end
 
-    # TurbozaimUser.where(is_phone_verified: ['false', nil]).each do |u|
-    #   f = u.phone.last(10)
-    #   users = ParsedUser.where(phone: ["7#{f}", f])
-    #
-    #   bool = users.select { |user| user.last_name&.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
-    #   puts '==================================================== ' if bool
-    #   u.update(os_status: bool) if bool
-    # end
+    TurbozaimUser.where(is_phone_verified: ['false', nil]).each do |u|
+      f = u.phone.last(10)
+      bool = u.os_status == 't'
+      bool ||= ParsedUser.where(phone: ["7#{f}", f]).select { |user| user.last_name&.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
+      bool ||= OkbService.call(
+        telephone_number: u.phone,
+        birthday: u.birth_date,
+        name: u.last_name.downcase,
+        surname: u.first_name.downcase
+      )['score'] > 2
+      puts '==================================================== ' if bool
+      u.update(is_phone_verified_2: bool) if bool
+    end
 
     # TurbozaimUser.where(is_phone_verified: ['false', nil]).each do |u|
     #   f = u.phone.last(10)

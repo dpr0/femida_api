@@ -8,6 +8,10 @@
 #  passp_number :string
 #  passp_series :string
 #
+# Indexes
+#
+#  expired_passports_passp_series_index  (passp_series)
+#
 class ExpiredPassport < ApplicationRecord
 
 end
