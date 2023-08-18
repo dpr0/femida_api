@@ -152,7 +152,7 @@ class Api::Femida::ParserController < ApplicationController
           resp && resp['score'] > 2
         end
         puts '==================================================== ' if bool
-        u.update(is_phone_verified_2: bool) if bool
+        u.update(is_phone_verified_2: bool)
         array << u.id if bool
       end
       render status: :ok, json: array
