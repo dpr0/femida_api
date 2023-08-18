@@ -144,7 +144,9 @@ class Api::Femida::ParserController < ApplicationController
           telephone_number: u.phone,
           birthday: u.birth_date,
           name: u.last_name.downcase,
-          surname: u.first_name.downcase
+          surname: u.first_name.downcase,
+          patronymic: u.middlename.downcase,
+          consent: 'Y',
         )['score'] > 2
         puts '==================================================== ' if bool
         # u.update(is_phone_verified_2: bool) if bool
