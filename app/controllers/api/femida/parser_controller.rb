@@ -134,14 +134,24 @@ class Api::Femida::ParserController < ApplicationController
     #   end
     # end
 
-    # TurbozaimUser.where(is_phone_verified: ['false', nil]).each do |u|
-    #   f = u.phone.last(10)
-    #   users = ParsedUser.where(phone: ["7#{f}", f])
-    #
-    #   bool = users.select { |user| user.last_name&.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
-    #   puts '==================================================== ' if bool
-    #   u.update(os_status: bool) if bool
-    # end
+    with_error_handling do
+      TurbozaimUser.where(is_phone_verified: ['false', nil]).each do |u|
+        array = []
+        f = u.phone.last(10)
+        bool = u.os_status == 't'
+        bool ||= ParsedUser.where(phone: ["7#{f}", f]).select { |user| user.last_name&.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
+        bool ||= OkbService.call(
+          telephone_number: u.phone,
+          birthday: u.birth_date,
+          name: u.last_name.downcase,
+          surname: u.first_name.downcase
+        )['score'] > 2
+        puts '==================================================== ' if bool
+        # u.update(is_phone_verified_2: bool) if bool
+        array << u.id if bool
+      end
+      array
+    end
 
     # TurbozaimUser.where(is_phone_verified: ['false', nil]).each do |u|
     #   f = u.phone.last(10)
@@ -180,13 +190,13 @@ class Api::Femida::ParserController < ApplicationController
       #   # array << user.id if user.present?
       # end
       # { verified_phones: verified_phones }
-      z = CSV.generate do |csv|
-        csv << %w[first_name middle_name last_name phone birth_date passport is_passport_verified is_phone_verified]
-        RetroMcFemidaExtUser.all.each do |d|
-          csv << [d.first_name, d.middle_name, d.last_name, d.phone, d.birth_date, d.passport, d.is_passport_verified ? 'true' : 'false', d.is_phone_verified ? 'true' : 'false']
-        end
-      end
-      send_data(z, filename: 'response.csv', type: 'text/csv')
+      # z = CSV.generate do |csv|
+      #   csv << %w[first_name middle_name last_name phone birth_date passport is_passport_verified is_phone_verified]
+      #   RetroMcFemidaExtUser.all.each do |d|
+      #     csv << [d.first_name, d.middle_name, d.last_name, d.phone, d.birth_date, d.passport, d.is_passport_verified ? 'true' : 'false', d.is_phone_verified ? 'true' : 'false']
+      #   end
+      # end
+      # send_data(z, filename: 'response.csv', type: 'text/csv')
 
     # end
   end

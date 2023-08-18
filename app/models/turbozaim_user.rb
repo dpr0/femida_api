@@ -15,8 +15,10 @@
 #  is_in_black_list       :string
 #  is_massive_supervisors :string
 #  is_passport_verified   :string
+#  is_passport_verified_2 :boolean
 #  is_pdl                 :string
 #  is_phone_verified      :string
+#  is_phone_verified_2    :boolean
 #  is_terrorist           :string
 #  last_name              :string
 #  middlename             :string
