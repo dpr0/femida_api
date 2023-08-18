@@ -61,7 +61,6 @@ class ApplicationController < ActionController::Base
     sum % 11 % 10
   end
 
-
   def get(path, headers: {}, parse: true, key: :str, host: HOST)
     puts host + path
     resp = RestClient.get(host + path, headers)
