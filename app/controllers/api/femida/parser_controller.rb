@@ -158,7 +158,7 @@ class Api::Femida::ParserController < ApplicationController
         rescue
           false
         end
-        puts '==================================================== ' if bool
+        Rails.logger.info '==================================================== ' if bool
         u.update(is_phone_verified_2: bool)
         array1 << u.id if bool
       end
