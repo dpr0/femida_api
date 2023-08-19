@@ -48,7 +48,11 @@ class InnService
     end
 
     def req(url, payload, method: :post)
-      JSON.parse RestClient::Request.execute(url: url, payload: payload, method: method, verify_ssl: false)
+      hash = { url: url, payload: payload, method: method }
+      Rails.logger "Request: #{hash}"
+      resp = RestClient::Request.execute(hash)
+      Rails.logger "Response: #{resp}"
+      JSON.parse resp
     end
   end
 end
