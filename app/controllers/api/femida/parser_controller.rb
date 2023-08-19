@@ -162,13 +162,17 @@ class Api::Femida::ParserController < ApplicationController
 
       array2 = []
       TurbozaimUser.where(is_passport_verified: ['false', nil]).each do |u|
-        resp = InnService.call(
-          passport: u.passport,
-          date: u.birth_date,
-          f: u.last_name.downcase,
-          i: u.first_name.downcase,
-          o: u.middlename.downcase
-        )
+        resp = begin
+                 InnService.call(
+                   passport: u.passport,
+                   date: u.birth_date,
+                   f: u.last_name.downcase,
+                   i: u.first_name.downcase,
+                   o: u.middlename.downcase
+                 )
+               rescue
+                 false
+               end
         bool = resp && resp['inn'].present? && resp['error_code'].blank?
         puts '==================================================== ' if bool
         u.update(is_passport_verified_2: bool)
