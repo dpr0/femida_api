@@ -152,6 +152,8 @@ class Api::Femida::ParserController < ApplicationController
             )
           end
           resp && resp['score'] > 2
+        rescue
+          false
         end
         puts '==================================================== ' if bool
         u.update(is_phone_verified_2: bool)
