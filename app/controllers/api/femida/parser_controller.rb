@@ -136,7 +136,10 @@ class Api::Femida::ParserController < ApplicationController
 
     # with_error_handling do
       array1 = []
-      TurbozaimUser.where(is_phone_verified: ['false', nil], is_phone_verified_2: nil).each do |u|
+      TurbozaimUser
+        .where.not(is_phone_verified: true)
+        .where.not(is_phone_verified_2: true)
+        .each do |u|
         f = u.phone.last(10)
         bool = u.os_status == 't'
         bool ||= ParsedUser.where(phone: ["7#{f}", f]).select { |user| user.last_name&.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
@@ -161,7 +164,7 @@ class Api::Femida::ParserController < ApplicationController
       end
 
       array2 = []
-      TurbozaimUser.where(is_passport_verified: ['false', nil]).each do |u|
+      TurbozaimUser.where(is_passport_verified: ['false', nil], is_passport_verified_2: nil).each do |u|
         resp = begin
                  InnService.call(
                    passport: u.passport,
