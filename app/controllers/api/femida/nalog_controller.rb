@@ -9,7 +9,7 @@ class Api::Femida::NalogController < ApplicationController
   api :GET, '/nalog/ogr?id=:inn', 'Проверка на ограничение' # 668608997290
   def ogr
     with_error_handling do
-      inn = check_inn(params[:id])
+      inn = InnService.check_inn(params[:id])
       hash = captcha_proc
       hash[:mode] = 'search-ogr'
       hash[:queryOgr] = inn
@@ -37,7 +37,7 @@ class Api::Femida::NalogController < ApplicationController
   api :GET, '/nalog/uchr?id=:inn', 'Проверка на учредителей и гендиректоров' # 502419236001
   def uchr
     with_error_handling do
-      inn = check_inn(params[:id])
+      inn = InnService.check_inn(params[:id])
       hash = captcha_proc
       hash[:mode] = 'search-upr-uchr'
       hash[:queryUpr] = inn
@@ -67,7 +67,7 @@ class Api::Femida::NalogController < ApplicationController
   api :GET, '/nalog/ip?id=:inn', 'Проверка на ИП' # 772830410106
   def ip
     with_error_handling do
-      inn = check_inn(params[:id])
+      inn = InnService.check_inn(params[:id])
       hash = captcha_proc
       hash[:mode] = 'search-ip'
       hash[:queryIp] = inn

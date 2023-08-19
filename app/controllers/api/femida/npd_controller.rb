@@ -6,7 +6,7 @@ class Api::Femida::NpdController < ApplicationController
   api :GET, '/npd/:inn', 'Проверка самозанятого - json: {"status": boolean, "message": string} (https://npd.nalog.ru/check-status/)'
   def show
     with_error_handling do
-      inn = check_inn(params[:id])
+      inn = InnService.check_inn(params[:id])
 
       x = 0
       while x < RETRY

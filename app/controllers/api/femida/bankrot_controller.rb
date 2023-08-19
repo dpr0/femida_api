@@ -9,7 +9,7 @@ class Api::Femida::BankrotController < ApplicationController
   api :GET, '/bankrot/:inn', ''
   def show
     with_error_handling do
-      @inn = check_inn(params[:id])
+      @inn = InnService.check_inn(params[:id])
       data = get('cmpbankrupts')['pageData'] + get('prsnbankrupts')['pageData']
       infos = data.map { |x| get_info_by(x['guid']) }
       publications = data.map { |x| get_by(x['guid'])['pageData'] }

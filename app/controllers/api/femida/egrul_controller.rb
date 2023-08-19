@@ -7,7 +7,7 @@ class Api::Femida::EgrulController < ApplicationController
   api :GET, '/egrul/:inn', "Проверка ЕГРЮЛ (#{URL}index.html)"
   def show
     with_error_handling do
-      @inn = check_inn(params[:id])
+      @inn = InnService.check_inn(params[:id])
       @errors = []
       token = begin
                 post_request

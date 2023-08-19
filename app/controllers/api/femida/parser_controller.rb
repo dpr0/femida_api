@@ -135,27 +135,44 @@ class Api::Femida::ParserController < ApplicationController
     # end
 
     # with_error_handling do
-      array = []
-      TurbozaimUser.where(is_phone_verified: ['false', nil]).each do |u|
+      array1 = []
+      TurbozaimUser.where(is_phone_verified: ['false', nil], is_phone_verified_2: nil).each do |u|
         f = u.phone.last(10)
         bool = u.os_status == 't'
         bool ||= ParsedUser.where(phone: ["7#{f}", f]).select { |user| user.last_name&.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
         bool ||= begin
-          resp = OkbService.call(
-            telephone_number: u.phone,
-            birthday: u.birth_date,
-            name: u.last_name.downcase,
-            surname: u.first_name.downcase,
-            patronymic: u.middlename.downcase,
-            consent: 'Y',
-          ) if u.phone.present? && u.birth_date.present? && u.last_name.present? && u.first_name.present? && u.middlename.present?
+          if u.phone.present? && u.birth_date.present? && u.last_name.present? && u.first_name.present? && u.middlename.present?
+            resp = OkbService.call(
+              telephone_number: u.phone,
+              birthday: u.birth_date,
+              surname: u.last_name.downcase,
+              name: u.first_name.downcase,
+              patronymic: u.middlename.downcase,
+              consent: 'Y'
+            )
+          end
           resp && resp['score'] > 2
         end
         puts '==================================================== ' if bool
         u.update(is_phone_verified_2: bool)
-        array << u.id if bool
+        array1 << u.id if bool
       end
-      render status: :ok, json: array
+
+      array2 = []
+      TurbozaimUser.where(is_passport_verified: ['false', nil]).each do |u|
+        resp = InnService.call(
+          passport: u.passport,
+          date: u.birth_date,
+          f: u.last_name.downcase,
+          i: u.first_name.downcase,
+          o: u.middlename.downcase
+        )
+        bool = resp && resp['inn'].present? && resp['error_code'].blank?
+        puts '==================================================== ' if bool
+        u.update(is_passport_verified_2: bool)
+        array2 << u.id if bool
+      end
+      render status: :ok, json: { array1: array1, array2: array2 }
     # end
 
     # TurbozaimUser.where(is_phone_verified: ['false', nil]).each do |u|
