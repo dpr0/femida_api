@@ -44,6 +44,7 @@ Rails.application.routes.draw do
           get :narod
           get :expired_passports
           get :retro
+          get :retro2
           get :start_csv
           get :sample1
           get :sample2

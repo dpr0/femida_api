@@ -405,7 +405,7 @@ class Api::Femida::ParserController < ApplicationController
       # RetroJob.perform_later()
       array = []
 
-      (12000..86000).to_a.each_slice(1000) do |ids|
+      (86000..92000).to_a.each_slice(1000) do |ids|
         sql = <<-SQL.squish
           SELECT distinct
           r1.id,
@@ -449,6 +449,47 @@ class Api::Femida::ParserController < ApplicationController
         RetroMcFemidaExtUser.upsert_all(array.uniq { |as| as[:id] }, update_only: [:is_passport_verified, :is_phone_verified])
         array = []
       end
+    end
+  end
+
+  def retro2
+    with_error_handling do
+      array = []
+      RetroMcFemidaExtUser.where(is_passport_verified: false).each do |u|
+        resp = begin
+                 InnService.call(
+                   passport: u.passport,
+                   date: u.birth_date,
+                   f: u.last_name.downcase,
+                   i: u.first_name.downcase,
+                   o: u.middle_name.downcase
+                 )
+               rescue
+                 false
+               end
+        bool = resp && resp['inn'].present? && resp['error_code'].blank?
+        Rails.logger.info('==================================================== ') if bool
+        bool2 = u.is_phone_verified
+        bool2 ||= ParsedUser.where(phone: ["7#{u.phone}", u.phone]).select { |user| user.last_name&.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
+        bool2 ||= begin
+                   if u.phone.present? && u.birth_date.present? && u.last_name.present? && u.first_name.present? && u.middle_name.present?
+                     resp = OkbService.call(
+                       telephone_number: u.phone,
+                       birthday: u.birth_date,
+                       surname: u.last_name.downcase,
+                       name: u.first_name.downcase,
+                       patronymic: u.middle_name.downcase,
+                       consent: 'Y'
+                     )
+                   end
+                   resp && resp['score'] > 2
+                 rescue
+                   false
+                 end
+        u.update(is_passport_verified: bool, is_phone_verified: bool2)
+        array << u.id if bool
+      end
+      array
     end
   end
 
