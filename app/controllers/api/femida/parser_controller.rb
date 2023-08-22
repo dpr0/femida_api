@@ -426,7 +426,6 @@ class Api::Femida::ParserController < ApplicationController
 
           resp['data'].each do |data|
             info = JSON.parse(data['Information'])['D']
-            byebug
           end
         end
 
