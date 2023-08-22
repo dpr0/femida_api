@@ -4,15 +4,17 @@
 #
 # Table name: sample_02
 #
-#  id          :bigint           not null, primary key
-#  birth_date  :string
-#  first_name  :string
-#  last_name   :string
-#  middle_name :string
-#  passport    :string
-#  phone       :string
-#  resp        :text
-#  customer_id :integer
+#  id                   :bigint           not null, primary key
+#  birth_date           :string
+#  first_name           :string
+#  is_passport_verified :boolean
+#  is_phone_verified    :boolean
+#  last_name            :string
+#  middle_name          :string
+#  passport             :string
+#  phone                :string
+#  resp                 :text
+#  customer_id          :integer
 #
 # Indexes
 #

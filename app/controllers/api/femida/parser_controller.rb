@@ -232,6 +232,48 @@ class Api::Femida::ParserController < ApplicationController
     # end
   end
 
+  def turbozaim2
+    t_users = TurbozaimUser.all.index_by(&:turbozaim_id)
+    zz = CSV.generate(col_sep: ';') do |csv|
+      csv << %w[id type dateopen last_name first_name middlename birth_date passport phone is_expired_passport is_massive_supervisors is_terrorist is_phone_verified is_18 is_in_black_list has_double_citizenship is_pdl os_inns os_phones os_passports os_snils archive_fssp is_passport_verified score legal_scoring is_criminal score_v2 is_phone_verified is_phone_verified_2 is_passport_verified is_passport_verified_2]
+      File.readlines(Rails.root.join('tmp', 'parser', 'turbozaim_xlsx.csv')).each do |z|
+        x = z.chomp.delete("\"").split(';')
+        next if x[0] == 'id'
+
+        tu = t_users[x[0]]
+        xx = tu.blank? ? [] : [bool(tu.is_phone_verified), bool(tu.is_phone_verified_2), bool(tu.is_passport_verified), bool(tu.is_passport_verified_2)]
+        csv << x + xx
+      end
+    end
+    send_data(zz, filename: 'response.csv', type: 'text/csv')
+  end
+
+  def turbozaim3
+    zz = CSV.generate(col_sep: ';') do |csv|
+      csv << %w[id type dateopen last_name first_name middlename birth_date passport phone is_expired_passport is_massive_supervisors is_terrorist is_phone_verified is_18 is_in_black_list has_double_citizenship is_pdl os_inns os_phones os_passports os_snils archive_fssp is_passport_verified score legal_scoring is_criminal score_v2 is_phone_verified is_phone_verified_2 is_passport_verified is_passport_verified_2]
+      File.readlines(Rails.root.join('tmp', 'parser', 'response_.csv')).each do |z|
+        x = z.chomp.delete("\"").split(';')
+        next if x[0] == 'id'
+        z = x[-4..-1]
+        x.insert(26, '') if x.size == 30
+        (x[-1] = x[-2]) if x[-2] == 'TRUE' && x[-1] != 'TRUE'
+        (x[-3] = x[-4]) if x[-4] == 'TRUE' && x[-3] != 'TRUE'
+        puts("#{x[0]} --- #{z} >> #{x[-4..-1]}") if (x[-2] == 'TRUE' && z[-1] != 'TRUE') || (x[-4] == 'TRUE' && z[-3] != 'TRUE')
+        csv << x
+      end
+    end
+    send_data(zz, filename: 'response.csv', type: 'text/csv')
+  end
+
+  def bool(b)
+    case b
+    when 'true' then 'TRUE'
+    when 'false' then 'FALSE'
+    else
+      ''
+    end
+  end
+
   def start_csv
     hash1 = {}
     File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_is_os_phone_req.csv')).each do |line|
@@ -363,28 +405,33 @@ class Api::Femida::ParserController < ApplicationController
   end
 
   def sample2
-    with_error_handling do
-      Sample02.where.not('resp is not null').each do |sample|
-        data = {
-          key: ENV['ODYSSEY_KEY'],
-          firstname: sample.first_name,
-          lastname: sample.last_name,
-          middlename: sample.middle_name,
-          phone_number: sample.phone,
-          passport_series_and_number: sample.passport,
-        }
-        begin
-          resp = RestClient::Request.execute(method: :post, url: "#{ENV['ODYSSEY_HOST']}/v2.0/name_standart", payload: data, timeout: 2, read_timeout: 2, open_timeout: 2)
-          if resp.code == 200
-            z = JSON.parse resp.body
-            sample.update(resp: z['data']) if z['data'].present?
-          else
-            sample.update(resp: '')
+    # with_error_handling do
+      resp = RestClient::Request.execute(
+        method: :post,
+        url: "#{ENV['FEMIDA_PERSONS_API_HOST']}/api/users/login",
+        payload: { email: ENV['FEMIDA_PERSONS_API_LOGIN'], password: ENV['FEMIDA_PERSONS_API_PASSWORD'] }
+      )
+      body = JSON.parse resp.body if resp.code == 200
+      Sample02.in_batches.each do |batch|
+        batch.each do |sample|
+          hash = {
+            last_name: sample.last_name.downcase,
+            first_name: sample.first_name.downcase,
+            middle_name: sample.middle_name.downcase
+          }
+          hash[:birthdate] = sample.birth_date if sample.birth_date.present?
+
+          resp = JSON.parse RestClient.post("#{ENV['FEMIDA_PERSONS_API_HOST']}/api/persons/search", hash, 'Authorization' => "Bearer #{body['auth_token']}")
+          next if resp['count'] == 0
+
+          resp['data'].each do |data|
+            info = JSON.parse(data['Information'])['D']
+            byebug
           end
-        rescue Exception => e
         end
+
       end
-    end
+    # end
     # z = CSV.generate do |csv|
     #   csv << %w[Phone_search LastName FirstName MiddleName birthday Source Year]
     #   array.each do |d|

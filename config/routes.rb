@@ -41,6 +41,8 @@ Rails.application.routes.draw do
           get :whoosh
           get :phone_rates
           get :turbozaim
+          get :turbozaim2
+          get :turbozaim3
           get :narod
           get :expired_passports
           get :retro
