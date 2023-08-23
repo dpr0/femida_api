@@ -425,7 +425,7 @@ class Api::Femida::ParserController < ApplicationController
           }
           z = eval(u.resp) if u.resp && u.resp[0..2] == '[{"'
           drs = z.select { |smpl| smpl['ИМЯ']&.downcase == "#{hash[:last_name]} #{hash[:first_name]} #{hash[:middle_name]}" && smpl['ПАСПОРТ']&.downcase == u.passport }
-                 .map { |x| x['ДАТА РОЖДЕНИЯ'] }.uniq
+                 .map { |x| x['ДАТА РОЖДЕНИЯ'] }.uniq if z.present?
           is_passport_verified ||= if drs.present?
             hash[:birthdate] = drs.first
             resp = JSON.parse RestClient.post(
@@ -447,7 +447,7 @@ class Api::Femida::ParserController < ApplicationController
             end
           end
           is_passport_verified ||= begin
-            if drs.first.present?
+            if drs&.first.present?
               inn = InnService.call(
                 passport: u.passport,
                 date: drs.first,
@@ -495,7 +495,7 @@ class Api::Femida::ParserController < ApplicationController
           rescue
             false
           end
-          array << { id: u.id, birth_date: drs.join(','), is_passport_verified: is_passport_verified, is_phone_verified: is_phone_verified }
+          array << { id: u.id, birth_date: drs&.join(','), is_passport_verified: is_passport_verified, is_phone_verified: is_phone_verified }
         end
         Sample02.upsert_all(array, update_only: [:birth_date, :is_passport_verified, :is_phone_verified])
       end
