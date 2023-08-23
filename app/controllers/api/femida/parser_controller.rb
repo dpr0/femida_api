@@ -416,7 +416,6 @@ class Api::Femida::ParserController < ApplicationController
       Sample02.in_batches.each do |batch|
         array = []
         batch.each do |u|
-          byebug
           is_phone_verified = nil
           is_passport_verified = nil
           hash = {

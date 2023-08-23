@@ -65,7 +65,3 @@ group :test do
   gem 'cuprite'
   gem 'simplecov', require: false
 end
-
-group :development do
-  gem 'web-console'
-end
