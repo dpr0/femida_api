@@ -382,7 +382,7 @@ class Api::Femida::ParserController < ApplicationController
     end
   end
 
-  def sample1
+  def sample
     array1 = []
     File.readlines(Rails.root.join('tmp', 'parser', 'ekapusta_femida_sample.csv')).each do |z|
       x = z.chomp.delete("\"").split(',')
@@ -403,6 +403,20 @@ class Api::Femida::ParserController < ApplicationController
     end
     array1.uniq!
     array1.each_slice(10000) { |slice| Sample02.insert_all(slice) }
+  end
+
+  def sample1
+    File.readlines(Rails.root.join('tmp', 'parser', 'ekapusta_femida_sample_2.csv')).each_slice(1000) do |slice|
+      hash = {}
+      slice.each do |z|
+        x = z.chomp.split(',')
+        next if x[0] == 'customer_id'
+
+        hash[x[0].to_i] = x[7]
+      end
+      array = Sample02.where(customer_id: hash.keys).map { |u| { id: u.id, birth_date: hash[u.customer_id] } }
+      Sample02.upsert_all(array, update_only: [:birth_date])
+    end
   end
 
   def sample2
@@ -570,7 +584,9 @@ class Api::Femida::ParserController < ApplicationController
   def retro2
     with_error_handling do
       array = []
-      RetroMcFemidaExtUser.where(is_passport_verified: false).each do |u|
+      RetroMcFemidaExtUser.where(is_passport_verified: false)
+                          .or(RetroMcFemidaExtUser.where(is_phone_verified: false))
+                          .each do |u|
         resp = begin
                  InnService.call(
                    passport: u.passport,
