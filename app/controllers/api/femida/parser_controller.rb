@@ -416,8 +416,8 @@ class Api::Femida::ParserController < ApplicationController
       Sample02.in_batches.each do |batch|
         array = []
         batch.each do |u|
-          is_phone_verified = nil
-          is_passport_verified = nil
+          is_phone_verified = u.is_phone_verified
+          is_passport_verified = u.is_passport_verified
           hash = {
             last_name: u.last_name.downcase,
             first_name: u.first_name.downcase,
@@ -425,7 +425,7 @@ class Api::Femida::ParserController < ApplicationController
           }
           z = eval(u.resp) if u.resp && u.resp[0..2] == '[{"'
           drs = z.select { |smpl| smpl['ИМЯ']&.downcase == "#{hash[:last_name]} #{hash[:first_name]} #{hash[:middle_name]}" && smpl['ПАСПОРТ']&.downcase == u.passport }
-                 .map { |x| x['ДАТА РОЖДЕНИЯ'] }.uniq if z.present?
+                 .map { |x| x['ДАТА РОЖДЕНИЯ'] if x['ДАТА РОЖДЕНИЯ'].present? }.compact.uniq if z.present?
           is_passport_verified ||= if drs.present?
             hash[:birthdate] = drs.first
             resp = JSON.parse RestClient.post(
@@ -481,10 +481,10 @@ class Api::Femida::ParserController < ApplicationController
           ).exists?
 
           is_phone_verified ||= begin
-            if u.phone.present? && u.birth_date.present? && u.last_name.present? && u.first_name.present? && u.middle_name.present?
+            if u.phone.present? && drs.first.present? && u.last_name.present? && u.first_name.present? && u.middle_name.present?
               resp = OkbService.call(
                 telephone_number: u.phone,
-                birthday: u.birth_date,
+                birthday: drs.first,
                 surname: u.last_name.downcase,
                 name: u.first_name.downcase,
                 patronymic: u.middle_name.downcase,
@@ -495,7 +495,7 @@ class Api::Femida::ParserController < ApplicationController
           rescue
             false
           end
-          array << { id: u.id, birth_date: drs&.join(','), is_passport_verified: is_passport_verified, is_phone_verified: is_phone_verified }
+          array << { id: u.id, birth_date: drs&.join(',') || '', is_passport_verified: is_passport_verified || false, is_phone_verified: is_phone_verified || false }
         end
         Sample02.upsert_all(array, update_only: [:birth_date, :is_passport_verified, :is_phone_verified])
       end
