@@ -423,7 +423,7 @@ class Api::Femida::ParserController < ApplicationController
             first_name: u.first_name.downcase,
             middle_name: u.middle_name.downcase
           }
-          z = eval(u.resp) if u.resp[0..2] == '[{"'
+          z = eval(u.resp) if u.resp && u.resp[0..2] == '[{"'
           drs = z.select { |smpl| smpl['ИМЯ']&.downcase == "#{hash[:last_name]} #{hash[:first_name]} #{hash[:middle_name]}" && smpl['ПАСПОРТ']&.downcase == u.passport }
                  .map { |x| x['ДАТА РОЖДЕНИЯ'] }.uniq
           is_passport_verified ||= if drs.present?
