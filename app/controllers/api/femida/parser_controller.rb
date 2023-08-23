@@ -415,17 +415,17 @@ class Api::Femida::ParserController < ApplicationController
       body = JSON.parse resp.body if resp.code == 200
       Sample02.in_batches.each do |batch|
         array = []
-        batch.each do |sample|
+        batch.each do |u|
           byebug
           is_phone_verified = nil
           is_passport_verified = nil
           hash = {
-            last_name: sample.last_name.downcase,
-            first_name: sample.first_name.downcase,
-            middle_name: sample.middle_name.downcase
+            last_name: u.last_name.downcase,
+            first_name: u.first_name.downcase,
+            middle_name: u.middle_name.downcase
           }
-          z = eval(sample.resp) if sample.resp[0..2] == '[{"'
-          drs = z.select { |smpl| smpl['ИМЯ']&.downcase == "#{hash[:last_name]} #{hash[:first_name]} #{hash[:middle_name]}" && smpl['ПАСПОРТ']&.downcase == sample.passport }
+          z = eval(u.resp) if u.resp[0..2] == '[{"'
+          drs = z.select { |smpl| smpl['ИМЯ']&.downcase == "#{hash[:last_name]} #{hash[:first_name]} #{hash[:middle_name]}" && smpl['ПАСПОРТ']&.downcase == u.passport }
                  .map { |x| x['ДАТА РОЖДЕНИЯ'] }.uniq
           is_passport_verified ||= if drs.present?
             hash[:birthdate] = drs.first
@@ -436,7 +436,7 @@ class Api::Femida::ParserController < ApplicationController
             )
             if resp && resp['count'] > 0
               is_phone_verified ||= resp['data'].select do |d|
-                d['LastName'] == sample.last_name && d['FirstName'] == sample.first_name && d['Telephone'] == sample.phone
+                d['LastName'] == u.last_name && d['FirstName'] == u.first_name && d['Telephone'] == u.phone
               end.present?
 
               # resp['data'].each do |data|
@@ -444,17 +444,17 @@ class Api::Femida::ParserController < ApplicationController
               #   ...
               # end
 
-              resp['data'].select { |d| d['Passport'] == sample.passport }.present?
+              resp['data'].select { |d| d['Passport'] == u.passport }.present?
             end
           end
           is_passport_verified ||= begin
             if drs.first.present?
               inn = InnService.call(
-                passport: sample.passport,
+                passport: u.passport,
                 date: drs.first,
-                f: sample.last_name&.downcase,
-                i: sample.first_name&.downcase,
-                o: sample.middle_name&.downcase
+                f: u.last_name&.downcase,
+                i: u.first_name&.downcase,
+                o: u.middle_name&.downcase
               )
               inn && inn['inn'].present?
             else
@@ -467,28 +467,28 @@ class Api::Femida::ParserController < ApplicationController
           is_phone_verified ||= begin
             resp = JSON.parse RestClient.post(
               "#{ENV['FEMIDA_PERSONS_API_HOST']}/api/persons/search",
-              { phone: sample.phone },
+              { phone: u.phone },
               'Authorization' => "Bearer #{body['auth_token']}"
             )
             if resp && resp['count'] > 0
-              resp['data'].select { |d| d['LastName'] == sample.last_name && d['FirstName'] == sample.first_name }.present?
+              resp['data'].select { |d| d['LastName'] == u.last_name && d['FirstName'] == u.first_name }.present?
             end
           end
 
           is_phone_verified ||= ParsedUser.where(
-            last_name: sample.last_name&.downcase,
-            first_name: sample.first_name&.downcase,
-            phone: sample.phone&.last(10)
+            last_name: u.last_name&.downcase,
+            first_name: u.first_name&.downcase,
+            phone: u.phone&.last(10)
           ).exists?
 
           is_phone_verified ||= begin
-            if sample.phone.present? && sample.birth_date.present? && sample.last_name.present? && sample.first_name.present? && sample.middle_name.present?
+            if u.phone.present? && u.birth_date.present? && u.last_name.present? && u.first_name.present? && u.middle_name.present?
               resp = OkbService.call(
-                telephone_number: sample.phone,
-                birthday: sample.birth_date,
-                surname: sample.last_name.downcase,
-                name: sample.first_name.downcase,
-                patronymic: sample.middle_name.downcase,
+                telephone_number: u.phone,
+                birthday: u.birth_date,
+                surname: u.last_name.downcase,
+                name: u.first_name.downcase,
+                patronymic: u.middle_name.downcase,
                 consent: 'Y'
               )
             end
@@ -496,8 +496,7 @@ class Api::Femida::ParserController < ApplicationController
           rescue
             false
           end
-          byebug
-          array << { id: sample.id, birth_date: drs.join(','), is_passport_verified: is_passport_verified, is_phone_verified: is_phone_verified }
+          array << { id: u.id, birth_date: drs.join(','), is_passport_verified: is_passport_verified, is_phone_verified: is_phone_verified }
         end
         Sample02.upsert_all(array, update_only: [:birth_date, :is_passport_verified, :is_phone_verified])
       end
