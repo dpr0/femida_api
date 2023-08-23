@@ -241,7 +241,8 @@ class Api::Femida::ParserController < ApplicationController
         next if x[0] == 'id'
 
         tu = t_users[x[0]]
-        xx = tu.blank? ? [] : [bool(tu.is_phone_verified), bool(tu.is_phone_verified_2), bool(tu.is_passport_verified), bool(tu.is_passport_verified_2)]
+        xx = tu.blank? ? [] : [bool(tu.is_phone_verified), bool(tu.is_phone_verified == 'true' || tu.is_phone_verified_2), bool(tu.is_passport_verified), bool(tu.is_passport_verified == 'true' || tu.is_passport_verified_2)]
+        x << '' if x.size == 26
         csv << x + xx
       end
     end
@@ -267,8 +268,8 @@ class Api::Femida::ParserController < ApplicationController
 
   def bool(b)
     case b
-    when 'true' then 'TRUE'
-    when 'false' then 'FALSE'
+    when 'true', true then 'TRUE'
+    when 'false', false then 'FALSE'
     else
       ''
     end
@@ -413,22 +414,92 @@ class Api::Femida::ParserController < ApplicationController
       )
       body = JSON.parse resp.body if resp.code == 200
       Sample02.in_batches.each do |batch|
+        array = []
         batch.each do |sample|
+          byebug
+          is_phone_verified = nil
+          is_passport_verified = nil
           hash = {
             last_name: sample.last_name.downcase,
             first_name: sample.first_name.downcase,
             middle_name: sample.middle_name.downcase
           }
-          hash[:birthdate] = sample.birth_date if sample.birth_date.present?
+          z = eval(sample.resp) if sample.resp[0..2] == '[{"'
+          drs = z.select { |smpl| smpl['ИМЯ']&.downcase == "#{hash[:last_name]} #{hash[:first_name]} #{hash[:middle_name]}" && smpl['ПАСПОРТ']&.downcase == sample.passport }
+                 .map { |x| x['ДАТА РОЖДЕНИЯ'] }.uniq
+          is_passport_verified ||= if drs.present?
+            hash[:birthdate] = drs.first
+            resp = JSON.parse RestClient.post(
+              "#{ENV['FEMIDA_PERSONS_API_HOST']}/api/persons/search",
+              hash,
+              'Authorization' => "Bearer #{body['auth_token']}"
+            )
+            if resp && resp['count'] > 0
+              is_phone_verified ||= resp['data'].select do |d|
+                d['LastName'] == sample.last_name && d['FirstName'] == sample.first_name && d['Telephone'] == sample.phone
+              end.present?
 
-          resp = JSON.parse RestClient.post("#{ENV['FEMIDA_PERSONS_API_HOST']}/api/persons/search", hash, 'Authorization' => "Bearer #{body['auth_token']}")
-          next if resp['count'] == 0
+              # resp['data'].each do |data|
+              #   inform = JSON.parse(data['Information'])['D']
+              #   ...
+              # end
 
-          resp['data'].each do |data|
-            info = JSON.parse(data['Information'])['D']
+              resp['data'].select { |d| d['Passport'] == sample.passport }.present?
+            end
           end
-        end
+          is_passport_verified ||= begin
+            if drs.first.present?
+              inn = InnService.call(
+                passport: sample.passport,
+                date: drs.first,
+                f: sample.last_name&.downcase,
+                i: sample.first_name&.downcase,
+                o: sample.middle_name&.downcase
+              )
+              inn && inn['inn'].present?
+            else
+              false
+            end
+          rescue
+            false
+          end
 
+          is_phone_verified ||= begin
+            resp = JSON.parse RestClient.post(
+              "#{ENV['FEMIDA_PERSONS_API_HOST']}/api/persons/search",
+              { phone: sample.phone },
+              'Authorization' => "Bearer #{body['auth_token']}"
+            )
+            if resp && resp['count'] > 0
+              resp['data'].select { |d| d['LastName'] == sample.last_name && d['FirstName'] == sample.first_name }.present?
+            end
+          end
+
+          is_phone_verified ||= ParsedUser.where(
+            last_name: sample.last_name&.downcase,
+            first_name: sample.first_name&.downcase,
+            phone: sample.phone&.last(10)
+          ).exists?
+
+          is_phone_verified ||= begin
+            if sample.phone.present? && sample.birth_date.present? && sample.last_name.present? && sample.first_name.present? && sample.middle_name.present?
+              resp = OkbService.call(
+                telephone_number: sample.phone,
+                birthday: sample.birth_date,
+                surname: sample.last_name.downcase,
+                name: sample.first_name.downcase,
+                patronymic: sample.middle_name.downcase,
+                consent: 'Y'
+              )
+            end
+            resp && resp['score'] > 2
+          rescue
+            false
+          end
+          byebug
+          array << { id: sample.id, birth_date: drs.join(','), is_passport_verified: is_passport_verified, is_phone_verified: is_phone_verified }
+        end
+        Sample02.upsert_all(array, update_only: [:birth_date, :is_passport_verified, :is_phone_verified])
       end
     # end
     # z = CSV.generate do |csv|
