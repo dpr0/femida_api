@@ -10,9 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_08_21_190000) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_24_080000) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "citext"
   enable_extension "plpgsql"
+  enable_extension "postgres_fdw"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
@@ -72,6 +74,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_21_190000) do
   create_table "expired_passports", force: :cascade do |t|
     t.string "passp_number"
     t.string "passp_series"
+    t.index ["passp_series"], name: "expired_passports_passp_series_index"
   end
 
   create_table "femida_retro_users", force: :cascade do |t|
@@ -450,6 +453,17 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_21_190000) do
     t.string "type"
   end
 
+  create_table "otk_table_1", id: false, force: :cascade do |t|
+    t.string "dob"
+    t.string "femidav1"
+    t.string "femidav2"
+    t.string "fio"
+    t.serial "id", null: false
+    t.string "idx"
+    t.string "phone"
+    t.string "status"
+  end
+
   create_table "parsed_users", force: :cascade do |t|
     t.string "address"
     t.string "birth_date"
@@ -463,6 +477,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_21_190000) do
     t.datetime "updated_at", null: false
     t.index ["passport"], name: "index_parsed_users_on_passport"
     t.index ["phone"], name: "index_parsed_users_on_phone"
+  end
+
+  create_table "pdl", id: false, force: :cascade do |t|
+    t.string "dob"
+    t.serial "id", null: false
+    t.string "inn"
+    t.string "last_job_title"
+    t.string "oif"
+    t.string "rank"
   end
 
   create_table "phone_rates", force: :cascade do |t|
@@ -511,6 +534,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_21_190000) do
     t.string "birth_date"
     t.integer "customer_id"
     t.string "first_name"
+    t.string "info"
     t.boolean "is_passport_verified"
     t.boolean "is_phone_verified"
     t.string "last_name"

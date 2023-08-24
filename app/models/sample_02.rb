@@ -7,6 +7,7 @@
 #  id                   :bigint           not null, primary key
 #  birth_date           :string
 #  first_name           :string
+#  info                 :string
 #  is_passport_verified :boolean
 #  is_phone_verified    :boolean
 #  last_name            :string
