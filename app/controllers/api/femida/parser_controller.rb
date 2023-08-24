@@ -434,9 +434,10 @@ class Api::Femida::ParserController < ApplicationController
         Sample02.where(is_phone_verified: false, info: nil)
       ).or(
         Sample02.where('id > 55000')
-      ).limit(2000).in_batches.each do |batch|
+      ).in_batches.each do |batch|
         array = []
         batch.each do |u|
+          next if u.info && u.info[0..2] == '---'
           info = {}
           is_phone_verified = u.is_phone_verified
           is_passport_verified = u.is_passport_verified

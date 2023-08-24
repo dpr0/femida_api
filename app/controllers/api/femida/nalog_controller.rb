@@ -46,24 +46,31 @@ class Api::Femida::NalogController < ApplicationController
       data = search_proc(hash)
 
       hash2 = {}
-      (data['upr']['data'] + data['uchr']['data']).each do |z|
-        h = { pbCaptchaToken: hash[:pbCaptchaToken], token: z['token'], mode: 'search-ul', queryUpr: z['inn'] }
-        x = search_proc(h)
-        next unless x
+      if params[:companies] == 'true'
+        (data['upr']['data'] + data['uchr']['data']).each do |z|
+          h = { pbCaptchaToken: hash[:pbCaptchaToken], token: z['token'], mode: 'search-ul', queryUpr: z['inn'] }
+          x = search_proc(h)
+          next unless x
 
-        hash2[z['inn']] = x['ul']['data'].map do |xx|
-          resp = xx.slice(*%w[yearcode periodcode inn okved2 okved2name regionname namec namep])
-          company = company_proc(xx['token'], h[:pbCaptchaToken]) if params[:extended] == 'true'
-          resp.merge(company: company)
-        end.compact.flatten
+          hash2[z['inn']] = x['ul']['data'].map do |xx|
+            resp = xx.slice(*%w[yearcode periodcode inn okved2 okved2name regionname namec namep])
+            company = company_proc(xx['token'], h[:pbCaptchaToken]) if params[:extended] == 'true'
+            resp.merge(company: company)
+          end.compact.flatten
+        end
       end
+
       {
         success: true, error: '',
         director: data['upr']['data'].map do |d|
-          { inn: d['inn'], name: d['name'], count: d['ul_cnt'], companies: hash2[d['inn']] }
+          z = { inn: d['inn'], name: d['name'], count: d['ul_cnt'] }
+          z[:companies] = hash2[d['inn']] if params[:companies] == 'true'
+          z
         end,
         owner: data['uchr']['data'].map do |d|
-          { inn: d['inn'], name: d['name'], count: d['ul_cnt'], companies: hash2[d['inn']] }
+          z = { inn: d['inn'], name: d['name'], count: d['ul_cnt'] }
+          z[:companies] = hash2[d['inn']] if params[:companies] == 'true'
+          z
         end
       }
     end
