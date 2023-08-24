@@ -472,6 +472,8 @@ class Api::Femida::ParserController < ApplicationController
               info[:is_passport_verified] = :odyssey if z
               z
             end
+          rescue
+            false
           end
           is_passport_verified ||= begin
             inn = InnService.call(
@@ -499,6 +501,8 @@ class Api::Femida::ParserController < ApplicationController
                 end
             info[:is_phone_verified] = :solar if z
             z
+          rescue
+            false
           end
 
           is_phone_verified ||= begin
