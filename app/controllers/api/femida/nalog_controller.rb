@@ -4,7 +4,7 @@ class Api::Femida::NalogController < ApplicationController
   protect_from_forgery with: :null_session
 
   HOST = 'https://pb.nalog.ru/'
-  RETRY = 5
+  RETRY = 3
 
   api :GET, '/nalog/ogr?id=:inn', 'Проверка на ограничение' # 668608997290
   def ogr
@@ -15,7 +15,7 @@ class Api::Femida::NalogController < ApplicationController
       hash[:queryOgr] = inn
       d = search_proc(hash)
       data = d['ogrfl']['data'] + d['ogrul']['data']
-      # { data: data, company: company_proc(data) }
+      # { data: data, company: data.map { |z| company_proc(z['token']) }.compact }
       {
         success: true, error: '',
         limit_org: data.map do |d|
@@ -44,21 +44,26 @@ class Api::Femida::NalogController < ApplicationController
       hash[:uprType0] = 1
       hash[:uprType1] = 1
       data = search_proc(hash)
-      # resp = data.map do |z|
-      #   hash = { pbCaptchaToken: hash[:pbCaptchaToken], token: z['token'], mode: 'search-ul', queryUpr: z['inn'] }
-      #   x = search_proc(hash)
-      #   next unless x
-      #
-      #   x['ul']['data']
-      # end.compact.flatten
-      # { data: data, resp: resp, company: company_proc(resp, hash[:pbCaptchaToken]) }
+
+      hash2 = {}
+      (data['upr']['data'] + data['uchr']['data']).each do |z|
+        h = { pbCaptchaToken: hash[:pbCaptchaToken], token: z['token'], mode: 'search-ul', queryUpr: z['inn'] }
+        x = search_proc(h)
+        next unless x
+
+        hash2[z['inn']] = x['ul']['data'].map do |xx|
+          resp = xx.slice(*%w[yearcode periodcode inn okved2 okved2name regionname namec namep])
+          company = company_proc(xx['token'], h[:pbCaptchaToken]) if params[:extended] == 'true'
+          resp.merge(company: company)
+        end.compact.flatten
+      end
       {
         success: true, error: '',
         director: data['upr']['data'].map do |d|
-          { inn: d['inn'], name: d['name'], count: d['ul_cnt'] }
+          { inn: d['inn'], name: d['name'], count: d['ul_cnt'], companies: hash2[d['inn']] }
         end,
         owner: data['uchr']['data'].map do |d|
-          { inn: d['inn'], name: d['name'], count: d['ul_cnt'] }
+          { inn: d['inn'], name: d['name'], count: d['ul_cnt'], companies: hash2[d['inn']] }
         end
       }
     end
@@ -74,7 +79,7 @@ class Api::Femida::NalogController < ApplicationController
       hash[:uprType0] = 1
       hash[:uprType1] = 1
       data = search_proc(hash)['ip']['data']
-      # { data: data, company: company_proc(data) }
+      # { data: data, company: data.map { |z| company_proc(z['token']) }.compact }
       {
         success: true, error: '',
         ip: data.map do |d|
@@ -119,16 +124,16 @@ class Api::Femida::NalogController < ApplicationController
 
   private
 
-  def company_proc(array, pb = nil)
-    array.map do |z|
-      hash = { token: z['token'], method: 'get-request' }
-      hash[:pbCaptchaToken] = pb if pb
-      x = load_retry(:company, hash)
-      next if x.nil?
+  def company_proc(token, pb = nil)
+    hash = { token: token, method: 'get-request', v: 2 }
+    hash[:pbCaptchaToken] = pb
+    x = load_retry(:company, hash)
+    hash[:pbCaptchaToken] = captcha_proc[:pbCaptchaToken] if x.nil?
+    x = load_retry(:company, hash) if x.nil?
+    return if x.nil?
 
-      hash = { token: x['token'], id: x['id'], method: 'get-response' }
-      load_retry(:company, hash)
-    end.compact
+    hash = { token: x['token'], id: x['id'], method: 'get-response', v: 2 }
+    load_retry(:company, hash)
   end
 
   def search_proc(hash)
@@ -148,9 +153,7 @@ class Api::Femida::NalogController < ApplicationController
   end
 
   def load_retry(url, hash)
-    puts "--------------------------------------------------------- => #{url}"
-    puts hash
-
+    Rails.logger.info "Request: ---------- #{url}: #{hash}"
     x = 0
     resp = nil
     while x < RETRY
@@ -158,7 +161,7 @@ class Api::Femida::NalogController < ApplicationController
       resp = load(url, hash)
       resp.nil? ? sleep(1.second) : (x = RETRY)
     end
-    puts "\n <= ..... #{resp}"
+    Rails.logger.info "Response: --------- #{resp}"
     JSON.parse(resp) if resp.present?
   end
 
@@ -166,8 +169,7 @@ class Api::Femida::NalogController < ApplicationController
     RestClient::Request.execute(
       url: "#{HOST}#{url}-proc.json",
       payload: hash.map { |key, value| "#{key}=#{value}" }.join("&"),
-      method: :post,
-      verify_ssl: false
+      method: :post
     ).body
     rescue Errno::ECONNRESET, RestClient::BadRequest
   end

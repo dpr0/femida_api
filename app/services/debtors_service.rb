@@ -46,10 +46,10 @@ class DebtorsService
     link = "https://fssp.gov.ru/vnimanie_rozysk/action/debtors/?#{"page=#{page}&" if page}region=#{code}"
     print code
     z = RestClient.get(link, 'X-Requested-With': 'XMLHttpRequest')
-    puts
+    Rails.logger.info
     z
   rescue
-    puts(' - fail')
+    Rails.logger.info(' - fail')
     nil
   end
 end

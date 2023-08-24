@@ -20,7 +20,7 @@ class ApplicationController < ActionController::Base
     while x < RETRY
       x += 1
       resp = get_rucaptcha(id)
-      puts "#{x}: #{resp.body}"
+      Rails.logger.info "#{x}: #{resp.body}"
       x = RETRY if resp.body == ERROR
       resp.body[0..1] == 'OK' ? (x = RETRY) : sleep(1.second)
     end
@@ -42,7 +42,7 @@ class ApplicationController < ActionController::Base
   end
 
   def get(path, headers: {}, parse: true, key: :str, host: HOST)
-    puts host + path
+    Rails.logger.info host + path
     resp = RestClient.get(host + path, headers)
     parse ? JSON.parse(resp) : resp
   rescue RestClient::NotFound, RestClient::BadRequest => e

@@ -136,7 +136,7 @@ class Api::Femida::OpendataController < ApplicationController
   end
 
   def get(url)
-    puts url
+    Rails.logger.info url
     RestClient::Request.execute(url: url, method: :get, verify_ssl: false)
   end
 

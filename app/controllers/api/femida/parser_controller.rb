@@ -102,7 +102,7 @@ class Api::Femida::ParserController < ApplicationController
     #     #     begin
     #     #     z2.send("field#{index}=", x[key])
     #     #     rescue
-    #     #       puts "------------------------------------------------ > #{key}"
+    #     #       Rails.logger.info "------------------------------------------------ > #{key}"
     #     #     end
     #     #   end
     #     # end
@@ -125,7 +125,7 @@ class Api::Femida::ParserController < ApplicationController
     #     Hash.from_xml(r2.to_xml).dig('html', 'body', 'response', 'source').each do |zx|
     #       resp = zx.dig('record', 'field')&.second&.dig('fieldvalue')
     #       if resp
-    #         puts "#{u.phone} - #{resp}"
+    #         Rails.logger.info "#{u.phone} - #{resp}"
     #         response << u
     #       end
     #       u.os_status = resp || 'not_found'
@@ -177,7 +177,7 @@ class Api::Femida::ParserController < ApplicationController
                  false
                end
         bool = resp && resp['inn'].present? && resp['error_code'].blank?
-        puts '==================================================== ' if bool
+        Rails.logger.info '==================================================== ' if bool
         u.update(is_passport_verified_2: bool)
         array2 << u.id if bool
       end
@@ -192,7 +192,7 @@ class Api::Femida::ParserController < ApplicationController
     #   bool = users.select { |user| user.last_name.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
     #   # bool = users.select { |user| user['LastName']&.downcase == u.last_name.downcase && user['FirstName']&.downcase == u.first_name.downcase }.present?
     #   # bool = users.select { |user| user.surname&.downcase == u.last_name.downcase && user.name&.downcase == u.first_name.downcase }.present?
-    #   puts '==================================================== ' if bool
+    #   Rails.logger.info '==================================================== ' if bool
     #   u.update(os_status: bool) if bool
     # end
     # with_error_handling do
@@ -217,7 +217,7 @@ class Api::Femida::ParserController < ApplicationController
       #     # end
       #   end
       #   # user = users.select { |user| user.last_name.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.first
-      #   # puts '==================================================== ' if user.present?
+      #   # Rails.logger.info '==================================================== ' if user.present?
       #   # array << user.id if user.present?
       # end
       # { verified_phones: verified_phones }
@@ -259,7 +259,7 @@ class Api::Femida::ParserController < ApplicationController
         x.insert(26, '') if x.size == 30
         (x[-1] = x[-2]) if x[-2] == 'TRUE' && x[-1] != 'TRUE'
         (x[-3] = x[-4]) if x[-4] == 'TRUE' && x[-3] != 'TRUE'
-        puts("#{x[0]} --- #{z} >> #{x[-4..-1]}") if (x[-2] == 'TRUE' && z[-1] != 'TRUE') || (x[-4] == 'TRUE' && z[-3] != 'TRUE')
+        Rails.logger.info("#{x[0]} --- #{z} >> #{x[-4..-1]}") if (x[-2] == 'TRUE' && z[-1] != 'TRUE') || (x[-4] == 'TRUE' && z[-3] != 'TRUE')
         csv << x
       end
     end

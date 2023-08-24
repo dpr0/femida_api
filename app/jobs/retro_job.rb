@@ -27,7 +27,7 @@ class RetroJob < ApplicationJob
       # end
     end
 
-    puts "======================================================================="
+    Rails.logger.info "======================================================================="
 
     dfs = DatesFromString.new
     File.readlines(Rails.root.join('tmp', 'narod', 'femida_retro.csv')).each do |line|

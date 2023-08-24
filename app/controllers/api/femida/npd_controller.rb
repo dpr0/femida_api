@@ -13,7 +13,7 @@ class Api::Femida::NpdController < ApplicationController
         @error = nil
         x += 1
         resp = post_request(inn)
-        puts x
+        Rails.logger.info x
         resp.try(:code) == 200 ? (x = RETRY) : sleep(1)
       end
 
