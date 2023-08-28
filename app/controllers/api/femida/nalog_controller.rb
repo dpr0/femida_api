@@ -5,6 +5,11 @@ class Api::Femida::NalogController < ApplicationController
 
   HOST = 'https://pb.nalog.ru/'
   RETRY = 3
+  RU = {
+    'а' => 'a', 'б' => 'b', 'в' => 'v',  'г' => 'g',  'д' => 'd',   'е' => 'e', 'ё' => 'yo', 'ж' => 'j', 'з' => 'z', 'и' => 'i',  'й' => 'y',
+    'к' => 'k', 'л' => 'l', 'м' => 'm',  'н' => 'n',  'о' => 'o',   'п' => 'p', 'р' => 'r',  'с' => 's', 'т' => 't', 'у' => 'u',  'ф' => 'f',
+    'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch', 'ъ' => '',  'ы' => 'y',  'ь' => '',  'э' => 'e', 'ю' => 'yu', 'я' => 'ya'
+  }.freeze
 
   api :GET, '/nalog/ogr?id=:inn', 'Проверка на ограничение' # 668608997290
   def ogr
@@ -60,19 +65,7 @@ class Api::Femida::NalogController < ApplicationController
         end
       end
 
-      {
-        success: true, error: '',
-        director: data['upr']['data'].map do |d|
-          z = { inn: d['inn'], name: d['name'], count: d['ul_cnt'] }
-          z[:companies] = hash2[d['inn']] if params[:companies] == 'true'
-          z
-        end,
-        owner: data['uchr']['data'].map do |d|
-          z = { inn: d['inn'], name: d['name'], count: d['ul_cnt'] }
-          z[:companies] = hash2[d['inn']] if params[:companies] == 'true'
-          z
-        end
-      }
+      { success: true, error: '', director: prepare_date(data['upr'], hash2), owner: prepare_date(data['uchr'], hash2) }
     end
   end
 
@@ -179,5 +172,26 @@ class Api::Femida::NalogController < ApplicationController
       method: :post
     ).body
     rescue Errno::ECONNRESET, RestClient::BadRequest
+  end
+
+  def prepare_date(data, hash)
+    data['data'].map do |d|
+      z = { inn: d['inn'], name: d['name'], count: d['ul_cnt'] }
+      if params[:companies] == 'true'
+        z[:companies] = hash[d['inn']].map do |result|
+          result[:company]['vyp'] = result[:company]['vyp'].transform_keys { |x| transliterate x } if result.dig(:company, 'vyp')
+          result
+        end
+      end
+      z
+    end
+  end
+
+  def transliterate(cyrillic_string)
+    result = ''
+    cyrillic_string.downcase.each_char { |char| result += RU[char] ? RU[char] : char }
+    result.gsub(/[^a-z0-9_]+/, '_').gsub(/^[-_]*|[-_]*$/, '')
+    # remaining non-alphanumeric => hyphen
+    # remove hyphens/underscores and numbers at beginning and hyphens/underscores at end
   end
 end

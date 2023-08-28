@@ -55,3 +55,4 @@ dump.rdb
 /config/cred.byebug_history
 .byebug_history
 package-lock.json
+test.rb
