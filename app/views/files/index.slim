@@ -1,6 +1,11 @@
 .hero-body
   .container.has-text-centered
     .columns
+      = form_for current_user, url: files_path, method: :post, html: { multipart: true }, data: { turbo: false } do |f|
+        = f.label :attachment
+        = f.file_field :attachment
+        = f.submit 'Загрузить файл'
+    .columns
       .column.is-2
       .column.is-8
         h2.subtitle Список файлов
@@ -9,8 +14,17 @@
         table.table.is-fullwidth.is-striped
           thead
             th ID
-            th Статус
-            th Формат
+            th Файл
             th Создан
-            th Обновлен
+            th
           tbody
+            - @attachments.each do |a|
+              tr
+                td = a.id
+                td = link_to a.filename, url_for(a), target: '_blank'
+                td = a.created_at.strftime('%d.%m.%Y %H.%M')
+                td
+                  - if current_user && a.record_id == current_user.id
+                    = link_to 'удалить', file_path(a), method: :delete, data: { turbo: true, turbo_method: :delete, turbo_confirm: 'Вы уверены?' }
+                  - else
+                    = 'удалить'

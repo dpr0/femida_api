@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
+  mount LetterOpenerWeb::Engine, at: '/letter_opener' if Rails.env.development?
 
   apipie
-  use_doorkeeper
-  devise_for :users, controllers: { omniauth_callbacks: 'callbacks' }
+  devise_for :users
 
   resources :users
   resources :files
