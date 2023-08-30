@@ -1,12 +1,4 @@
 GIT
-  remote: https://github.com/rubysec/bundler-audit.git
-  revision: bc041d13eeccab70dd01672c097e8906108d07e3
-  specs:
-    bundler-audit (0.9.1)
-      bundler (>= 1.2.0, < 3)
-      thor (~> 1.0)
-
-GIT
   remote: https://github.com/teamcapybara/capybara.git
   revision: abf976e58a3b5b9937b88e8fc5867c828ccfc484
   specs:
@@ -536,7 +528,6 @@ DEPENDENCIES
   bcrypt_pbkdf
   bootsnap
   brakeman
-  bundler-audit!
   byebug
   capistrano
   capistrano-bundler

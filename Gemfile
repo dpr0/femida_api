@@ -42,7 +42,7 @@ group :development, :test do
   gem 'byebug'
   gem 'annotate'
   gem 'brakeman'
-  gem 'bundler-audit', github: 'rubysec/bundler-audit'
+  # gem 'bundler-audit', github: 'rubysec/bundler-audit'
   gem 'letter_opener_web'
   gem 'standard'
   gem 'rspec-rails'
