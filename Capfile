@@ -3,7 +3,7 @@
 require 'capistrano/setup'
 require 'capistrano/deploy'
 require 'capistrano/rbenv'
-require 'capistrano/puma'
+# require 'capistrano/puma'
 # require 'capistrano/rails/assets'
 require 'capistrano/rails/migrations'
 require 'capistrano/scm/git'
