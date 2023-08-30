@@ -2,7 +2,7 @@
 
 class FilesController < ApplicationController
   protect_from_forgery with: :null_session
-  # before_action :authenticate_user!
+  before_action :authenticate_user!
 
   def index
     @attachments = ActiveStorage::Attachment.all
