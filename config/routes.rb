@@ -50,6 +50,7 @@ Rails.application.routes.draw do
           get :start_csv
           get :sample1
           get :sample2
+          get :sample3
         end
       end
       resources :esia, only: :index do

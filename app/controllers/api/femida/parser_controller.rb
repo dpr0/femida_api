@@ -276,33 +276,36 @@ class Api::Femida::ParserController < ApplicationController
   end
 
   def start_csv
-    hash1 = {}
-    File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_is_os_phone_req.csv')).each do |line|
-      key, value = line.chomp.delete('"').split(",")
-      next if key == 'Phone_search'
-      hash1[key.last(10)] = value
-    end
-    hash2 = {}
-    File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_scored_adjusted_score.csv')).each do |line|
-      key, value = line.chomp.delete('"').split(",")
-      next if key == 'phone'
-      hash2[key.last(10)] = value
-    end
+    # hash1 = {}
+    # File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_is_os_phone_req.csv')).each do |line|
+    #   key, value = line.chomp.delete('"').split(",")
+    #   next if key == 'Phone_search'
+    #   hash1[key.last(10)] = value
+    # end
+    # hash2 = {}
+    # File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_scored_adjusted_score.csv')).each do |line|
+    #   key, value = line.chomp.delete('"').split(",")
+    #   next if key == 'phone'
+    #   hash2[key.last(10)] = value
+    # end
 
     z = CSV.generate do |csv|
-      csv << %w[first_name middle_name last_name phone birth_date passport is_passport_verified is_phone_verified is_os_phone_req adjusted_score]
-      FemidaRetroUser.all.each do |data|
+      arr = %w[id customer_id last_name first_name middle_name phone passport birth_date is_passport_verified is_phone_verified]
+      csv << arr
+      Sample02.select(arr).all.each do |data|
         array = [
+          data.id,
+          data.customer_id,
+          data.last_name,
           data.first_name,
           data.middle_name,
-          data.last_name,
           data.phone,
-          data.birth_date,
           data.passport,
+          data.birth_date,
           data.is_passport_verified,
-          data.is_phone_verified,
-          hash1[data.phone.last(10)],
-          hash2[data.phone.last(10)]
+          data.is_phone_verified
+          # hash1[data.phone.last(10)],
+          # hash2[data.phone.last(10)]
         ]
         csv << array
       end
@@ -422,7 +425,7 @@ class Api::Femida::ParserController < ApplicationController
     end
   end
 
-  def sample2
+  def sample3
     # with_error_handling do
       resp = RestClient::Request.execute(
         method: :post,
@@ -430,14 +433,9 @@ class Api::Femida::ParserController < ApplicationController
         payload: { email: ENV['FEMIDA_PERSONS_API_LOGIN'], password: ENV['FEMIDA_PERSONS_API_PASSWORD'] }
       )
       body = JSON.parse resp.body if resp.code == 200
-      Sample02.where(is_passport_verified: false, info: nil).or(
-        Sample02.where(is_phone_verified: false, info: nil)
-      ).or(
-        Sample02.where('id > 55000')
-      ).in_batches.each do |batch|
+      Sample02.where(is_passport_verified: false).or(Sample02.where(is_phone_verified: false)).in_batches.each do |batch|
         array = []
         batch.each do |u|
-          next if u.info && u.info[0..2] == '---'
           info = {}
           is_phone_verified = u.is_phone_verified
           is_passport_verified = u.is_passport_verified
