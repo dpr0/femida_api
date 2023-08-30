@@ -31,24 +31,23 @@ gem 'sucker_punch'
 gem 'turbo-rails'
 gem 'whenever', require: false
 gem 'sprockets-rails'
-# gem 'puma', '4.3.10'
+gem 'puma', '4.3.10'
 gem 'strong_migrations'
 gem 'rtesseract'
 gem 'sassc-rails'
-gem 'falcon'
 
 group :development, :test do
   gem 'debug'
   gem 'byebug'
   gem 'annotate'
   gem 'brakeman'
-  # gem 'bundler-audit', github: 'rubysec/bundler-audit'
+  gem 'bundler-audit', github: 'rubysec/bundler-audit'
   gem 'letter_opener_web'
   gem 'standard'
   gem 'rspec-rails'
   gem 'factory_bot_rails'
   gem 'bcrypt_pbkdf'
-  # gem 'capistrano3-puma', '4.0.0', require: false
+  gem 'capistrano3-puma', '4.0.0', require: false
   gem 'capistrano',         require: false
   gem 'capistrano-bundler', require: false
   gem 'capistrano-nvm',     require: false
