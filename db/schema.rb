@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_08_24_080000) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_31_080000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -67,6 +67,41 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_24_080000) do
     t.string "login"
     t.string "password"
     t.integer "request_count"
+  end
+
+  create_table "csv_parsers", force: :cascade do |t|
+    t.integer "birth_date"
+    t.integer "external_id"
+    t.integer "file_id"
+    t.integer "first_name"
+    t.string "headers"
+    t.integer "is_passport_verified_count"
+    t.integer "is_phone_verified_count"
+    t.integer "last_name"
+    t.integer "middle_name"
+    t.integer "passport"
+    t.integer "phone"
+    t.integer "rows"
+    t.boolean "saved"
+    t.string "separator"
+  end
+
+  create_table "csv_users", force: :cascade do |t|
+    t.string "birth_date"
+    t.string "external_id"
+    t.string "file_id"
+    t.string "first_name"
+    t.text "info"
+    t.boolean "is_passport_verified"
+    t.string "is_passport_verified_source"
+    t.boolean "is_phone_verified"
+    t.string "is_phone_verified_source"
+    t.string "last_name"
+    t.string "middle_name"
+    t.string "passport"
+    t.string "phone"
+    t.index ["passport"], name: "index_csv_users_on_passport"
+    t.index ["phone"], name: "index_csv_users_on_phone"
   end
 
   create_table "expired_passports", force: :cascade do |t|

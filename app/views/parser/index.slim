@@ -1,0 +1,34 @@
+.hero-body
+  .container.has-text-centered
+    .columns
+      = form_for current_user, url: parser_index_path, method: :post, data: { turbo: false } do |f|
+        = f.label :attachment
+        = f.file_field :attachment
+        = f.submit 'Загрузить файл'
+      br
+      br
+      br
+      br
+    .columns
+      table.table.is-fullwidth.is-striped
+        thead
+          tr
+            th ID
+            th FILE_ID
+            th Строк в файле
+            th Уникальный строк в БД
+            th Телефонов подтверждено
+            th Паспортов подтверждено
+            th Сохранен
+        tbody
+          - CsvParser.all.each do |parser|
+            tr
+              td = parser.id
+              td.level-right
+                = link_to parser.file_id, parser_path(parser)
+              td = parser.rows
+              td = CsvUser.where(file_id: parser.file_id).count
+              td = parser.is_phone_verified_count
+              td = parser.is_passport_verified_count
+              td
+                i.fa-solid class="fa-square-#{ parser.saved ? 'check has-text-primary' : 'xmark has-text-danger'}"

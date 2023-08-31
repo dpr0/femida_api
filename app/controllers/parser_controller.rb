@@ -1,0 +1,54 @@
+# frozen_string_literal: true
+
+class ParserController < ApplicationController
+  protect_from_forgery with: :null_session
+  before_action :authenticate_user!
+
+  def index
+  end
+
+  def show
+    @csv_parser = CsvParser.find_by(file_id: params[:id])
+    @csv_user = CsvUser.new
+    @csv_users = CsvUser.where(file_id: @csv_parser.file_id)
+    @headers = @csv_parser.headers.split(@csv_parser.separator)
+  end
+
+  def create
+    current_user.attachments.attach(params[:user][:attachment])
+    file = current_user.attachments.last
+    headers = file.open(&:first).chomp
+    rows = file.open(&:count) - 1
+    a1 = headers.split(';').size
+    a2 = headers.split(',').size
+    sep = [' ',';',','][a1 <=> a2]
+    CsvParser.create(file_id: file.id, headers: headers, rows: rows, separator: sep)
+    redirect_to parser_path(file.id)
+  end
+
+  def update
+    csv_parser = CsvParser.find_by(file_id: params[:id])
+    @headers = csv_parser.headers.split(csv_parser.separator)
+    csv_parser.update(
+      saved:       params[:saved],
+      phone:       index_by(:phone),
+      passport:    index_by(:passport),
+      last_name:   index_by(:last_name),
+      first_name:  index_by(:first_name),
+      middle_name: index_by(:middle_name),
+      birth_date:  index_by(:birth_date),
+      external_id: index_by(:external_id)
+    )
+    redirect_to parser_path(csv_parser.file_id)
+  end
+
+  def parse
+    CsvParserJob.perform_later(params[:parser_id])
+  end
+
+  private
+
+  def index_by(key)
+    @headers.find_index(params[key])
+  end
+end

@@ -8,6 +8,9 @@ Rails.application.routes.draw do
 
   resources :users
   resources :files
+  resources :parser do
+    post :parse
+  end
 
   namespace :api do
     namespace :femida do

@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
-class CreateSample03 < ActiveRecord::Migration[7.0]
+class CreateCsvUsers < ActiveRecord::Migration[7.0]
   def change
-    create_table :sample_03 do |t|
-      t.integer :external_id
+    create_table :csv_users do |t|
+      t.string :file_id
+      t.string :external_id
       t.string :phone
       t.string :passport
       t.string :last_name
@@ -17,7 +18,7 @@ class CreateSample03 < ActiveRecord::Migration[7.0]
       t.string :is_passport_verified_source
     end
 
-    add_index :sample_03, :phone
-    add_index :sample_03, :passport
+    add_index :csv_users, :phone
+    add_index :csv_users, :passport
   end
 end

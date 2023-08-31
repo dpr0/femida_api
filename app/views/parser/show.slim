@@ -1,0 +1,73 @@
+.hero-body
+  .container.has-text-centered
+    = form_for @csv_user, url: parser_path(params[:id]), method: :patch, data: { turbo: false } do |f|
+      .columns
+        .column.is-2
+          .field
+            label.label.has-text-success-dark Кол-во строк
+            .control
+              = text_field_tag :rows, @csv_parser.rows, class: 'input is-medium', disabled: true
+        .column.is-2
+          .field
+            label.label.has-text-success-dark Разделитель
+            .control
+              = text_field_tag :separator, ';', class: 'input is-medium'
+        .column.is-2
+          .field
+            label.label.has-text-success-dark Сохранить параметры
+            .control
+              = check_box_tag :saved, true, class: 'input is-medium'
+        .column.is-2
+          .field
+            = f.submit 'Сохранить', class: 'button is-success'
+        .column.is-2
+          .field
+            - if @csv_parser.saved
+              = link_to 'Распарсить файл', parser_parse_path(@csv_parser.file_id), method: :post, data: { turbo: true, turbo_method: :post }, class: 'button is-primary'
+
+      - if @csv_users.present?
+        .columns
+          .column.is-3
+            .field
+              label.label.has-text-success-dark Добавлено уникальных записей в БД
+              .control
+                = text_field_tag :rows, @csv_users.count, class: 'input is-medium', disabled: true
+          .column.is-3
+            .field
+              label.label.has-text-success-dark Записей проверено
+              .control
+                = text_field_tag :rows, @csv_users.where.not(is_phone_verified: nil).count, class: 'input is-medium', disabled: true
+          .column.is-3
+            .field
+              label.label.has-text-success-dark Телефон подтвержден
+              .control
+                = text_field_tag :rows, @csv_users.where(is_phone_verified: true).count, class: 'input is-medium', disabled: true
+          .column.is-3
+            .field
+              label.label.has-text-success-dark Паспорт подтвержден
+              .control
+                = text_field_tag :rows, @csv_users.where(is_passport_verified: true).count, class: 'input is-medium', disabled: true
+
+      - unless @csv_parser.saved
+        .columns
+          label.label.has-text-success-dark Аттрибуты из первой строки
+        .columns
+          .content
+            ol type="1"
+              - @headers.each do |col|
+                li
+                  - if @csv_user.attribute_names.include?(col)
+                    .has-text-primary = col
+                  - elsif @csv_user.attribute_names.find { |x| x.include?(col[0..3]) || col.include?(x[0..3]) }
+                    .has-text-grey = col
+                  - else
+                    .has-text-danger = col
+      - %w[external_id phone passport last_name first_name middle_name birth_date].each_slice(4) do |slice|
+        .columns
+          - slice.each do |ff|
+            .column.is-3
+              .field
+                label.label.has-text-success-dark = ff
+                .control
+                  - fff = @headers.select { |col| ff.include?(col[0..3]) || col.include?(ff[0..3]) }
+                  = text_field_tag ff, @csv_parser.saved ? @headers[@csv_parser.send(ff)] : fff, class: 'input is-medium'
