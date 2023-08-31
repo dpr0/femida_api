@@ -10,7 +10,7 @@ class ParserController < ApplicationController
   def show
     @csv_parser = CsvParser.find_by(file_id: params[:id])
     @csv_user = CsvUser.new
-    @csv_users = CsvUser.where(file_id: @csv_parser.file_id)
+    @csv_users = CsvUser.where(file_id: params[:id])
     @headers = @csv_parser.headers.split(@csv_parser.separator)
   end
 

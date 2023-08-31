@@ -25,7 +25,7 @@
             tr
               td = parser.id
               td.level-right
-                = link_to parser.file_id, parser_path(parser)
+                = link_to parser.file_id, parser_path(parser.file_id)
               td = parser.rows
               td = CsvUser.where(file_id: parser.file_id).count
               td = parser.is_phone_verified_count
