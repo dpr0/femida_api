@@ -30,5 +30,5 @@
               td = CsvUser.where(file_id: parser.file_id).count
               td = parser.is_phone_verified_count
               td = parser.is_passport_verified_count
-              td
-                i.fa-solid class="fa-square-#{ parser.saved ? 'check has-text-primary' : 'xmark has-text-danger'}"
+              td = "#{parser.status} - #{CsvParser::STATUSES[parser.status]}"
+                / i.fa-solid class="fa-square-#{ parser.status == 1 ? 'check has-text-primary' : 'xmark has-text-danger'}"

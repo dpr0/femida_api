@@ -1,8 +1,9 @@
-class CsvParserJob < ApplicationJob
+class CsvParserParseJob < ApplicationJob
   queue_as :default
 
   def perform(id)
     parser = CsvParser.find_by(file_id: id)
+    parser.update(status: 2)
     file = ActiveStorage::Attachment.find_by(id: id)
     array = []
     file.open do |f|
@@ -14,15 +15,16 @@ class CsvParserJob < ApplicationJob
         array << {
           file_id: id,
           external_id: (line[parser.external_id]    if parser.external_id),
+          middle_name: (line[parser.middle_name]    if parser.middle_name),
           phone:       (line[parser.phone].last(10) if parser.phone),
           passport:    (line[parser.passport]       if parser.passport),
           last_name:   (line[parser.last_name]      if parser.last_name),
           first_name:  (line[parser.first_name]     if parser.first_name),
-          middle_name: (line[parser.middle_name]    if parser.middle_name),
           birth_date:  (line[parser.birth_date].to_date&.strftime('%d.%m.%Y') if parser.birth_date)
         }
       end
     end
     array.uniq.each_slice(10000) { |slice| CsvUser.insert_all(slice) }
+    parser.update(status: 3)
   end
 end

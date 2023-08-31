@@ -30,7 +30,7 @@ class ParserController < ApplicationController
     csv_parser = CsvParser.find_by(file_id: params[:id])
     @headers = csv_parser.headers.split(csv_parser.separator)
     csv_parser.update(
-      saved:       params[:saved],
+      status:      1,
       phone:       index_by(:phone),
       passport:    index_by(:passport),
       last_name:   index_by(:last_name),
@@ -43,7 +43,21 @@ class ParserController < ApplicationController
   end
 
   def parse
-    CsvParserJob.perform_later(params[:parser_id])
+    CsvParserParseJob.perform_later(params[:parser_id])
+  end
+
+  def check
+    CsvParserCheckJob.perform_later(params[:parser_id])
+  end
+
+  def get_csv
+    z = CSV.generate do |csv|
+      csv << %w[external_id phone passport last_name first_name middle_name birth_date is_phone_verified is_passport_verified]
+      CsvUser.where(file_id: params[:parser_id]).each do |d|
+        csv << [d.external_id, d.phone, d.passport, d.last_name, d.first_name, d.middle_name, d.birth_date, d.is_phone_verified, d.is_passport_verified]
+      end
+    end
+    send_data(z, filename: "response_ID_#{params[:parser_id]}-#{Time.now.to_i}.csv", type: 'text/csv')
   end
 
   private

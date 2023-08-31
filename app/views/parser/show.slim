@@ -14,16 +14,19 @@
               = text_field_tag :separator, ';', class: 'input is-medium'
         .column.is-2
           .field
-            label.label.has-text-success-dark Сохранить параметры
+            label.label.has-text-success-dark Статус
             .control
-              = check_box_tag :saved, true, class: 'input is-medium'
+              = text_field_tag :status, "#{@csv_parser.status} - #{CsvParser::STATUSES[@csv_parser.status]}", class: 'input is-medium', disabled: true
         .column.is-2
           .field
-            = f.submit 'Сохранить', class: 'button is-success'
-        .column.is-2
-          .field
-            - if @csv_parser.saved
+            - if @csv_parser.status == 0
+              = f.submit 'Сохранить', class: 'button is-success'
+            - if @csv_parser.status == 1
               = link_to 'Распарсить файл', parser_parse_path(@csv_parser.file_id), method: :post, data: { turbo: true, turbo_method: :post }, class: 'button is-primary'
+            - if @csv_parser.status == 3
+              = link_to 'Запустить проверку', parser_check_path(@csv_parser.file_id), method: :post, data: { turbo: true, turbo_method: :post }, class: 'button is-primary'
+            - if @csv_parser.status == 5
+              = link_to 'Скачать CSV', parser_get_csv_path(@csv_parser.file_id), target: '_blank', class: 'button is-primary'
 
       - if @csv_users.present?
         .columns
@@ -48,7 +51,7 @@
               .control
                 = text_field_tag :rows, @csv_users.where(is_passport_verified: true).count, class: 'input is-medium', disabled: true
 
-      - unless @csv_parser.saved
+      - if @csv_parser.status == 0
         .columns
           label.label.has-text-success-dark Аттрибуты из первой строки
         .columns
@@ -62,12 +65,13 @@
                     .has-text-grey = col
                   - else
                     .has-text-danger = col
-      - %w[external_id phone passport last_name first_name middle_name birth_date].each_slice(4) do |slice|
-        .columns
-          - slice.each do |ff|
-            .column.is-3
-              .field
-                label.label.has-text-success-dark = ff
-                .control
-                  - fff = @headers.select { |col| ff.include?(col[0..3]) || col.include?(ff[0..3]) }
-                  = text_field_tag ff, @csv_parser.saved ? @headers[@csv_parser.send(ff)] : fff, class: 'input is-medium'
+      - if @csv_parser.status < 2
+        - %w[external_id phone passport last_name first_name middle_name birth_date].each_slice(4) do |slice|
+          .columns
+            - slice.each do |ff|
+              .column.is-3
+                .field
+                  label.label.has-text-success-dark = ff
+                  .control
+                    - fff = @headers.select { |col| ff.include?(col[0..3]) || col.include?(ff[0..3]) }
+                    = text_field_tag ff, @csv_parser.status == 1 ? @headers[@csv_parser.send(ff)] : fff, class: 'input is-medium'

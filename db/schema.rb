@@ -82,8 +82,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_31_080000) do
     t.integer "passport"
     t.integer "phone"
     t.integer "rows"
-    t.boolean "saved"
     t.string "separator"
+    t.integer "status", default: 0
   end
 
   create_table "csv_users", force: :cascade do |t|

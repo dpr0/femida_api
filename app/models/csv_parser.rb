@@ -15,11 +15,13 @@
 #  passport                   :integer
 #  phone                      :integer
 #  rows                       :integer
-#  saved                      :boolean
 #  separator                  :string
+#  status                     :integer          default(0)
 #  external_id                :integer
 #  file_id                    :integer
 #
 class CsvParser < ApplicationRecord
   has_many :csv_users
+
+  STATUSES = ['загружен', 'распознаны заголовки', 'начало инсерта в БД', 'сохранено в БД', 'запущена проверка', 'проверка завершена', '', '', '']
 end

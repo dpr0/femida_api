@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   resources :files
   resources :parser do
     post :parse
+    post :check
+    get :get_csv
   end
 
   namespace :api do

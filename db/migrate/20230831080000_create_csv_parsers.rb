@@ -14,7 +14,7 @@ class CreateCsvParsers < ActiveRecord::Migration[7.0]
       t.integer :first_name
       t.integer :middle_name
       t.integer :birth_date
-      t.boolean :saved
+      t.integer :status, default: 0
       t.string :headers
       t.string :separator
     end
