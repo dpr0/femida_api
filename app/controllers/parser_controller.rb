@@ -10,7 +10,7 @@ class ParserController < ApplicationController
   def show
     @csv_parser = CsvParser.find_by(file_id: params[:id])
     @csv_user = CsvUser.new
-    @csv_users = CsvUser.where(file_id: params[:id])
+    @csv_users = CsvUser.where(file_id: params[:id]).all
     @headers = @csv_parser.headers.split(@csv_parser.separator)
   end
 
@@ -48,6 +48,7 @@ class ParserController < ApplicationController
 
   def check
     CsvParserCheckJob.perform_later(params[:parser_id])
+    redirect_to parser_path(params[:parser_id])
   end
 
   def get_csv

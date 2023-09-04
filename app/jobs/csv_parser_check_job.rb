@@ -2,32 +2,26 @@ class CsvParserCheckJob < ApplicationJob
   queue_as :default
 
   def perform(id)
+    okbService = 0
     parser = CsvParser.find_by(file_id: id)
     parser.update(status: 4)
-    file = ActiveStorage::Attachment.find_by(id: id)
-    array = []
-
     resp = RestClient::Request.execute(
       method: :post,
       url: "#{ENV['FEMIDA_PERSONS_API_HOST']}/api/users/login",
       payload: { email: ENV['FEMIDA_PERSONS_API_LOGIN'], password: ENV['FEMIDA_PERSONS_API_PASSWORD'] }
     )
     body = JSON.parse resp.body if resp.code == 200
-    Sample02.where(is_passport_verified: false).or(Sample02.where(is_phone_verified: false)).in_batches.each do |batch|
+    CsvUser.where(file_id: id).in_batches.each do |batch|
       array = []
       batch.each do |u|
-        info = {}
         is_phone_verified = u.is_phone_verified
         is_passport_verified = u.is_passport_verified
         hash = {
-          last_name: u.last_name.downcase,
-          first_name: u.first_name.downcase,
-          middle_name: u.middle_name.downcase,
+          last_name: u.last_name,
+          first_name: u.first_name,
+          middle_name: u.middle_name,
           birth_date: u.birth_date
         }
-        # z = eval(u.resp) if u.resp && u.resp[0..2] == '[{"'
-        # drs = z.select { |smpl| smpl['ИМЯ']&.downcase == "#{hash[:last_name]} #{hash[:first_name]} #{hash[:middle_name]}" && smpl['ПАСПОРТ']&.downcase == u.passport }
-        #        .map { |x| x['ДАТА РОЖДЕНИЯ'] if x['ДАТА РОЖДЕНИЯ'].present? }.compact.uniq if z.present?
         is_passport_verified ||= begin # if drs.present?
           resp = JSON.parse RestClient.post(
             "#{ENV['FEMIDA_PERSONS_API_HOST']}/api/persons/search",
@@ -39,21 +33,19 @@ class CsvParserCheckJob < ApplicationJob
                                     z = resp['data'].select do |d|
                                       d['LastName'] == u.last_name && d['FirstName'] == u.first_name && d['Telephone'].last(10) == u.phone.last(10)
                                     end.present?
-                                    info[:is_phone_verified] = :odyssey if z
+                                    is_phone_verified_source = :odyssey if z
                                     z
                                   end
-            # resp['data'].each do |data|
-            #   inform = JSON.parse(data['Information'])['D']
-            #   ...
-            # end
-
+            # inform = resp['data'].map { |data| JSON.parse(data['Information'])['D'] }
+            # pasports = inform.select { |x| x.join(' ').include? 'ПАСПОРТ' }.compact
+            # drs = inform.select { |smpl| smpl.join(' ').include? 'РОЖД' }.compact
             z = resp['data'].select { |d| d['Passport'] == u.passport }.present?
-            info[:is_passport_verified] = :odyssey if z
+            is_passport_verified_source = :odyssey if z
             z
           end
         rescue
           false
-                                 end
+        end
         is_passport_verified ||= begin
                                    inn = InnService.call(
                                      passport: u.passport,
@@ -63,7 +55,7 @@ class CsvParserCheckJob < ApplicationJob
                                      o: u.middle_name&.downcase
                                    )
                                    z = inn && inn['inn'].present?
-                                   info[:is_passport_verified] = :inn_service if z
+                                   is_passport_verified_source = :inn_service if z
                                    z
                                  rescue
                                    false
@@ -78,7 +70,7 @@ class CsvParserCheckJob < ApplicationJob
                                 z = if resp && resp['count'] > 0
                                       resp['data'].select { |d| d['LastName'] == u.last_name && d['FirstName'] == u.first_name }.present?
                                     end
-                                info[:is_phone_verified] = :solar if z
+                                is_phone_verified_source = :solar if z
                                 z
                               rescue
                                 false
@@ -90,7 +82,7 @@ class CsvParserCheckJob < ApplicationJob
                                   first_name: u.first_name&.downcase,
                                   phone: u.phone&.last(10)
                                 ).exists?
-                                info[:is_phone_verified] = :parsed_users if z
+                                is_phone_verified_source = :parsed_users if z
                                 z
                               end
 
@@ -104,16 +96,18 @@ class CsvParserCheckJob < ApplicationJob
                                     patronymic: u.middle_name.downcase,
                                     consent: 'Y'
                                   )
+                                  okbService += 1
+                                  Rails.logger.info("CsvParserCheckJob_#{id}___okb_service___ #{okbService}")
                                 end
                                 z = resp && resp['score'] > 2
-                                info[:is_phone_verified] = :okb if z
+                                is_phone_verified_source = :okb if z
                                 z
                               rescue
                                 false
                               end
-        array << { id: u.id, is_passport_verified: is_passport_verified || false, is_phone_verified: is_phone_verified || false, info: info }
+        array << { id: u.id, is_passport_verified: is_passport_verified || false, is_phone_verified: is_phone_verified || false, is_phone_verified_source: is_phone_verified_source, is_passport_verified_source: is_passport_verified_source }
       end
-      Sample02.upsert_all(array, update_only: [:is_passport_verified, :is_phone_verified, :info])
+      CsvUser.upsert_all(array, update_only: [:is_passport_verified, :is_phone_verified, :is_phone_verified_source, :is_passport_verified_source])
     end
     parser.update(status: 5)
   end

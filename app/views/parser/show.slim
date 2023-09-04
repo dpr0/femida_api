@@ -19,6 +19,7 @@
               = text_field_tag :status, "#{@csv_parser.status} - #{CsvParser::STATUSES[@csv_parser.status]}", class: 'input is-medium', disabled: true
         .column.is-2
           .field
+            label.label.has-text-success-dark Действие
             - if @csv_parser.status == 0
               = f.submit 'Сохранить', class: 'button is-success'
             - if @csv_parser.status == 1
@@ -34,22 +35,22 @@
             .field
               label.label.has-text-success-dark Добавлено уникальных записей в БД
               .control
-                = text_field_tag :rows, @csv_users.count, class: 'input is-medium', disabled: true
+                = text_field_tag :rows, @csv_users.size, class: 'input is-medium', disabled: true
           .column.is-3
             .field
               label.label.has-text-success-dark Записей проверено
               .control
-                = text_field_tag :rows, @csv_users.where.not(is_phone_verified: nil).count, class: 'input is-medium', disabled: true
+                = text_field_tag :rows, @csv_users.select { |x| x.is_phone_verified != nil }.size, class: 'input is-medium', disabled: true
           .column.is-3
             .field
               label.label.has-text-success-dark Телефон подтвержден
               .control
-                = text_field_tag :rows, @csv_users.where(is_phone_verified: true).count, class: 'input is-medium', disabled: true
+                = text_field_tag :rows, @csv_users.select { |x| x.is_phone_verified == true }.size, class: 'input is-medium', disabled: true
           .column.is-3
             .field
               label.label.has-text-success-dark Паспорт подтвержден
               .control
-                = text_field_tag :rows, @csv_users.where(is_passport_verified: true).count, class: 'input is-medium', disabled: true
+                = text_field_tag :rows, @csv_users.select { |x| x.is_passport_verified == true }.size, class: 'input is-medium', disabled: true
 
       - if @csv_parser.status == 0
         .columns
@@ -74,4 +75,4 @@
                   label.label.has-text-success-dark = ff
                   .control
                     - fff = @headers.select { |col| ff.include?(col[0..3]) || col.include?(ff[0..3]) }
-                    = text_field_tag ff, @csv_parser.status == 1 ? @headers[@csv_parser.send(ff)] : fff, class: 'input is-medium'
+                    = text_field_tag ff, @csv_parser.status == 1 && @csv_parser.send(ff) ? @headers[@csv_parser.send(ff)] : fff, class: 'input is-medium'
