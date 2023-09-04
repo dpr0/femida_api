@@ -87,7 +87,7 @@ class CsvParserCheckJob < ApplicationJob
                               end
 
         is_phone_verified ||= begin
-                                if is_phone_verified.nil? && u.phone.present? && u.birth_date.present? && u.last_name.present? && u.first_name.present? && u.middle_name.present?
+                                if u.phone.present? && u.birth_date.present? && u.last_name.present? && u.first_name.present? && u.middle_name.present?
                                   resp = OkbService.call(
                                     telephone_number: u.phone,
                                     birthday: u.birth_date,
