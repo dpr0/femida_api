@@ -11,7 +11,7 @@ class CsvParserCheckJob < ApplicationJob
       payload: { email: ENV['FEMIDA_PERSONS_API_LOGIN'], password: ENV['FEMIDA_PERSONS_API_PASSWORD'] }
     )
     body = JSON.parse resp.body if resp.code == 200
-    CsvUser.where(file_id: id).where.not(is_phone_verified: nil).in_batches(of: 100).each do |batch|
+    CsvUser.where(file_id: id).where(is_phone_verified: nil).in_batches(of: 100).each do |batch|
       array = []
       batch.each do |u|
         is_phone_verified = u.is_phone_verified
