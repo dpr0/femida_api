@@ -3,7 +3,7 @@ class CsvParserInnJob < ApplicationJob
 
   def perform(id)
     parser = CsvParser.find_by(file_id: id)
-    parser.update(status: 6)
+    parser.update(status: 4)
     CsvUser.where(file_id: id, is_passport_verified: [nil, false]).in_batches(of: 100).each do |batch|
       array = []
       batch.each do |u|
@@ -33,7 +33,7 @@ class CsvParserInnJob < ApplicationJob
     end
 
     parser.update(
-      status: 7,
+      status: 5,
       is_passport_verified_count: CsvUser.where(file_id: id, is_passport_verified: true).count
     )
   end

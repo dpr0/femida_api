@@ -57,6 +57,11 @@ class ParserController < ApplicationController
     redirect_to parser_path(params[:parser_id])
   end
 
+  def user_check
+    CsvParserUserJob.perform_later(params[:parser_id])
+    redirect_to parser_path(params[:parser_id])
+  end
+
   def okb_check
     CsvParserOkbJob.perform_later(params[:parser_id])
     redirect_to parser_path(params[:parser_id])

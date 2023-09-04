@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     post :parse
     post :solar_check
     post :inn_check
+    post :user_check
     post :okb_check
     get :get_csv
   end
