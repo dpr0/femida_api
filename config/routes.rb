@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   resources :parser do
     post :parse
     post :check
+    post :okb_check
     get :get_csv
   end
 
