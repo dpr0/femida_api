@@ -10,7 +10,8 @@ Rails.application.routes.draw do
   resources :files
   resources :parser do
     post :parse
-    post :check
+    post :solar_check
+    post :inn_check
     post :okb_check
     get :get_csv
   end

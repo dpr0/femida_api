@@ -4,8 +4,8 @@ class CsvParserOkbJob < ApplicationJob
   def perform(id)
     okbService = 0
     parser = CsvParser.find_by(file_id: id)
-    parser.update(status: 6)
-    CsvUser.where(file_id: id, is_phone_verified: false).in_batches(of: 10).each do |batch|
+    parser.update(status: 8)
+    CsvUser.where(file_id: id, is_phone_verified: false).in_batches(of: 100).each do |batch|
       array = []
       batch.each do |u|
         is_phone_verified = u.is_phone_verified
@@ -38,6 +38,6 @@ class CsvParserOkbJob < ApplicationJob
       end
       CsvUser.upsert_all(array, update_only: [:is_phone_verified, :is_phone_verified_source])
     end
-    parser.update(status: 7)
+    parser.update(status: 9)
   end
 end

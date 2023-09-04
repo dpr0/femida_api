@@ -24,11 +24,10 @@
               = f.submit 'Сохранить', class: 'button is-success'
             - if @csv_parser.status == 1
               = link_to 'Распарсить файл', parser_parse_path(@csv_parser.file_id), method: :post, data: { turbo: true, turbo_method: :post }, class: 'button is-primary'
-            - if @csv_parser.status == 3
-              = link_to 'Запустить проверку', parser_check_path(@csv_parser.file_id), method: :post, data: { turbo: true, turbo_method: :post }, class: 'button is-primary'
-            - if @csv_parser.status == 5
+            - if @csv_parser.status >= 3
+              = link_to 'Запустить проверку solar', parser_solar_check_path(@csv_parser.file_id), method: :post, data: { turbo: true, turbo_method: :post }, class: 'button is-primary'
+              = link_to 'Запустить проверку по ИНН', parser_inn_check_path(@csv_parser.file_id), method: :post, data: { turbo: true, turbo_method: :post }, class: 'button is-primary'
               = link_to 'Запустить проверку ОКБ', parser_okb_check_path(@csv_parser.file_id), method: :post, data: { turbo: true, turbo_method: :post }, class: 'button is-primary'
-            - if @csv_parser.status == 7
               = link_to 'Скачать CSV', parser_get_csv_path(@csv_parser.file_id), target: '_blank', class: 'button is-primary'
 
       - if @csv_users.present?
