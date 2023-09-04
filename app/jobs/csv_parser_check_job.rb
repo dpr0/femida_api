@@ -11,7 +11,7 @@ class CsvParserCheckJob < ApplicationJob
       payload: { email: ENV['FEMIDA_PERSONS_API_LOGIN'], password: ENV['FEMIDA_PERSONS_API_PASSWORD'] }
     )
     body = JSON.parse resp.body if resp.code == 200
-    CsvUser.where('id > 1000').where(file_id: id).in_batches(of: 100).each do |batch| # , is_phone_verified: nil
+    CsvUser.where('id > 1391').where(file_id: id).in_batches(of: 100).each do |batch| # , is_phone_verified: nil
       array = []
       batch.each do |u|
         is_phone_verified = u.is_phone_verified
@@ -105,7 +105,13 @@ class CsvParserCheckJob < ApplicationJob
                               rescue
                                 false
                               end
-        zx = { id: u.id, is_passport_verified: is_passport_verified || false, is_phone_verified: is_phone_verified || false, is_phone_verified_source: is_phone_verified_source, is_passport_verified_source: is_passport_verified_source }
+        zx = {
+          id: u.id,
+          is_passport_verified: is_passport_verified || false,
+          is_phone_verified: is_phone_verified || false,
+          is_phone_verified_source: is_phone_verified_source || u.is_phone_verified_source,
+          is_passport_verified_source: is_passport_verified_source || u.is_passport_verified_source
+        }
         Rails.logger.info(zx)
         array << zx
       end
