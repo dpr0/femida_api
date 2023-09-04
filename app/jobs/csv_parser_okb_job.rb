@@ -10,28 +10,26 @@ class CsvParserOkbJob < ApplicationJob
       batch.each do |u|
         is_phone_verified = u.is_phone_verified
         is_phone_verified ||= begin
-                                if u.phone.present? && u.birth_date.present? && u.last_name.present? && u.first_name.present? && u.middle_name.present?
-                                  resp = OkbService.call(
-                                    telephone_number: u.phone,
-                                    birthday: u.birth_date,
-                                    surname: u.last_name.downcase,
-                                    name: u.first_name.downcase,
-                                    patronymic: u.middle_name.downcase,
-                                    consent: 'Y'
-                                  )
-                                  okbService += 1
-                                  Rails.logger.info("#{u.id} CsvParserOkbJob_#{id}___okb_service___ #{okbService}")
-                                end
-                                z = resp && resp['score'] > 2
-                                is_phone_verified_source = :okb if z
-                                z
-                              rescue
-                                false
-                              end
+          if u.phone.present? && u.birth_date.present? && u.last_name.present? && u.first_name.present? && u.middle_name.present?
+            resp = OkbService.call(
+              telephone_number: u.phone,
+              birthday: u.birth_date,
+              surname: u.last_name.downcase,
+              name: u.first_name.downcase,
+              patronymic: u.middle_name.downcase,
+              consent: 'Y'
+            )
+            okbService += 1
+            Rails.logger.info("#{u.id} CsvParserOkbJob_#{id}___okb_service___ #{okbService}")
+          end
+          resp && resp['score'] > 2
+        rescue
+          false
+        end
         zx = {
           id: u.id,
           is_phone_verified: is_phone_verified || false,
-          is_phone_verified_source: is_phone_verified_source || u.is_phone_verified_source,
+          is_phone_verified_source: u.is_phone_verified_source || :okb,
         }
         Rails.logger.info(zx)
         array << zx
