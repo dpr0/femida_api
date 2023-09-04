@@ -19,17 +19,16 @@ class CsvParserOkbJob < ApplicationJob
               patronymic: u.middle_name.downcase,
               consent: 'Y'
             )
-            okbService += 1
-            Rails.logger.info("#{u.id} CsvParserOkbJob_#{id}___okb_service___ #{okbService}")
+            Rails.logger.info("#{u.id} CsvParserOkbJob_#{id} score_#{resp['score']} ##{okbService += 1}")
+            resp && resp['score'] > 2
           end
-          resp && resp['score'] > 2
         rescue
           false
         end
         zx = {
           id: u.id,
           is_phone_verified: is_phone_verified || false,
-          is_phone_verified_source: u.is_phone_verified_source || :okb,
+          is_phone_verified_source: :okb
         }
         Rails.logger.info(zx)
         array << zx
