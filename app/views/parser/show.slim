@@ -49,7 +49,7 @@
               label.label.has-text-success-dark Телефон подтвержден
               .control
                 - verified = @csv_users.select { |x| x.is_phone_verified == true }
-                - map = verified.group_by(&:is_passport_verified_source).map { |k, v| [k, v.size] }.map { |val| "#{val[0] || 'nil'}: #{val[1]}" }
+                - map = verified.group_by(&:is_phone_verified_source).map { |k, v| [k, v.size] }.map { |val| "#{val[0] || 'nil'}: #{val[1]}" }
                 = text_field_tag :rows, "#{verified.size} (#{map.join(', ')})", class: 'input is-medium', disabled: true
 
           .column.is-6
