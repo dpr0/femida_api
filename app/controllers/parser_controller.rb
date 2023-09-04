@@ -18,7 +18,7 @@ class ParserController < ApplicationController
     current_user.attachments.attach(params[:user][:attachment])
     file = current_user.attachments.last
     headers = file.open(&:first).chomp
-    rows = file.open(&:count) - 1
+    rows = file.open(&:count)
     a1 = headers.split(';').size
     a2 = headers.split(',').size
     sep = [' ',';',','][a1 <=> a2]

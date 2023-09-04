@@ -42,27 +42,23 @@
               label.label.has-text-success-dark Записей проверено
               .control
                 = text_field_tag :rows, @csv_users.select { |x| x.is_phone_verified != nil }.size, class: 'input is-medium', disabled: true
-          .column.is-3
+      - if @csv_users.present?
+        .columns
+          .column.is-6
             .field
               label.label.has-text-success-dark Телефон подтвержден
               .control
-                = text_field_tag :rows, @csv_users.select { |x| x.is_phone_verified == true }.size, class: 'input is-medium', disabled: true
-          .column.is-3
+                - verified = @csv_users.select { |x| x.is_phone_verified == true }
+                - map = verified.group_by(&:is_passport_verified_source).map { |k, v| [k, v.size] }.map { |val| "#{val[0] || 'nil'}: #{val[1]}" }
+                = text_field_tag :rows, "#{verified.size} (#{map.join(', ')})", class: 'input is-medium', disabled: true
+
+          .column.is-6
             .field
               label.label.has-text-success-dark Паспорт подтвержден
               .control
-                = text_field_tag :rows, @csv_users.select { |x| x.is_passport_verified == true }.size, class: 'input is-medium', disabled: true
-        .columns
-          .column.is-3
-            .field
-              label.label.has-text-success-dark
-              .control
-                ul
-                  - @csv_users.select { |x| x.is_phone_verified == true }.group_by(&:is_phone_verified_source).map { |k,v| [k, v.size] }.each do |val|
-                    li = "#{val[0]} => #{val[1]}"
-                ul
-                  - @csv_users.select { |x| x.is_passport_verified == true }.group_by(&:is_passport_verified_source).map { |k,v| [k, v.size] }.each do |val|
-                    li = "#{val[0]} => #{val[1]}"
+                - verified = @csv_users.select { |x| x.is_passport_verified == true }
+                - map = verified.group_by(&:is_passport_verified_source).map { |k, v| [k, v.size] }.map { |val| "#{val[0] || 'nil'}: #{val[1]}" }
+                = text_field_tag :rows, "#{verified.size} (#{map.join(', ')})", class: 'input is-medium', disabled: true
 
       - if @csv_parser.status == 0
         .columns

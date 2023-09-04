@@ -99,22 +99,6 @@ GEM
       actionpack (>= 5.0)
       activesupport (>= 5.0)
     ast (2.4.2)
-    async (1.31.0)
-      console (~> 1.10)
-      nio4r (~> 2.3)
-      timers (~> 4.1)
-    async-http (0.60.2)
-      async (>= 1.25)
-      async-io (>= 1.28)
-      async-pool (>= 0.2)
-      protocol-http (~> 0.24.0)
-      protocol-http1 (~> 0.15.0)
-      protocol-http2 (~> 0.15.0)
-      traces (>= 0.10.0)
-    async-io (1.35.0)
-      async
-    async-pool (0.4.0)
-      async (>= 1.25)
     base64 (0.1.1)
     bcrypt (3.1.19)
     bcrypt_pbkdf (1.1.0)
@@ -149,9 +133,6 @@ GEM
     cocoon (1.2.15)
     concurrent-ruby (1.2.2)
     connection_pool (2.4.1)
-    console (1.23.2)
-      fiber-annotation
-      fiber-local
     crass (1.0.6)
     cssbundling-rails (1.2.0)
       railties (>= 6.0.0)
@@ -189,8 +170,6 @@ GEM
       webrick (~> 1.7)
       websocket-driver (>= 0.6, < 0.8)
     ffi (1.15.5)
-    fiber-annotation (0.2.0)
-    fiber-local (1.0.0)
     globalid (1.2.0)
       activesupport (>= 6.1)
     http-accept (1.7.0)
@@ -272,13 +251,6 @@ GEM
       ast (~> 2.4.1)
       racc
     pg (1.5.4)
-    protocol-hpack (1.4.2)
-    protocol-http (0.24.7)
-    protocol-http1 (0.15.1)
-      protocol-http (~> 0.22)
-    protocol-http2 (0.15.1)
-      protocol-hpack (~> 1.4)
-      protocol-http (~> 0.18)
     psych (5.1.0)
       stringio
     public_suffix (5.0.3)
@@ -445,8 +417,6 @@ GEM
     thor (1.2.2)
     tilt (2.2.0)
     timeout (0.4.0)
-    timers (4.3.5)
-    traces (0.11.1)
     turbo-rails (1.4.0)
       actionpack (>= 6.0.0)
       activejob (>= 6.0.0)
@@ -485,7 +455,6 @@ PLATFORMS
 DEPENDENCIES
   annotate
   apipie-rails
-  async-http
   bcrypt_pbkdf
   bootsnap
   brakeman

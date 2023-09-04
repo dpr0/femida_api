@@ -28,7 +28,7 @@ class CsvParserSolarJob < ApplicationJob
             tels = inform.select { |x| x.join(' ').include?('ТЕЛЕФОН') }.compact.select do |x|
               ['СВЯЗЬ', 'ТЕЛЕФОН ЮЛ', 'ТЕЛЕФОН РАБОТЫ'].map { |xx| xx if x.join(' ').include? xx }.compact.blank?
             end.compact
-            is_phone_verified ||= tels.map { |xx| xx.join(' ').scan(/[0-9]{10,11}/).map { |x| x.last(10) }.select { |x| x.first == '4' } }.flatten.include? u.phone
+            is_phone_verified ||= tels.map { |xx| xx.join(' ').scan(/[0-9]{10,11}/).map { |x| x.last(10) }.select { |x| x.first == '9' } }.flatten.include? u.phone
             is_phone_verified ||= resp['data'].find do |d|
                                     d['LastName']&.downcase == u.last_name && d['FirstName']&.downcase == u.first_name && d['Telephone']&.last(10) == u.phone.last(10)
                                   end.present?
