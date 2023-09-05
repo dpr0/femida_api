@@ -2,8 +2,6 @@ class CsvParserUserJob < ApplicationJob
   queue_as :default
 
   def perform(id)
-    parser = CsvParser.find_by(file_id: id)
-    parser.update(status: 4)
     CsvUser.where(file_id: id, is_phone_verified: [nil, false]).in_batches(of: 100).each do |batch|
       array = []
       batch.each do |u|
@@ -25,7 +23,7 @@ class CsvParserUserJob < ApplicationJob
       CsvUser.upsert_all(array, update_only: [:is_phone_verified, :is_phone_verified_source])
     end
 
-    parser.update(
+    CsvParser.find_by(file_id: id).update(
       status: 5,
       is_phone_verified_count: CsvUser.where(file_id: id, is_phone_verified: true).count
     )

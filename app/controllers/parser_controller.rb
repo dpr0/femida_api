@@ -43,28 +43,23 @@ class ParserController < ApplicationController
   end
 
   def parse
-    CsvParserParseJob.perform_later(params[:parser_id])
-    redirect_to parser_path(params[:parser_id])
+    check(CsvParserParseJob, status: 2)
   end
 
   def solar_check
-    CsvParserSolarJob.perform_later(params[:parser_id])
-    redirect_to parser_path(params[:parser_id])
+    check(CsvParserSolarJob)
   end
 
   def inn_check
-    CsvParserInnJob.perform_later(params[:parser_id])
-    redirect_to parser_path(params[:parser_id])
+    check(CsvParserInnJob)
   end
 
   def user_check
-    CsvParserUserJob.perform_later(params[:parser_id])
-    redirect_to parser_path(params[:parser_id])
+    check(CsvParserUserJob)
   end
 
   def okb_check
-    CsvParserOkbJob.perform_later(params[:parser_id])
-    redirect_to parser_path(params[:parser_id])
+    check(CsvParserOkbJob)
   end
 
   def get_csv
@@ -78,6 +73,13 @@ class ParserController < ApplicationController
   end
 
   private
+
+  def check(job, status: 4)
+    id = params[:parser_id]
+    CsvParser.find_by(file_id: id).update(status: status)
+    job.perform_later(id)
+    redirect_to parser_path(id)
+  end
 
   def index_by(key)
     @headers.find_index(params[key])

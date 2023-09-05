@@ -25,5 +25,5 @@
 #  index_csv_users_on_phone     (phone)
 #
 class CsvUser < ApplicationRecord
-  belongs_to :csv_parser
+  belongs_to :csv_parser, foreign_key: :file_id, primary_key: :file_id
 end

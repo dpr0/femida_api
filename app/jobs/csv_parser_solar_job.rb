@@ -2,8 +2,6 @@ class CsvParserSolarJob < ApplicationJob
   queue_as :default
 
   def perform(id)
-    parser = CsvParser.find_by(file_id: id)
-    parser.update(status: 4)
     resp = RestClient::Request.execute(
       method: :post,
       url: "#{ENV['FEMIDA_PERSONS_API_HOST']}/api/users/login",
@@ -62,7 +60,7 @@ class CsvParserSolarJob < ApplicationJob
       CsvUser.upsert_all(array, update_only: [:is_passport_verified, :is_phone_verified, :is_phone_verified_source, :is_passport_verified_source])
     end
 
-    parser.update(
+    CsvParser.find_by(file_id: id).update(
       status: 5,
       is_phone_verified_count:    CsvUser.where(file_id: id, is_phone_verified: true).count,
       is_passport_verified_count: CsvUser.where(file_id: id, is_passport_verified: true).count

@@ -21,7 +21,7 @@
 #  file_id                    :integer
 #
 class CsvParser < ApplicationRecord
-  has_many :csv_users
+  has_many :csv_users, foreign_key: :file_id, primary_key: :file_id
 
   STATUSES = [
     'загружен',
