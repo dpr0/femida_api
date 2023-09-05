@@ -21,7 +21,7 @@ class ParserController < ApplicationController
     rows = file.open(&:count)
     a1 = headers.split(';').size
     a2 = headers.split(',').size
-    sep = [' ',';',','][a1 <=> a2]
+    sep = [' ', ';', ','][a1 <=> a2]
     CsvParser.create(file_id: file.id, headers: headers, rows: rows, separator: sep)
     redirect_to parser_path(file.id)
   end

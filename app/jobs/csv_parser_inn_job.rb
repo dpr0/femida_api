@@ -4,7 +4,6 @@ class CsvParserInnJob < ApplicationJob
   def perform(id)
     CsvUser
       .where(file_id: id, is_passport_verified: [nil, false])
-      # .where.not(is_passport_verified_source: :inn_service)
       .in_batches(of: 100).each do |batch|
       array = []
       batch.each do |u|

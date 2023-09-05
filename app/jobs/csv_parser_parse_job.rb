@@ -23,7 +23,7 @@ class CsvParserParseJob < ApplicationJob
         }
       end
     end
-    array.uniq.each_slice(10000) { |slice| CsvUser.insert_all(slice) }
+    array.each_slice(10000) { |slice| CsvUser.insert_all(slice) }
     parser.update(status: 3)
   end
 end
