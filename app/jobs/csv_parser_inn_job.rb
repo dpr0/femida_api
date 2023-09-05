@@ -7,7 +7,6 @@ class CsvParserInnJob < ApplicationJob
       .in_batches(of: 100).each do |batch|
       array = []
       batch.each do |u|
-        is_passport_verified = u.is_passport_verified
         is_passport_verified ||= begin
           inn = InnService.call(
             passport: u.passport,
@@ -24,7 +23,7 @@ class CsvParserInnJob < ApplicationJob
         zx = {
           id: u.id,
           is_passport_verified: is_passport_verified || false,
-          is_passport_verified_source: u.is_passport_verified_source || :inn_service
+          is_passport_verified_source: (:inn_service if is_passport_verified)
         }
         Rails.logger.info(zx)
         array << zx

@@ -52,18 +52,18 @@ class CsvParserSolarJob < ApplicationJob
           id: u.id,
           is_passport_verified: is_passport_verified || false,
           is_phone_verified: is_phone_verified || false,
-          is_phone_verified_source: u.is_phone_verified_source || :solar,
-          is_passport_verified_source: u.is_passport_verified_source || :solar
+          is_phone_verified_source: u.is_phone_verified ? u.is_phone_verified_source : (:solar if is_phone_verified),
+          is_passport_verified_source: u.is_passport_verified ? u.is_passport_verified_source : (:solar if is_passport_verified)
         }
         Rails.logger.info(zx)
         array << zx
       end
-      CsvUser.upsert_all(array, update_only: [:is_passport_verified, :is_phone_verified, :is_phone_verified_source, :is_passport_verified_source])
+      CsvUser.upsert_all(array, update_only: %i[is_passport_verified is_phone_verified is_phone_verified_source is_passport_verified_source])
     end
 
     CsvParser.find_by(file_id: id).update(
       status: 5,
-      is_phone_verified_count:    CsvUser.where(file_id: id, is_phone_verified: true).count,
+      is_phone_verified_count:    CsvUser.where(file_id: id, is_phone_verified:    true).count,
       is_passport_verified_count: CsvUser.where(file_id: id, is_passport_verified: true).count
     )
   end

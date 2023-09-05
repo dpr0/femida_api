@@ -8,7 +8,6 @@ class CsvParserOkbJob < ApplicationJob
       .in_batches(of: 100).each do |batch|
       array = []
       batch.each do |u|
-        is_phone_verified = u.is_phone_verified
         is_phone_verified ||= begin
           if u.phone.present? && u.birth_date.present? && u.last_name.present? && u.first_name.present? && u.middle_name.present?
             resp = OkbService.call(
@@ -28,7 +27,7 @@ class CsvParserOkbJob < ApplicationJob
         zx = {
           id: u.id,
           is_phone_verified: is_phone_verified || false,
-          is_phone_verified_source: :okb
+          is_phone_verified_source: (:okb if is_phone_verified)
         }
         Rails.logger.info(zx)
         array << zx
