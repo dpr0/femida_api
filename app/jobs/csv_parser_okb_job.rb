@@ -3,7 +3,10 @@ class CsvParserOkbJob < ApplicationJob
 
   def perform(id)
     okbService = 0
-    CsvUser.where(file_id: id, is_phone_verified: false).in_batches(of: 100).each do |batch|
+    CsvUser
+      .where(file_id: id, is_phone_verified: false)
+      .where.not(is_phone_verified_source: :okb)
+      .in_batches(of: 100).each do |batch|
       array = []
       batch.each do |u|
         is_phone_verified = u.is_phone_verified

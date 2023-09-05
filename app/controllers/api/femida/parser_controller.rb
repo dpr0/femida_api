@@ -3,22 +3,8 @@
 class Api::Femida::ParserController < ApplicationController
   protect_from_forgery with: :null_session
 
-  def whoosh
-    file = File.read(Rails.root.join('tmp', 'whoosh', 'whoosh-small-users.json'))
-    data = JSON.parse(file)
-    array = data.map { |u| { name: u['name'], phone: u['phone'], email: u['email'] } }
-    array.each_slice(30000) do |slice|
-      User.insert_all(slice)
-    end
-    file = CSV.generate do |csv|
-      csv << ['name', 'phone', 'email']
-      array.each { |data| csv << [data[:name], data[:phone], data[:email]] }
-    end
-    send_data(file, filename: 'response.csv', type: 'text/csv')
-  end
-
   def phone_rates
-    filename = 'sql1.csv''retro_mc_femida_complete_scored.csv'
+    filename = 'retro_mc_femida_complete_scored.csv'
     file = File.read(Rails.root.join('tmp', 'parser', filename))
     data = CSV.parse(file, headers: true)
     response = []
@@ -273,44 +259,6 @@ class Api::Femida::ParserController < ApplicationController
     else
       ''
     end
-  end
-
-  def start_csv
-    # hash1 = {}
-    # File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_is_os_phone_req.csv')).each do |line|
-    #   key, value = line.chomp.delete('"').split(",")
-    #   next if key == 'Phone_search'
-    #   hash1[key.last(10)] = value
-    # end
-    # hash2 = {}
-    # File.readlines(Rails.root.join('tmp', 'narod', 'moneyman_scored_adjusted_score.csv')).each do |line|
-    #   key, value = line.chomp.delete('"').split(",")
-    #   next if key == 'phone'
-    #   hash2[key.last(10)] = value
-    # end
-
-    z = CSV.generate do |csv|
-      arr = %w[id customer_id last_name first_name middle_name phone passport birth_date is_passport_verified is_phone_verified]
-      csv << arr
-      Sample02.select(arr).all.each do |data|
-        array = [
-          data.id,
-          data.customer_id,
-          data.last_name,
-          data.first_name,
-          data.middle_name,
-          data.phone,
-          data.passport,
-          data.birth_date,
-          data.is_passport_verified,
-          data.is_phone_verified
-          # hash1[data.phone.last(10)],
-          # hash2[data.phone.last(10)]
-        ]
-        csv << array
-      end
-    end
-    send_data(z, filename: 'response.csv', type: 'text/csv')
   end
 
   def narod

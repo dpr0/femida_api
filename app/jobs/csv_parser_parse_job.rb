@@ -2,6 +2,7 @@ class CsvParserParseJob < ApplicationJob
   queue_as :default
 
   def perform(id)
+    parser = CsvParser.find_by(file_id: id)
     file = ActiveStorage::Attachment.find_by(id: id)
     array = []
     file.open do |f|
@@ -23,6 +24,6 @@ class CsvParserParseJob < ApplicationJob
       end
     end
     array.uniq.each_slice(10000) { |slice| CsvUser.insert_all(slice) }
-    CsvParser.find_by(file_id: id).update(status: 3)
+    parser.update(status: 3)
   end
 end

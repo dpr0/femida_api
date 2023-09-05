@@ -2,7 +2,10 @@ class CsvParserUserJob < ApplicationJob
   queue_as :default
 
   def perform(id)
-    CsvUser.where(file_id: id, is_phone_verified: [nil, false]).in_batches(of: 100).each do |batch|
+    CsvUser
+      .where(file_id: id, is_phone_verified: [nil, false])
+      .where.not(is_phone_verified_source: :parsed_users)
+      .in_batches(of: 100).each do |batch|
       array = []
       batch.each do |u|
         is_phone_verified = u.is_phone_verified
