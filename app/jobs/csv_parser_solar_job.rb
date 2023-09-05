@@ -7,7 +7,7 @@ class CsvParserSolarJob < ApplicationJob
       { email: ENV['FEMIDA_PERSONS_API_LOGIN'], password: ENV['FEMIDA_PERSONS_API_PASSWORD'] }
     )
     @body = JSON.parse resp.body if resp.code == 200
-    CsvUser.where(file_id: id, is_phone_verified: [nil, false]).where.not(is_phone_verified_source: :solar).in_batches(of: 100).each do |batch|
+    CsvUser.where(file_id: id, is_phone_verified: nil).in_batches(of: 100).each do |batch|
       array = []
       batch.each do |u|
         is_phone_verified = u.is_phone_verified
