@@ -10,7 +10,7 @@ class CsvParserParseJob < ApplicationJob
         str = f.readline.force_encoding('UTF-8').chomp.delete("\"")
         next if str == parser.headers
 
-        line = str.downcase.delete("\"").split(parser.separator)
+        line = str.downcase.delete("\"").tr('ё', 'е').split(parser.separator)
         array << {
           file_id: id,
           external_id: (line[parser.external_id]    if parser.external_id),
@@ -19,6 +19,8 @@ class CsvParserParseJob < ApplicationJob
           passport:    (line[parser.passport]       if parser.passport),
           last_name:   (line[parser.last_name]      if parser.last_name),
           first_name:  (line[parser.first_name]     if parser.first_name),
+          is_passport_verified: (line[7] if line[7] == 'true'),
+          is_phone_verified: (line[8] if line[8] == 'true'),
           birth_date:  (line[parser.birth_date].to_date&.strftime('%d.%m.%Y') if parser.birth_date)
         }
       end

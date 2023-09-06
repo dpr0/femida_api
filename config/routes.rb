@@ -15,6 +15,7 @@ Rails.application.routes.draw do
     post :user_check
     post :okb_check
     get :get_csv
+    get :sample, on: :collection
   end
 
   namespace :api do
@@ -45,19 +46,11 @@ Rails.application.routes.draw do
       resources :fssp_wanted, only: :index
       resources :parser do
         collection do
-          get :whoosh
           get :phone_rates
           get :turbozaim
           get :turbozaim2
           get :turbozaim3
           get :narod
-          get :expired_passports
-          get :retro
-          get :retro2
-          get :start_csv
-          get :sample1
-          get :sample2
-          get :sample3
         end
       end
       resources :esia, only: :index do

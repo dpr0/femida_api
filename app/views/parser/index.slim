@@ -21,13 +21,13 @@
             th Паспортов подтверждено
             th Сохранен
         tbody
-          - CsvParser.all.each do |parser|
+          - @csv_parsers.each do |parser|
             tr
               td = parser.id
               td.level-right
                 = link_to parser.file_id, parser_path(parser.file_id)
               td = parser.rows
-              td = CsvUser.where(file_id: parser.file_id).count
+              td = parser.csv_users.count
               td = parser.is_phone_verified_count
               td = parser.is_passport_verified_count
               td = "#{parser.status} - #{CsvParser::STATUSES[parser.status]}"

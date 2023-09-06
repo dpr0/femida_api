@@ -5,6 +5,16 @@ class ParserController < ApplicationController
   before_action :authenticate_user!
 
   def index
+    @csv_parsers = CsvParser.all
+  end
+
+  def sample
+    user = params['csv_user'].permit!.to_h.reject { |_, value| value.blank? }
+    @csv_user = CsvUser.new
+
+    if user
+      @results = PersonService.instance.search(user)['data'].group_by { |x| x['Telephone'] }
+    end
   end
 
   def show

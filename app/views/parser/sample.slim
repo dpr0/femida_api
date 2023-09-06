@@ -1,0 +1,67 @@
+.hero-body
+  .container.has-text-centered
+    = form_for @csv_user, url: sample_parser_index_path, method: :get, data: { turbo: false } do |f|
+      .columns
+        .column.is-2
+          .field
+            label.label.has-text-success-dark Фамилия
+            .control
+              = f.text_field :last_name, class: 'input is-medium form-control', value: params.dig(:csv_user, :last_name)
+        .column.is-2
+          .field
+            label.label.has-text-success-dark Имя
+            .control
+              = f.text_field :first_name, class: 'input is-medium form-control', value: params.dig(:csv_user, :first_name)
+        .column.is-2
+          .field
+            label.label.has-text-success-dark Отчество
+            .control
+              = f.text_field :middle_name, class: 'input is-medium form-control', value: params.dig(:csv_user, :middle_name)
+        .column.is-2
+          .field
+            label.label.has-text-success-dark Телефон
+            .control
+              = f.text_field :phone, class: 'input is-medium form-control', value: params.dig(:csv_user, :phone)
+        .column.is-2
+          .field
+            label.label.has-text-success-dark Дата рождения
+            .control
+              = f.text_field :birth_date, class: 'input is-medium form-control', value: params.dig(:csv_user, :birth_date)
+        .column.is-2
+          .field
+            label.label.has-text-success-dark !
+            .control
+              = f.submit 'Проверить', class: 'button is-primary is-fullwidth'
+
+      .columns
+        .column.is-12
+          - @results.each do |key, array|
+            - next if key.blank?
+            - result = array.first.slice(*%w[ID FirstName LastName MiddleName Telephone Car Passport DayBirth MonthBirth YearBirth SNILS INN])
+            - results = array.map { |x| JSON.parse(x['Information'])['D'].reject(&:empty?).join(' ') }
+            br
+            .card
+              .card-content
+                .media
+                  .media-content
+                    p.title.is-4
+                      = result.slice(*%w[LastName FirstName MiddleName]).values.reject(&:blank?).join(' ')
+                    .columns
+                      .column.is-2
+                      .column.is-4
+                        p.subtitle
+                          = key.present? ? "Тел.: #{key}" : 'Остальные'
+                      .column.is-4
+                        p.subtitle
+                          = "Дата рождения: #{result.slice(*%w[DayBirth MonthBirth YearBirth]).values.reject(&:blank?).join('.').to_date&.strftime('%d.%m.%Y')}"
+                      .column.is-2
+
+                .content
+                  - result.slice(*%w[Car Passport SNILS INN]).each do |k, v|
+                    - if v.present?
+                      = "#{k}: #{v}"
+
+                  ul
+                    - results.each do |k, v|
+                      li.has-text-left = "#{k}: #{v}"
+
