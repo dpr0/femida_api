@@ -1,6 +1,8 @@
 class PersonService
   include Singleton
 
+  attr_reader :token
+
   def initialize
     @token = post_req(
       {
@@ -12,7 +14,7 @@ class PersonService
   end
 
   def search(hash)
-    post_req(hash, 'persons/search', 'Authorization' => "Bearer #{@token}")
+    post_req(hash, 'persons/search', 'Authorization' => "Bearer #{token}")
   end
 
   private

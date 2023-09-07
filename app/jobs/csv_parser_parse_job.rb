@@ -6,7 +6,7 @@ class CsvParserParseJob < ApplicationJob
     file = ActiveStorage::Attachment.find_by(id: id)
     array = []
     file.open do |f|
-      (parser.rows + 1).times do
+      parser.rows.times do
         str = f.readline.force_encoding('UTF-8').chomp.delete("\"")
         next if str == parser.headers || str.blank?
 
@@ -19,8 +19,8 @@ class CsvParserParseJob < ApplicationJob
           passport:    (line[parser.passport]       if parser.passport),
           last_name:   (line[parser.last_name]      if parser.last_name),
           first_name:  (line[parser.first_name]     if parser.first_name),
-          is_passport_verified: (line[8] if line[8] == 'true'),
-          is_phone_verified: (line[9] if line[9] == 'true'),
+          # is_passport_verified: (line[8] if line[8] == 'true'),
+          # is_phone_verified:    (line[7] if line[7] == 'true'),
           birth_date:  (line[parser.birth_date].to_date&.strftime('%d.%m.%Y') if parser.birth_date)
         }
       end

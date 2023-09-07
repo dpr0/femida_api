@@ -12,8 +12,10 @@ class CsvParserSolarPhoneJob < ApplicationJob
           resp = person_service.search(phone: u.phone.last(10))
           if resp && resp['count'] > 0
             resp['data'].select do |d|
-              fio = "#{d['LastName']} #{d['FirstName']} #{d['MiddleName']}".downcase.tr('ё', 'е')
-              fio.include?(u.last_name) && fio.include?(u.first_name)
+              ['Имя контакта', 'ИМЯ', 'ФИО', 'Клиент', 'Фио', 'ИМЯ КЛИЕНТА'].select do |ff|
+                fio = d[ff].downcase.tr('ё', 'е')
+                fio.include?(u.last_name) && fio.include?(u.first_name)
+              end.present?
             end.present?
           end
         rescue
@@ -26,7 +28,7 @@ class CsvParserSolarPhoneJob < ApplicationJob
         Rails.logger.info(zx)
         array << zx
       end
-      CsvUser.upsert_all(array, update_only: %i[is_phone_verified is_phone_verified_source])
+      CsvUser.upsert_all(array, update_only: %i[is_phone_verified is_phone_verified_source]) if array.present?
     end
 
     CsvParser.find_by(file_id: id).update(
