@@ -48,4 +48,8 @@ class ApplicationController < ActionController::Base
   rescue RestClient::NotFound, RestClient::BadRequest => e
     { key => false }
   end
+
+  def is_admin?
+    redirect_to '/' unless current_user.admin?
+  end
 end

@@ -1,26 +1,17 @@
 section.hero.is-lower-alpha
   .hero-head
     .container
-      / nav.navbar aria-label=("main navigation") role="navigation"
-        / #navbarBasicExample.navbar-menu
-          / .navbar-start
-            / .navbar-item
-              / = link_to 'femida-search.online'
-
-          .navbar-end
-            .navbar-item
-              .has-text-primary = notice
-            .navbar-item
-              .has-text-danger = alert
-
-section.hero.is-lower-alpha
-  .hero-head
-    .container
       nav.navbar aria-label=("main navigation") role="navigation"
         #navbarBasicExample.navbar-menu
           .navbar-start
             .navbar-item
-              = link_to 'FEMIDA', root_path
+              = link_to 'Админка', admin_index_path
+            .navbar-item
+              = link_to 'Файлы', files_path
+            .navbar-item
+              = link_to 'Ретро', parser_index_path
+            .navbar-item
+              = link_to 'Поиск', sample_parser_index_path
             .navbar-item
               - if current_user
                 = link_to users_path(current_user) do
@@ -41,4 +32,4 @@ section.hero.is-lower-alpha
       h1.title
         i.fa-solid.fa-scale-balanced
         | &nbsp
-        | femida
+        | Femida

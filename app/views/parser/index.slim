@@ -1,34 +1,78 @@
 .hero-body
-  .container.has-text-centered
-    .columns
-      = form_for current_user, url: parser_index_path, method: :post, data: { turbo: false } do |f|
-        = f.label :attachment
-        = f.file_field :attachment
-        = f.submit 'Загрузить файл'
-      br
-      br
-      br
-      br
-    .columns
-      table.table.is-fullwidth.is-striped
-        thead
-          tr
-            th ID
-            th FILE_ID
-            th Строк в файле
-            th Уникальный строк в БД
-            th Телефонов подтверждено
-            th Паспортов подтверждено
-            th Сохранен
-        tbody
-          - @csv_parsers.each do |parser|
-            tr
-              td = parser.id
-              td.level-right
-                = link_to parser.file_id, parser_path(parser.file_id)
-              td = parser.rows
-              td = parser.csv_users.count
-              td = parser.is_phone_verified_count
-              td = parser.is_passport_verified_count
-              td = "#{parser.status} - #{CsvParser::STATUSES[parser.status]}"
-                / i.fa-solid class="fa-square-#{ parser.status == 1 ? 'check has-text-primary' : 'xmark has-text-danger'}"
+  .container.is-fullhd.has-text-centered
+
+  .tile.is-ancestor
+    .tile.is-vertical.is-12
+      .tile.is-parent
+        article.tile.is-child.notification
+          p.title
+            | Wide tile
+          p.subtitle
+            = form_for current_user, url: parser_index_path, method: :post, data: { turbo: false } do |f|
+              = f.label :attachment
+              = f.file_field :attachment
+              = f.submit 'Загрузить файл'
+          p.content
+            .columns
+              table.table.is-fullwidth.is-striped
+                thead
+                  tr
+                    th ID
+                    th FILE_ID
+                    th Строк в файле
+                    th Уникальный строк в БД
+                    th Телефонов подтверждено
+                    th Паспортов подтверждено
+                    th Сохранен
+                tbody
+                  - @csv_parsers.each do |parser|
+                    tr
+                      td = parser.id
+                      td.level-right
+                        = link_to parser.file_id, parser_path(parser.file_id)
+                      td = parser.rows
+                      td = parser.csv_users.count
+                      td = parser.is_phone_verified_count
+                      td = parser.is_passport_verified_count
+                      td = "#{parser.status} - #{CsvParser::STATUSES[parser.status]}"
+                      / i.fa-solid class="fa-square-#{ parser.status == 1 ? 'check has-text-primary' : 'xmark has-text-danger'}"
+
+  / .tile.is-ancestor
+  /   .tile.is-vertical.is-8
+  /     .tile
+  /       .tile.is-parent.is-vertical
+  /         article.tile.is-child.notification.is-primary
+  /           p.title
+  /             | Vertical...
+  /           p.subtitle
+  /             | Top tile
+  /         article.tile.is-child.notification.is-warning
+  /           p.title
+  /             | ...tiles
+  /           p.subtitle
+  /             | Bottom tile
+  /       .tile.is-parent
+  /         article.tile.is-child.notification.is-info
+  /           p.title
+  /             | Middle tile
+  /           p.subtitle
+  /             | With an image
+  /           figure.image.is-4by3
+  /             img[src="https://bulma.io/images/placeholders/640x480.png"]
+  /     .tile.is-parent
+  /       article.tile.is-child.notification.is-danger
+  /         p.title
+  /           | Wide tile
+  /         p.subtitle
+  /           | Aligned with the right tile
+  /         .content
+  /
+  /   .tile.is-parent
+  /     article.tile.is-child.notification.is-success
+  /       .content
+  /
+  /       p.title
+  /         | Tall tile
+  /       p.subtitle
+  /         | With even more content
+  /       .content

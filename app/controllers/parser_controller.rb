@@ -3,6 +3,7 @@
 class ParserController < ApplicationController
   protect_from_forgery with: :null_session
   before_action :authenticate_user!
+  before_action :is_admin?, except: %i[index sample show]
 
   def index
     @csv_parsers = CsvParser.all
@@ -16,9 +17,9 @@ class ParserController < ApplicationController
   end
 
   def show
-    @csv_parser = CsvParser.find_by(file_id: params[:id])
     @csv_user = CsvUser.new
-    @csv_users = CsvUser.where(file_id: params[:id]).all
+    @csv_parser = CsvParser.find_by(file_id: params[:id])
+    @csv_users = @csv_parser.csv_users
     @headers = @csv_parser.headers.split(@csv_parser.separator)
   end
 
