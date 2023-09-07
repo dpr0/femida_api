@@ -9,12 +9,10 @@ class ParserController < ApplicationController
   end
 
   def sample
-    user = params['csv_user'].permit!.to_h.reject { |_, value| value.blank? }
+    user = params['csv_user'].permit!.to_h.reject { |_, value| value.blank? } if params['csv_user'].present?
     @csv_user = CsvUser.new
 
-    if user
-      @results = PersonService.instance.search(user)['data'].group_by { |x| x['Telephone'] }
-    end
+    @results = user ? PersonService.instance.search(user)['data'].group_by { |x| x['Telephone'] } : {}
   end
 
   def show
