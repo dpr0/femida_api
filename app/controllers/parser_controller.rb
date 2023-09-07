@@ -6,7 +6,7 @@ class ParserController < ApplicationController
   before_action :is_admin?, except: %i[index sample show]
 
   def index
-    @csv_parsers = CsvParser.all
+    @csv_parsers = CsvParser.all.order(:id)
   end
 
   def sample
@@ -55,8 +55,12 @@ class ParserController < ApplicationController
     check(CsvParserParseJob, status: 2)
   end
 
-  def solar_check
-    check(CsvParserSolarJob)
+  def solar_phone_check
+    check(CsvParserSolarPhoneJob)
+  end
+
+  def solar_passp_check
+    check(CsvParserSolarPasspJob)
   end
 
   def inn_check

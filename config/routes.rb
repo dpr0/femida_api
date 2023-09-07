@@ -11,7 +11,8 @@ Rails.application.routes.draw do
   resources :files
   resources :parser do
     post :parse
-    post :solar_check
+    post :solar_phone_check
+    post :solar_passp_check
     post :inn_check
     post :user_check
     post :okb_check
