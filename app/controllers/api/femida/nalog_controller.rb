@@ -4,7 +4,7 @@ class Api::Femida::NalogController < ApplicationController
   protect_from_forgery with: :null_session
 
   HOST = 'https://pb.nalog.ru/'
-  RETRY = 3
+  RETRY = 5
   RU = {
     'а' => 'a', 'б' => 'b', 'в' => 'v',  'г' => 'g',  'д' => 'd',   'е' => 'e', 'ё' => 'yo', 'ж' => 'j', 'з' => 'z', 'и' => 'i',  'й' => 'y',
     'к' => 'k', 'л' => 'l', 'м' => 'm',  'н' => 'n',  'о' => 'o',   'п' => 'p', 'р' => 'r',  'с' => 's', 'т' => 't', 'у' => 'u',  'ф' => 'f',

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_08_31_080000) do
+ActiveRecord::Schema[7.0].define(version: 2023_09_08_162000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -517,6 +517,20 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_31_080000) do
     t.float "rate"
     t.string "status"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "requests", force: :cascade do |t|
+    t.string "birth_date"
+    t.datetime "created_at", null: false
+    t.string "first_name"
+    t.string "info"
+    t.string "last_name"
+    t.string "middle_name"
+    t.string "phone"
+    t.string "response"
+    t.string "service"
+    t.datetime "updated_at", null: false
+    t.index ["phone"], name: "index_requests_on_phone"
   end
 
   create_table "retro_mc_femida_ext_complete_users", force: :cascade do |t|

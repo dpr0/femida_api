@@ -262,10 +262,10 @@ class Api::Femida::ParserController < ApplicationController
   end
 
   def narod
-    with_error_handling do
+    # with_error_handling do
       # MedJob.perform_later()
       # Med1Job.perform_later()
-      dfs = DatesFromString.new
+      # dfs = DatesFromString.new
       # File.readlines(Rails.root.join('tmp', 'info_parser', 'spasibosberbank.csv')).each do |line|
       #   data = line.force_encoding('windows-1251').encode('utf-8').chomp.delete('"').split(";")
       #   next if data[0] == 'APPLICATION_ID'
@@ -291,36 +291,42 @@ class Api::Femida::ParserController < ApplicationController
       # end
 
       array = []
-      File.readlines(Rails.root.join('tmp', 'info_parser', "sbermarket.csv")).each do |line|
-        data = line.chomp.split(",")
-        next if data[0] == 'firstname'
-        phone = data[3]&.last(10)
-        next if phone.blank?
-
-        # date = begin
-        #          dfs.find_date("#{data[3]}.#{data[4]}.#{data[5]}").first&.to_date&.strftime('%d.%m.%Y')
-        #        rescue
-        #          ''
-        #        end
-
-        hash = {
-          last_name: data[1]&.downcase,
-          first_name: data[0]&.downcase,
-          # middle_name: data[2]&.downcase,
-          # birth_date: data[3],
-          # passport: data[8],
-          phone: phone,
-          address: data[2]&.downcase,
-          is_phone_verified: data[4] == 'true'
-        }
-        array << hash # if data[0].present? || data[1].present? || data[2].present?
-        if array.size == 10000
-          ParsedUser.insert_all(array)
-          array = []
+      z = 0
+      File.readlines(Rails.root.join('tmp', 'parser', 'production.log')).each do |line|
+        z = 0 if z == 4
+        if line.include?('=========== Verify REQUEST: ============')
+          z += 1
+          next
+        end
+        next if z == 0
+        z += 1
+        if line.include?('https://idv.bki-okb.com/verify')
+          puts line
+          str = line.split('applicant":').last.split(',"submission').first
+          if str == 'null'
+            z = 0
+            next
+          end
+          data = JSON.parse(str)
+          @hash = {
+            service:     :okb,
+            phone:       data['telephone_number'].last(10),
+            last_name:   data['surname'],
+            first_name:  data['name'],
+            middle_name: data['patronymic'],
+            birth_date:  data['birthday'].to_date.strftime('%d.%m.%Y')
+          }
+          next
+        elsif line.include?('=========== Verify RESPONSE: ===========')
+          next
+        elsif line.include?('score')
+          @hash[:response] = JSON.parse(line)['score']
+          array << @hash
+          @hash = {}
+          z = 0
         end
       end
-      ParsedUser.insert_all(array) if array.present?
-
+      array.uniq.each_slice(10000) { |slice| Request.insert_all(slice) }
       # regexp = /\d{10}$/
       # batch_size = 50_000
       # (0..(ParsedUser.count.to_f / batch_size).ceil).each do |num|
@@ -330,7 +336,7 @@ class Api::Femida::ParserController < ApplicationController
       #   )
       #   sleep 0.2
       # end
-    end
+    # end
   end
 
   private
