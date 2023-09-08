@@ -35,33 +35,19 @@
 
       .columns
         .column.is-12
-          - @results.each do |key, array|
-            - next if key.blank?
-            - result = array.first.slice(*%w[ID FirstName LastName MiddleName Telephone Car Passport DayBirth MonthBirth YearBirth SNILS INN])
-            - results = array.map { |x| JSON.parse(x['Information'])['D'].reject(&:empty?).join(' ') }
+          - @results.each do |result|
             br
             .card
               .card-content
                 .media
                   .media-content
                     p.title.is-4
-                      = result.slice(*%w[LastName FirstName MiddleName]).values.reject(&:blank?).join(' ')
+                      = result['ИМЯ']
                     .columns
-                      .column.is-2
-                      .column.is-4
+                      .column.is-12
                         p.subtitle
-                          = key.present? ? "Тел.: #{key}" : 'Остальные'
-                      .column.is-4
-                        p.subtitle
-                          = "Дата рождения: #{result.slice(*%w[DayBirth MonthBirth YearBirth]).values.reject(&:blank?).join('.').to_date&.strftime('%d.%m.%Y')}"
-                      .column.is-2
-
+                          = result['Telephone'].present? ? "Тел.: #{result['Telephone']}" : '-'
                 .content
-                  - result.slice(*%w[Car Passport SNILS INN]).each do |k, v|
-                    - if v.present?
-                      = "#{k}: #{v}"
-
                   ul
-                    - results.each do |k, v|
+                    - result.each do |k, v|
                       li.has-text-left = "#{k}: #{v}"
-

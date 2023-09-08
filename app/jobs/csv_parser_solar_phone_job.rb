@@ -13,6 +13,8 @@ class CsvParserSolarPhoneJob < ApplicationJob
           if resp && resp['count'] > 0
             resp['data'].select do |d|
               ['Имя контакта', 'ИМЯ', 'ФИО', 'Клиент', 'Фио', 'ИМЯ КЛИЕНТА'].select do |ff|
+                next unless d[ff]
+
                 fio = d[ff].downcase.tr('ё', 'е')
                 fio.include?(u.last_name) && fio.include?(u.first_name)
               end.present?
