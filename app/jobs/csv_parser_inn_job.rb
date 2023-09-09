@@ -3,6 +3,7 @@ class CsvParserInnJob < ApplicationJob
 
   def perform(id)
     CsvUser
+      .where('id > 754670')
       .where(file_id: id, is_passport_verified: [nil, false])
       .in_batches(of: 100).each do |batch|
       array = []
