@@ -17,7 +17,6 @@
               table.table.is-fullwidth.is-striped
                 thead
                   tr
-                    th ID
                     th FILE_ID
                     th Строк в файле
                     th Уникальный строк в БД
@@ -27,9 +26,8 @@
                 tbody
                   - @csv_parsers.each do |parser|
                     tr
-                      td = parser.id
                       td.level-right
-                        = link_to parser.file_id, parser_path(parser.file_id)
+                        = link_to @blobs.find { |x| x.id == parser.file_id }.filename, parser_path(parser.file_id)
                       td = parser.rows
                       td = parser.csv_users.count
                       td = parser.is_phone_verified_count

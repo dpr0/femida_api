@@ -6,7 +6,8 @@ class FilesController < ApplicationController
   before_action :is_admin?
 
   def index
-    @attachments = ActiveStorage::Attachment.all
+    @csv_parser_ids = CsvParser.all.map { |x| x.file_id }
+    @attachments = ActiveStorage::Attachment.where.not(id: @csv_parser_ids).all
   end
 
   def create

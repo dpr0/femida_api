@@ -7,6 +7,7 @@ class ParserController < ApplicationController
 
   def index
     @csv_parsers = CsvParser.all.order(:id)
+    @blobs = ActiveStorage::Blob.where(id: @csv_parsers.map { |x| x.file_id })
   end
 
   def sample
@@ -81,7 +82,7 @@ class ParserController < ApplicationController
         csv << [d.external_id, d.phone, d.passport, d.last_name, d.first_name, d.middle_name, d.birth_date, d.is_phone_verified, d.is_passport_verified]
       end
     end
-    send_data(z, filename: "response_ID_#{params[:parser_id]}-#{Time.now.to_i}.csv", type: 'text/csv')
+    send_data(z, filename: "#{ActiveStorage::Blob.find(params[:parser_id]).filename}-#{Time.now.to_i}.csv", type: 'text/csv')
   end
 
   private

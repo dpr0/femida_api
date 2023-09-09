@@ -1,5 +1,5 @@
 class OkbService
-  def self.call(params)
+  def self.call(params, db = true)
     if params[:document].present?
       params[:document] = params[:document].to_i
       params[:issued_at] = params[:issued_at].to_date.to_s if params[:issued_at].present?
@@ -16,13 +16,28 @@ class OkbService
       params[:telephone_number]
     end
 
+    hash_req = {
+      service:     :okb,
+      phone:       params['telephone_number'].last(10),
+      last_name:   params['surname'],
+      first_name:  params['name'],
+      middle_name: params['patronymic'],
+      birth_date:  params['birthday'].to_date.strftime('%d.%m.%Y')
+    }
+    okb = Request.find_by(hash_req) if db
+
+    return { 'score': okb.score } if okb
+
     curl = "/opt/cprocsp/bin/amd64/curl -i -X POST -vvv --cert #{ENV['CERT_SHA1_THUMBPRINT']}:#{ENV['CERT_PASSWORD']} --cert-type CERT_SHA1_HASH_PROP_ID:CERT_SYSTEM_STORE_CURRENT_USER:MY"
     hash = { client_id: ENV['OKB_CLIENT_ID'], client_secret: ENV['OKB_CLIENT_SECRET'], grant_type: 'client_credentials', scope: 'openid' }
     auth = parse_json :auth, "#{curl} -H Content-Type:application/x-www-form-urlencoded #{hash_to_str(hash, 'd')}"
     t = Time.now
     json = { applicant: params, submission: { identifier: t.to_i.to_s, date: t.to_date.to_s, app_date: t.to_date.to_s } }.to_json
     hash = { 'Content-Type:': 'application/json', 'Authorization:Bearer ': auth['access_token'], 'X-Request-Id:': Digest::UUID.uuid_v4 }
-    parse_json :verify, "#{curl} #{hash_to_str(hash, 'H')} -d '#{json}'"
+    resp = parse_json :verify, "#{curl} #{hash_to_str(hash, 'H')} -d '#{json}'"
+
+    Request.create(hash_req.merge(score: resp['score']))
+    resp
   end
 
   private
@@ -40,7 +55,7 @@ class OkbService
     begin
       JSON.parse(s)
     rescue
-      { score: -5 } # 14866733913
+      { score: -5 }
     end
   end
 end
