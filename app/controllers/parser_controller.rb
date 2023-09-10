@@ -3,17 +3,11 @@
 class ParserController < ApplicationController
   protect_from_forgery with: :null_session
   before_action :authenticate_user!
-  before_action :is_admin?, except: %i[index sample show]
+  before_action :is_admin?, except: %i[index show]
 
   def index
     @csv_parsers = CsvParser.all.order(:id)
     @blobs = ActiveStorage::Blob.where(id: @csv_parsers.map { |x| x.file_id })
-  end
-
-  def sample
-    user = params['csv_user'].permit!.to_h.reject { |_, value| value.blank? } if params['csv_user'].present?
-    @csv_user = CsvUser.new
-    @results = user ? PersonService.instance.search(user)['data'] : {}
   end
 
   def show

@@ -1,6 +1,6 @@
 .hero-body
   .container.has-text-centered
-    = form_for @csv_user, url: sample_parser_index_path, method: :get, data: { turbo: false } do |f|
+    = form_for @csv_user, url: sample_index_path, method: :get, data: { turbo: false } do |f|
       .columns
         .column.is-2
           .field

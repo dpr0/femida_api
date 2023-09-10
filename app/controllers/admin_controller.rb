@@ -6,6 +6,6 @@ class AdminController < ApplicationController
   before_action :is_admin?
 
   def index
-
+    @request_count = `grep '=========== Verify REQUEST: ============' log/production.log -c`
   end
 end

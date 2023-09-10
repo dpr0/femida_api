@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   devise_for :users
 
   resources :admin
+  resources :sample
   resources :users
   resources :files
   resources :parser do
@@ -18,7 +19,6 @@ Rails.application.routes.draw do
     post :db_okb_check
     post :okb_check
     get :get_csv
-    get :sample, on: :collection
   end
 
   namespace :api do
