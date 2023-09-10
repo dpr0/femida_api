@@ -31,6 +31,7 @@
                 = link_to 'Проверка solar phone', parser_solar_phone_check_path(@csv_parser.file_id), opts
                 = link_to 'Проверка solar passp', parser_solar_passp_check_path(@csv_parser.file_id), opts
                 = link_to 'Проверка по ИНН',              parser_inn_check_path(@csv_parser.file_id), opts
+                = link_to 'Проверка db_okb',           parser_db_okb_check_path(@csv_parser.file_id), opts
                 = link_to 'Проверка по parsed_users',    parser_user_check_path(@csv_parser.file_id), opts
                 = link_to 'Проверка ОКБ',                 parser_okb_check_path(@csv_parser.file_id), opts
                 = link_to 'Скачать CSV',                    parser_get_csv_path(@csv_parser.file_id), target: '_blank', class: 'button outlined is-primary is-fullwidth'

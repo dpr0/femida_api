@@ -10,9 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_09_08_162000) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_31_080000) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "citext"
   enable_extension "plpgsql"
+  enable_extension "postgres_fdw"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
@@ -107,6 +109,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_08_162000) do
   create_table "expired_passports", force: :cascade do |t|
     t.string "passp_number"
     t.string "passp_series"
+    t.index ["passp_series"], name: "expired_passports_passp_series_index"
   end
 
   create_table "femida_retro_users", force: :cascade do |t|
@@ -511,26 +514,21 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_08_162000) do
     t.index ["phone"], name: "index_parsed_users_on_phone"
   end
 
+  create_table "pdl", id: false, force: :cascade do |t|
+    t.string "dob"
+    t.serial "id", null: false
+    t.string "inn"
+    t.string "last_job_title"
+    t.string "oif"
+    t.string "rank"
+  end
+
   create_table "phone_rates", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "phone"
     t.float "rate"
     t.string "status"
     t.datetime "updated_at", null: false
-  end
-
-  create_table "requests", force: :cascade do |t|
-    t.string "birth_date"
-    t.datetime "created_at", null: false
-    t.string "first_name"
-    t.string "info"
-    t.string "last_name"
-    t.string "middle_name"
-    t.string "phone"
-    t.string "response"
-    t.string "service"
-    t.datetime "updated_at", null: false
-    t.index ["phone"], name: "index_requests_on_phone"
   end
 
   create_table "retro_mc_femida_ext_complete_users", force: :cascade do |t|

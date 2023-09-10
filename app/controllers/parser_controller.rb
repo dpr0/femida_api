@@ -71,6 +71,10 @@ class ParserController < ApplicationController
     check(CsvParserUserJob)
   end
 
+  def db_okb_check
+    check(CsvParserDbOkbJob)
+  end
+
   def okb_check
     check(CsvParserOkbJob)
   end

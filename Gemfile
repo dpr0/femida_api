@@ -36,7 +36,6 @@ gem 'sassc-rails'
 group :development, :test do
   gem 'debug'
   gem 'byebug'
-  gem 'annotate'
   gem 'brakeman'
   gem 'bundler-audit', github: 'rubysec/bundler-audit'
   gem 'letter_opener_web'

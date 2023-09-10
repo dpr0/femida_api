@@ -301,13 +301,12 @@ class Api::Femida::ParserController < ApplicationController
         next if z == 0
         z += 1
         if line.include?('https://idv.bki-okb.com/verify')
-          puts line
           str = line.split('applicant":').last.split(',"submission').first
           if str == 'null'
             z = 0
             next
           end
-          data = JSON.parse(str)
+          data = JSON.parse(str.downcase.tr('ё', 'е'))
           @hash = {
             service:     :okb,
             phone:       data['telephone_number'].last(10),

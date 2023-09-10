@@ -15,6 +15,7 @@ Rails.application.routes.draw do
     post :solar_passp_check
     post :inn_check
     post :user_check
+    post :db_okb_check
     post :okb_check
     get :get_csv
     get :sample, on: :collection
