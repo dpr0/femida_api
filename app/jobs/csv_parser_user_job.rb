@@ -7,21 +7,25 @@ class CsvParserUserJob < ApplicationJob
       .in_batches(of: 100).each do |batch|
       array = []
       batch.each do |u|
-        user = ParsedUser.where(
+        user = ParsedUser.find_by(
           last_name: u.last_name&.downcase,
           first_name: u.first_name&.downcase,
           phone: u.phone&.last(10)
-        ).first
-        is_phone_verified = user.is_phone_verified
+        )
+        next unless user
+
+        is_phone_verified = user.is_phone_verified.nil? || user.is_phone_verified == 't'
+        next unless is_phone_verified
+
         zx = {
           id: u.id,
-          is_phone_verified: is_phone_verified || false,
-          is_phone_verified_source: (:parsed_users if user.is_phone_verified)
+          is_phone_verified: is_phone_verified,
+          is_phone_verified_source: :parsed_users
         }
         Rails.logger.info(zx)
         array << zx
       end
-      CsvUser.upsert_all(array, update_only: %i[is_phone_verified is_phone_verified_source])
+      CsvUser.upsert_all(array, update_only: %i[is_phone_verified is_phone_verified_source]) if array.present?
     end
 
     CsvParser.find_by(file_id: id).update(
