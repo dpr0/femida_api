@@ -18,15 +18,15 @@ class OkbService
 
     hash_req = {
       service:     :okb,
-      phone:       params['telephone_number'].last(10),
-      last_name:   params['surname'],
-      first_name:  params['name'],
-      middle_name: params['patronymic'],
-      birth_date:  params['birthday'].to_date.strftime('%d.%m.%Y')
+      phone:       params[:telephone_number].last(10),
+      last_name:   params[:surname],
+      first_name:  params[:name],
+      middle_name: params[:patronymic],
+      birth_date:  params[:birthday].to_date.strftime('%d.%m.%Y')
     }
     okb = Request.find_by(hash_req) if db
 
-    return { 'score': okb.score } if okb
+    return { 'score' => okb.response&.to_i || -5 } if okb
 
     curl = "/opt/cprocsp/bin/amd64/curl -i -X POST -vvv --cert #{ENV['CERT_SHA1_THUMBPRINT']}:#{ENV['CERT_PASSWORD']} --cert-type CERT_SHA1_HASH_PROP_ID:CERT_SYSTEM_STORE_CURRENT_USER:MY"
     hash = { client_id: ENV['OKB_CLIENT_ID'], client_secret: ENV['OKB_CLIENT_SECRET'], grant_type: 'client_credentials', scope: 'openid' }
