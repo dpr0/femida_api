@@ -35,12 +35,9 @@ class CsvParserXxxJob < ApplicationJob
 
         hash = { id: id, is_phone_verified: is_phone_verified, is_phone_verified_source: :solar }
         num += 1
-        Rails.logger.info("XXX_solar: ============================ :#{num}")
-        Rails.logger.info(hash)
+        Rails.logger.info("XXX_solar: ============================ :#{num} #{hash}")
         array << hash
-
         hash
-        array << u.log(:phone, :solar)
       end
       CsvUser.upsert_all(array, update_only: %i[is_phone_verified is_phone_verified_source]) if array.present?
     end
