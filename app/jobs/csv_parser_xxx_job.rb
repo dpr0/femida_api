@@ -33,7 +33,7 @@ class CsvParserXxxJob < ApplicationJob
           end.present?
         end
 
-        hash = { id: id, is_phone_verified: is_phone_verified, is_phone_verified_source: :solar }
+        hash = { id: u.id, is_phone_verified: is_phone_verified, is_phone_verified_source: :solar }
         num += 1
         Rails.logger.info("XXX_solar: ============================ :#{num} #{hash}")
         array << hash
