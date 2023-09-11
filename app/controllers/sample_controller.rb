@@ -9,5 +9,7 @@ class SampleController < ApplicationController
     user = params['csv_user'].permit!.to_h.reject { |_, value| value.blank? } if params['csv_user'].present?
     @csv_user = CsvUser.new
     @results = user ? PersonService.instance.search(user)['data'] : {}
+    @requests_results = user ? Request.where(user) : []
+    @parsed_user_results = user ? ParsedUser.where(user) : []
   end
 end

@@ -34,6 +34,43 @@
               = f.submit 'Проверить', class: 'button is-primary is-fullwidth'
 
       .columns
+        .column.is-6
+          - @requests_results.each do |result|
+            br
+            .card
+              .card-content
+                .media
+                  .media-content
+                    .columns
+                      .column.is-12
+                        p.subtitle
+                          | таблица запросов в ОКБ
+                .content
+                  ul
+                    li.has-text-left = "#{result.last_name} #{result.first_name} #{result.middle_name}"
+                    li.has-text-left = "#{result.birth_date}"
+                    li.has-text-left = "#{result.phone}"
+                    li.has-text-left = "Score: #{result.response}"
+        .column.is-6
+          - @parsed_user_results.each do |result|
+            br
+            .card
+              .card-content
+                .media
+                  .media-content
+                    .columns
+                      .column.is-12
+                        p.subtitle
+                          | таблица parsed_users
+                .content
+                  ul
+                    li.has-text-left = "#{result.last_name} #{result.first_name} #{result.middle_name}"
+                    li.has-text-left = "#{result.birth_date}"
+                    li.has-text-left = "#{result.passport}"
+                    li.has-text-left = "#{result.phone}"
+                    li.has-text-left = "#{result.address}"
+
+      .columns
         .column.is-12
           - @results.each do |result|
             br
@@ -46,7 +83,7 @@
                     .columns
                       .column.is-12
                         p.subtitle
-                          = result['Telephone'].present? ? "Тел.: #{result['Telephone']}" : '-'
+                          = result['ТЕЛЕФОН']
                 .content
                   ul
                     - result.each do |k, v|
