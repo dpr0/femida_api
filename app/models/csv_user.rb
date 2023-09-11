@@ -26,4 +26,14 @@
 #
 class CsvUser < ApplicationRecord
   belongs_to :csv_parser, foreign_key: :file_id, primary_key: :file_id
+
+  def log(source, field)
+    hash = {
+      id: id,
+      "is_#{field}_verified".to_sym => true,
+      "is_#{field}_verified_source".to_sym => source
+    }
+    Rails.logger.info(hash)
+    hash
+  end
 end

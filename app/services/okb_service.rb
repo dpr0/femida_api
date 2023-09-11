@@ -16,6 +16,8 @@ class OkbService
       params[:telephone_number]
     end
 
+    return if params[:telephone_number].blank?
+
     hash_req = {
       service:     :okb,
       phone:       params[:telephone_number].last(10),

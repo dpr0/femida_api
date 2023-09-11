@@ -19,16 +19,9 @@ class CsvParserInnJob < ApplicationJob
         rescue
           false
         end
-
-        zx = {
-          id: u.id,
-          is_passport_verified: is_passport_verified || false,
-          is_passport_verified_source: (:inn_service if is_passport_verified)
-        }
-        Rails.logger.info(zx)
-        array << zx
+        array << u.log(:passport, :inn_service) if is_passport_verified
       end
-      CsvUser.upsert_all(array, update_only: [:is_passport_verified, :is_passport_verified_source])
+      CsvUser.upsert_all(array, update_only: %i[is_passport_verified is_passport_verified_source]) if array.present?
     end
 
     CsvParser.find_by(file_id: id).update(

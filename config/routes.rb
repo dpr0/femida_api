@@ -18,6 +18,7 @@ Rails.application.routes.draw do
     post :user_check
     post :db_okb_check
     post :okb_check
+    post :xxx_check
     get :get_csv
   end
 

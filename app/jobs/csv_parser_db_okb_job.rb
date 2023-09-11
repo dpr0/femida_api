@@ -15,17 +15,9 @@ class CsvParserDbOkbJob < ApplicationJob
         rescue
           false
         end
-        if is_phone_verified
-          zx = {
-            id: u.id,
-            is_phone_verified: is_phone_verified || false,
-            is_phone_verified_source: (:db_okb if is_phone_verified)
-          }
-          Rails.logger.info(zx)
-          array << zx
-        end
+        array << u.log(:phone, :db_okb) if is_phone_verified
       end
-      CsvUser.upsert_all(array, update_only: [:is_phone_verified, :is_phone_verified_source]) if array.present?
+      CsvUser.upsert_all(array, update_only: %i[is_phone_verified is_phone_verified_source]) if array.present?
     end
     CsvParser.find_by(file_id: id).update(
       status: 5,

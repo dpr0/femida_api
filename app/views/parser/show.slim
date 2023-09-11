@@ -28,6 +28,7 @@
             - if @csv_parser.status == 3 || @csv_parser.status == 5
               .buttons.has-addons
                 - opts = { method: :post, data: { turbo: true, turbo_method: :post }, class: 'button is-primary is-fullwidth' }
+                = link_to 'Проверка ХХХ',                  parser_xxx_check_path(@csv_parser.file_id), opts
                 = link_to 'Проверка solar по тел', parser_solar_phone_check_path(@csv_parser.file_id), opts
                 = link_to 'Проверка solar фио+др', parser_solar_passp_check_path(@csv_parser.file_id), opts
                 = link_to 'Проверка по ИНН',               parser_inn_check_path(@csv_parser.file_id), opts

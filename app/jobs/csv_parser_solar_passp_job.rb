@@ -14,7 +14,7 @@ class CsvParserSolarPasspJob < ApplicationJob
         if resp && resp['count'] > 0
           is_phone_verified ||= resp['data'].find do |d|
             tels = %w[Телефон_сотовый Связь_с_телефоном Телефон_работы ТЕЛЕФОН].map { |x| d[x].scan(/\d/).join.last(10) if d[x].present? }.compact.uniq
-            name = d['ИМЯ'].downcase
+            name = d['ИМЯ']&.downcase&.tr('ё', 'е')&.split(' ')
             name&.include?(u.last_name) && name&.include?(u.first_name) && tels.include?(u.phone.last(10))
           end.present?
           is_passport_verified ||= resp['data'].find { |x| x['ПАСПОРТ'] == u.passport }.present?

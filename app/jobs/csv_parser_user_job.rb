@@ -15,15 +15,7 @@ class CsvParserUserJob < ApplicationJob
         next unless user
 
         is_phone_verified = user.is_phone_verified.nil? || user.is_phone_verified == 't'
-        next unless is_phone_verified
-
-        zx = {
-          id: u.id,
-          is_phone_verified: is_phone_verified,
-          is_phone_verified_source: :parsed_users
-        }
-        Rails.logger.info(zx)
-        array << zx
+        array << u.log(:phone, :parsed_users) if is_phone_verified
       end
       CsvUser.upsert_all(array, update_only: %i[is_phone_verified is_phone_verified_source]) if array.present?
     end

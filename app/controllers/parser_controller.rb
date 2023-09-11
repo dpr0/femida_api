@@ -73,6 +73,10 @@ class ParserController < ApplicationController
     check(CsvParserOkbJob)
   end
 
+  def xxx_check
+    check(CsvParserXxxJob)
+  end
+
   def get_csv
     z = CSV.generate do |csv|
       csv << %w[external_id phone passport last_name first_name middle_name birth_date is_phone_verified is_passport_verified]

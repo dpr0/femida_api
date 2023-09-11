@@ -15,7 +15,7 @@ class CsvParserSolarPhoneJob < ApplicationJob
               ['Имя контакта', 'ИМЯ', 'ФИО', 'Клиент', 'Фио', 'ИМЯ КЛИЕНТА'].select do |ff|
                 next unless d[ff]
 
-                fio = d[ff].downcase.tr('ё', 'е')
+                fio = d[ff].downcase.tr('ё', 'е').split(' ')
                 fio.include?(u.last_name) && fio.include?(u.first_name)
               end.present?
             end.present?
@@ -23,12 +23,7 @@ class CsvParserSolarPhoneJob < ApplicationJob
         rescue
           false
         end
-
-        next unless is_phone_verified
-
-        zx = { id: u.id, is_phone_verified: is_phone_verified, is_phone_verified_source: :solar }
-        Rails.logger.info(zx)
-        array << zx
+        array << u.log(:phone, :solar) if is_phone_verified
       end
       CsvUser.upsert_all(array, update_only: %i[is_phone_verified is_phone_verified_source]) if array.present?
     end
