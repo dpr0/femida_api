@@ -4,7 +4,7 @@ class CsvParserSolarPasspJob < ApplicationJob
   def perform(id)
     person_service = PersonService.instance
     CsvUser
-      .where(file_id: id, is_phone_verified: [nil, false])
+      .where(file_id: id, is_passport_verified: [nil, false])
       .in_batches(of: 100).each do |batch|
       array = []
       batch.each do |u|
@@ -23,8 +23,8 @@ class CsvParserSolarPasspJob < ApplicationJob
         if is_phone_verified || is_passport_verified
           zx = {
             id: u.id,
-            is_passport_verified: is_passport_verified || false,
             is_phone_verified: is_phone_verified || false,
+            is_passport_verified: is_passport_verified || false,
             is_phone_verified_source: u.is_phone_verified ? u.is_phone_verified_source : (:solar if is_phone_verified),
             is_passport_verified_source: u.is_passport_verified ? u.is_passport_verified_source : (:solar if is_passport_verified)
           }
