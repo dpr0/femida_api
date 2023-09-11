@@ -34,6 +34,7 @@ gem 'rtesseract'
 gem 'sassc-rails'
 
 group :development, :test do
+  gem 'annotate'
   gem 'debug'
   gem 'byebug'
   gem 'brakeman'

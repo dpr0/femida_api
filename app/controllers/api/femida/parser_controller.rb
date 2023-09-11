@@ -293,7 +293,7 @@ class Api::Femida::ParserController < ApplicationController
       array = []
       z = 0
       File.readlines(Rails.root.join('tmp', 'parser', 'production.log')).each do |line|
-        z = 0 if z == 4
+        # z = 0 if z == 4
         if line.include?('=========== Verify REQUEST: ============')
           z += 1
           next
@@ -318,7 +318,7 @@ class Api::Femida::ParserController < ApplicationController
           next
         elsif line.include?('=========== Verify RESPONSE: ===========')
           next
-        elsif line.include?('score')
+        elsif line.include?('{"score":')
           @hash[:response] = JSON.parse(line)['score']
           array << @hash
           @hash = {}

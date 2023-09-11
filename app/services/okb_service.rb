@@ -36,7 +36,7 @@ class OkbService
     hash = { 'Content-Type:': 'application/json', 'Authorization:Bearer ': auth['access_token'], 'X-Request-Id:': Digest::UUID.uuid_v4 }
     resp = parse_json :verify, "#{curl} #{hash_to_str(hash, 'H')} -d '#{json}'"
 
-    Request.create(hash_req.merge(score: resp['score']))
+    Request.create(hash_req.merge(response: resp['score']))
     resp
   end
 
