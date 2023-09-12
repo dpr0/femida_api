@@ -7,11 +7,13 @@ section.hero.is-lower-alpha
             .navbar-item
               = link_to 'Админка', admin_index_path
             .navbar-item
-              = link_to 'Файлы', files_path
+              = link_to 'Мониторинг', rails_performance_path
             .navbar-item
-              = link_to 'Ретро', parser_index_path
+              = link_to 'Файлообменник', files_path
             .navbar-item
-              = link_to 'Поиск', sample_index_path
+              = link_to 'Ретро парсер', parser_index_path
+            .navbar-item
+              = link_to 'Поиск в ОС(solar/db_okb/parsed_users)', sample_index_path
             .navbar-item
               - if current_user
                 = link_to users_path(current_user) do

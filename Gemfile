@@ -32,6 +32,7 @@ gem 'puma', '4.3.10'
 gem 'strong_migrations'
 gem 'rtesseract'
 gem 'sassc-rails'
+gem 'rails_performance'
 
 group :development, :test do
   gem 'annotate'
