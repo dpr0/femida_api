@@ -5,6 +5,7 @@ class CsvParserSolarPasspJob < ApplicationJob
     person_service = PersonService.instance
     CsvUser
       .where(file_id: id, is_passport_verified: [nil, false])
+      .order(id: :desc)
       .in_batches(of: 100).each do |batch|
       array = []
       batch.each do |u|
