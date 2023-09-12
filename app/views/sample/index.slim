@@ -35,34 +35,34 @@
 
       .columns
         .column.is-6
-          - @requests_results.each do |result|
-            br
-            .card
-              .card-content
-                .media
-                  .media-content
-                    .columns
-                      .column.is-12
-                        p.subtitle
-                          | таблица запросов в ОКБ
-                .content
+          br
+          .card
+            .card-content
+              .media
+                .media-content
+                  .columns
+                    .column.is-12
+                      p.subtitle
+                        | таблица запросов в ОКБ
+              .content
+                - @requests_results.each do |result|
                   ul
                     li.has-text-left = "#{result.last_name} #{result.first_name} #{result.middle_name}"
                     li.has-text-left = "#{result.birth_date}"
                     li.has-text-left = "#{result.phone}"
                     li.has-text-left = "Score: #{result.response}"
         .column.is-6
-          - @parsed_user_results.each do |result|
-            br
-            .card
-              .card-content
-                .media
-                  .media-content
-                    .columns
-                      .column.is-12
-                        p.subtitle
-                          | таблица parsed_users
-                .content
+          br
+          .card
+            .card-content
+              .media
+                .media-content
+                  .columns
+                    .column.is-12
+                      p.subtitle
+                        | таблица parsed_users
+              .content
+                - @parsed_user_results.each do |result|
                   ul
                     li.has-text-left = "#{result.last_name} #{result.first_name} #{result.middle_name}"
                     li.has-text-left = "#{result.birth_date}"

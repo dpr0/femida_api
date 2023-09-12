@@ -57,7 +57,7 @@ class OkbService
     begin
       JSON.parse(s)
     rescue
-      { score: -5 }
+      { 'score' => -5 }
     end
   end
 end
