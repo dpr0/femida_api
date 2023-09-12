@@ -11,7 +11,7 @@ class CsvParserSolarPhoneJob < ApplicationJob
       batch.each do |u|
         is_phone_verified = begin
           resp = person_service.search(phone: u.phone.last(10))
-          if resp && resp['count'] > 0
+          if resp && resp['count'] && resp['count'] > 0
             resp['data'].select do |d|
               ['Имя контакта', 'ИМЯ', 'ФИО', 'Клиент', 'Фио', 'ИМЯ КЛИЕНТА'].select do |ff|
                 next unless d[ff]
