@@ -20,11 +20,11 @@ class CsvParserSolarPasspJob < ApplicationJob
               name = d['ИМЯ']&.downcase&.tr('ё', 'е')&.split(' ')
               name&.include?(u.last_name) && name&.include?(u.first_name) && tels.include?(u.phone.last(10))
             end.present?
-            zx.merge(is_phone_verified: true, is_phone_verified_source: :solar) if r
+            zx.merge!(is_phone_verified: true, is_phone_verified_source: :solar) if r
           end
           unless is_passport_verified
             r = resp['data'].find { |x| [x['ПАСПОРТ'], x['ПАСПОРТ_']].compact.include? u.passport }.present?
-            zx.merge(is_passport_verified: true, is_passport_verified_source: :solar) if r
+            zx.merge!(is_passport_verified: true, is_passport_verified_source: :solar) if r
           end
         end
 
