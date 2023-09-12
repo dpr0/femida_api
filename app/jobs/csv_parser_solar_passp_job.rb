@@ -5,8 +5,8 @@ class CsvParserSolarPasspJob < ApplicationJob
     person_service = PersonService.instance
     CsvUser
       .where(file_id: id, is_passport_verified: [nil, false])
-      .order(id: :desc)
-      .in_batches(of: 100).each do |batch|
+      .in_batches(of: 100)
+      .each do |batch|
       array = []
       batch.each do |u|
         zx = { id: u.id }
@@ -33,6 +33,7 @@ class CsvParserSolarPasspJob < ApplicationJob
           array << zx
         end
       end
+      Rails.logger.info("=========================== >>> insert #{array.size} rows") if array.present?
       CsvUser.upsert_all(array, update_only: %i[is_passport_verified is_phone_verified is_phone_verified_source is_passport_verified_source]) if array.present?
     end
 
