@@ -22,5 +22,7 @@ class PersonService
   def post_req(hash, path, headers = {})
     resp = RestClient.post("#{ENV['FEMIDA_PERSONS_API_HOST']}/api/#{path}", hash, headers)
     resp.code == 200 ? JSON.parse(resp.body) : {}
+  rescue
+    {}
   end
 end
