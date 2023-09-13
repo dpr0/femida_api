@@ -1,7 +1,7 @@
 class CsvParserSolarPasspJob < ApplicationJob
   queue_as :default
 
-  def perform(id)
+  def perform(id, limit = 100)
     person_service = PersonService.instance
     CsvUser
       .where(file_id: id, is_passport_verified: [nil, false])
@@ -13,7 +13,9 @@ class CsvParserSolarPasspJob < ApplicationJob
         zx = { id: u.id }
         is_phone_verified = u.is_phone_verified
         is_passport_verified = u.is_passport_verified
-        resp = person_service.search(u.slice(%i[first_name last_name middle_name birth_date]))
+        hash = u.slice(%i[first_name last_name middle_name birth_date])
+        hash[:limit] = limit
+        resp = person_service.search(hash)
         if resp && resp['count'] && resp['count'] > 0
           unless is_phone_verified
             r = resp['data'].find do |d|

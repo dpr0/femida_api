@@ -92,7 +92,7 @@ class ParserController < ApplicationController
   def check(job, status: 4)
     id = params[:parser_id]
     CsvParser.find_by(file_id: id).update(status: status)
-    job.perform_later(id)
+    job.perform_later(id, params[:limit] || 100)
     redirect_to parser_path(id)
   end
 
