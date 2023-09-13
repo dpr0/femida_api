@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/rubysec/bundler-audit.git
-  revision: bc041d13eeccab70dd01672c097e8906108d07e3
+  revision: 8f05ef768dcda995b37c4a457606e86b478e7dbe
   specs:
     bundler-audit (0.9.1)
       bundler (>= 1.2.0, < 3)
@@ -135,7 +135,7 @@ GEM
     concurrent-ruby (1.2.2)
     connection_pool (2.4.1)
     crass (1.0.6)
-    cssbundling-rails (1.2.0)
+    cssbundling-rails (1.3.1)
       railties (>= 6.0.0)
     cuprite (0.14.3)
       capybara (~> 3.0)
@@ -188,7 +188,7 @@ GEM
     jbuilder (2.11.5)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
-    jsbundling-rails (1.1.2)
+    jsbundling-rails (1.2.1)
       railties (>= 6.0.0)
     json (2.6.3)
     jwt (2.7.1)
@@ -374,7 +374,7 @@ GEM
       sentry-ruby (~> 5.11.0)
     sentry-ruby (5.11.0)
       concurrent-ruby (~> 1.0, >= 1.0.2)
-    sidekiq (7.1.3)
+    sidekiq (7.1.4)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
