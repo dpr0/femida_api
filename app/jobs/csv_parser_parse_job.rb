@@ -1,7 +1,8 @@
 class CsvParserParseJob < ApplicationJob
   queue_as :default
 
-  def perform(id:)
+  def perform(hash)
+    id = hash[:id]
     parser = CsvParser.find_by(file_id: id)
     file = ActiveStorage::Attachment.find_by(id: id)
     array = []

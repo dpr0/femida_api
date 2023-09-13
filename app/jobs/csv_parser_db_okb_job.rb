@@ -1,7 +1,8 @@
 class CsvParserDbOkbJob < ApplicationJob
   queue_as :default
 
-  def perform(id:)
+  def perform(hash)
+    id = hash[:id]
     CsvUser
       .where(file_id: id, is_phone_verified: [nil, false])
       .in_batches(of: 100).each do |batch|
