@@ -7,11 +7,9 @@ class CsvParserUserJob < ApplicationJob
       .in_batches(of: 100).each do |batch|
       array = []
       batch.each do |u|
-        user = ParsedUser.find_by(
-          last_name: u.last_name&.downcase,
-          first_name: u.first_name&.downcase,
-          phone: u.phone&.last(10)
-        )
+        user = ParsedUser
+          .where('lower(last_name) = ? and lower(first_name) = ?', u.last_name&.downcase, u.first_name&.downcase)
+          .where(phone: u.phone&.last(10)).first
         next unless user
 
         is_phone_verified = user.is_phone_verified.nil? || user.is_phone_verified == 't'
