@@ -1,7 +1,7 @@
 class CsvParserSolarPasspJob < ApplicationJob
   queue_as :default
 
-  def perform(id, limit = 100)
+  def perform(id:, limit: 100)
     person_service = PersonService.instance
     CsvUser
       .where(file_id: id, is_passport_verified: [nil, false])

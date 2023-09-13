@@ -1,7 +1,7 @@
 class CsvParserInnJob < ApplicationJob
   queue_as :default
 
-  def perform(id)
+  def perform(id:)
     CsvUser
       .where(file_id: id, is_passport_verified: [nil, false])
       .in_batches(of: 100).each do |batch|

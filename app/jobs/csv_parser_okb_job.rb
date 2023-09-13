@@ -1,7 +1,7 @@
 class CsvParserOkbJob < ApplicationJob
   queue_as :default
 
-  def perform(id)
+  def perform(id:)
     okbService = 0
     CsvUser
       .where(file_id: id, is_phone_verified: false)

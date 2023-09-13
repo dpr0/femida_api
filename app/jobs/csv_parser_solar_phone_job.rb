@@ -1,7 +1,7 @@
 class CsvParserSolarPhoneJob < ApplicationJob
   queue_as :default
 
-  def perform(id)
+  def perform(id:)
     person_service = PersonService.instance
     CsvUser
       .where(file_id: id, is_phone_verified: [nil, false])
