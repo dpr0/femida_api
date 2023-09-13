@@ -84,3 +84,22 @@
                 ul
                   - @inn&.each do |resp|
                     li.has-text-left = "Паспорт: #{resp[:passport]} - ИНН: #{resp[:inn]}"
+
+      .columns
+        .column.is-12
+          - @results&.each do |result|
+            br
+            .card
+              .card-content
+                .media
+                  .media-content
+                    p.title.is-4
+                      = result['ИМЯ']
+                    .columns
+                      .column.is-12
+                        p.subtitle
+                          = result['ТЕЛЕФОН']
+                .content
+                  ul
+                    - result.each do |k, v|
+                      li.has-text-left = "#{k}: #{v}"
