@@ -34,8 +34,13 @@ class CsvParserSolarPasspJob < ApplicationJob
           array << zx
         end
       end
-      Rails.logger.info("=========================== >>> insert #{array.size} rows") if array.present?
-      CsvUser.upsert_all(array, update_only: %i[is_passport_verified is_phone_verified is_phone_verified_source is_passport_verified_source]) if array.present?
+      if array.present?
+        Rails.logger.info("=========================== >>> insert #{array.size} rows")
+        CsvUser.upsert_all(
+          array.group_by { |x| x[:id] }.map { |key, v| h = { id: key }; v.each { |vv| vv.delete(:id); h.merge!(vv) }; h },
+          update_only: %i[is_passport_verified is_phone_verified is_phone_verified_source is_passport_verified_source]
+        )
+      end
     end
 
     CsvParser.find_by(file_id: id).update(

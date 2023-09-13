@@ -69,22 +69,18 @@
                     li.has-text-left = "#{result.passport}"
                     li.has-text-left = "#{result.phone}"
                     li.has-text-left = "#{result.address}"
-
       .columns
-        .column.is-12
-          - @results.each do |result|
-            br
-            .card
-              .card-content
-                .media
-                  .media-content
-                    p.title.is-4
-                      = result['ИМЯ']
-                    .columns
-                      .column.is-12
-                        p.subtitle
-                          = result['ТЕЛЕФОН']
-                .content
-                  ul
-                    - result.each do |k, v|
-                      li.has-text-left = "#{k}: #{v}"
+        .column.is-6
+          br
+          .card
+            .card-content
+              .media
+                .media-content
+                  .columns
+                    .column.is-12
+                      p.subtitle
+                        | ИНН (по ФИО+ДР)
+              .content
+                ul
+                  - @inn&.each do |resp|
+                    li.has-text-left = "Паспорт: #{resp[:passport]} - ИНН: #{resp[:inn]}"

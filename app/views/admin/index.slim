@@ -4,10 +4,18 @@
       .tile
         .tile.is-parent.is-vertical
           article.tile.is-child.notification.is-primary
+            p.subtitle
+              | Количество запросов в ОКБ
+            p.subtitle
+              = "до импорта логов #{@dt.to_date.strftime('%d.%m.%Y')}:"
+            p.title
+              = @old_request_count
+            p.subtitle
+              = "после:"
             p.title
               = @request_count
             p.subtitle
-              | Количество запросов в ОКБ
+              = "#{@req_per_day} в день"
           article.tile.is-child.notification.is-warning
             p.title
               = "₽ #{@balane_kapcha}"

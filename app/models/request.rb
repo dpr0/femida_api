@@ -21,4 +21,8 @@
 #  index_requests_on_phone  (phone)
 #
 class Request < ApplicationRecord
+
+  OKB_LOST_REQUESTS = 74016
+  OKB_IMPORT_DATE = '2023-09-11 04:00:00'
+
 end
