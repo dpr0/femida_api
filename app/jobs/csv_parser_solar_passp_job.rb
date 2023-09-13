@@ -15,6 +15,7 @@ class CsvParserSolarPasspJob < ApplicationJob
         is_passport_verified = u.is_passport_verified
         hash = u.slice(%i[first_name last_name middle_name birth_date])
         hash[:limit] = limit
+        hash[:birthdate] = hash.delete(:birth_date)
         resp = person_service.search(hash)
         if resp && resp['count'] && resp['count'] > 0
           unless is_phone_verified

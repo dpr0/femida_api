@@ -15,6 +15,7 @@ class SampleController < ApplicationController
       offset = params.delete(:offset)
       user.merge!(limit: limit) if limit
       user.merge!(offset: offset) if offset
+      user[:birthdate] = user.delete(:birth_date) # !!
       response = PersonService.instance.search(user)
       @results = response['data']
     end
@@ -23,12 +24,12 @@ class SampleController < ApplicationController
       pasp1 = @results.map { |x| x['ПАСПОРТ'] }.compact.uniq
       pasp2 = @parsed_user_results.map(&:passport).compact.uniq
       @inn = (pasp1 + pasp2).uniq.first(5).map do |pasp|
-        if user['last_name'] && user['first_name'] && user['middle_name'] && user['birth_date']
+        if user[:last_name] && user[:first_name] && user[:middle_name] && user[:birthdate]
           inn = InnService.call(
-            f: user['last_name'],
-            i: user['first_name'],
-            o: user['middle_name'],
-            date: user['birth_date'],
+            f: user[:last_name],
+            i: user[:first_name],
+            o: user[:middle_name],
+            date: user[:birthdate],
             passport: pasp
           )['inn']
         end
