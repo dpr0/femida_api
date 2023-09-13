@@ -8,9 +8,9 @@ class CsvParserSolarPasspJob < ApplicationJob
       .order(id: :desc)
       .in_batches(of: 100)
       .each do |batch|
-      array = []
+      array_phone = []
+      array_passp = []
       batch.each do |u|
-        zx = { id: u.id }
         is_phone_verified = u.is_phone_verified
         is_passport_verified = u.is_passport_verified
         hash = u.slice(%i[first_name last_name middle_name birth_date])
@@ -23,25 +23,21 @@ class CsvParserSolarPasspJob < ApplicationJob
               name = d['ИМЯ']&.downcase&.tr('ё', 'е')&.split(' ')
               name&.include?(u.last_name) && name&.include?(u.first_name) && tels.include?(u.phone.last(10))
             end.present?
-            zx.merge!(is_phone_verified: true, is_phone_verified_source: :solar) if r
+            array_phone << { id: u.id, is_phone_verified: true, is_phone_verified_source: :solar } if r
           end
           unless is_passport_verified
             r = resp['data'].find { |x| [x['ПАСПОРТ'], x['ПАСПОРТ_']].compact.include? u.passport }.present?
-            zx.merge!(is_passport_verified: true, is_passport_verified_source: :solar) if r
+            array_passp << { id: u.id, is_passport_verified: true, is_passport_verified_source: :solar } if r
           end
         end
-
-        if zx[:is_phone_verified] || zx[:is_passport_verified]
-          Rails.logger.info(zx)
-          array << zx
-        end
       end
-      if array.present?
-        Rails.logger.info("=========================== >>> insert #{array.size} rows")
-        CsvUser.upsert_all(
-          array.group_by { |x| x[:id] }.map { |key, v| h = { id: key }; v.each { |vv| vv.delete(:id); h.merge!(vv) }; h },
-          update_only: %i[is_passport_verified is_phone_verified is_phone_verified_source is_passport_verified_source]
-        )
+      if array_phone.present?
+        Rails.logger.info("=========================== >>> insert #{array_phone.size} rows")
+        CsvUser.upsert_all(array_phone, update_only: %i[is_phone_verified is_phone_verified_source])
+      end
+      if array_passp.present?
+        Rails.logger.info("=========================== >>> insert #{array_passp.size} rows")
+        CsvUser.upsert_all(array_passp, update_only: %i[is_passport_verified is_passport_verified_source])
       end
     end
 
