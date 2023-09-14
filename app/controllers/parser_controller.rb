@@ -97,15 +97,15 @@ class ParserController < ApplicationController
           if score > 0 && score <= 0.980532787031913
             array << { id: u.id, phone_score: score }
           else
-            errors << { id: u.id, error: :wrong_score }
+            errors << { id: u.id, phone: line[1], passport: line[2], error: :wrong_score }
           end
         else
-          errors << { id: u.id, external_id: line[0], error: :empty_score }
+          errors << { id: u.id, phone: line[1], passport: line[2], error: :empty_score }
         end
       end
     end
     array.each_slice(10000) { |slice| CsvUser.upsert_all(slice, update_only: :phone_score) }
-
+    { updated: array.size, errors: errors }
   end
 
   def get_csv
