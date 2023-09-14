@@ -93,7 +93,7 @@ class ParserController < ApplicationController
         u = csv_users.select { |u| u.phone == line[1] && u.passport == line[2] }
         if line[9].present? && u.present?
           score = line[9].tr(',','.').to_f
-          puts "#{i} - #{score}"
+          Rails.logger.info i
           if score > 0 && score <= 0.980532787031913
             array << { id: u.id, phone_score: score }
           else
