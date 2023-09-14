@@ -1,5 +1,7 @@
 .hero-body
   .container.has-text-centered
+    h3.title = ActiveStorage::Blob.find_by(id: params[:id]).filename
+
     = form_for @csv_user, url: parser_path(params[:id]), method: :patch, data: { turbo: false } do |f|
       .columns
         .column.is-6
