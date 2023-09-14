@@ -65,7 +65,6 @@ class Api::Femida::EsiaController < ApplicationController
     @headers = { 'Content-Type' => 'application/json' }.merge(headers)
     capcha = get("/captcha/#{PATH}/image", headers: headers, parse: false)
     @resp = post_rucaptcha(Base64.encode64(capcha), phrase: 0, regsense: 0, numeric: 0, language: 1, lang: :ru)
-    byebug
     return if @resp == ApplicationController::ERROR
 
     @token = JSON.parse(RestClient.post(

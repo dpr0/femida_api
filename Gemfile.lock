@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/rubysec/bundler-audit.git
-  revision: 8f05ef768dcda995b37c4a457606e86b478e7dbe
+  revision: d8af649e9bb7552b25e46e4de2aa0828e0b3076e
   specs:
     bundler-audit (0.9.1)
       bundler (>= 1.2.0, < 3)
@@ -165,6 +165,8 @@ GEM
     factory_bot_rails (6.2.0)
       factory_bot (~> 6.2.0)
       railties (>= 5.0.0)
+    fast_excel (0.4.1)
+      ffi (> 1.9, < 2)
     ferrum (0.13)
       addressable (~> 2.5)
       concurrent-ruby (~> 1.1)
@@ -417,8 +419,6 @@ GEM
     stimulus-rails (1.2.2)
       railties (>= 6.0.0)
     stringio (3.0.8)
-    strong_migrations (1.6.1)
-      activerecord (>= 5.2)
     sucker_punch (3.1.0)
       concurrent-ruby (~> 1.0)
     temple (0.10.2)
@@ -484,6 +484,7 @@ DEPENDENCIES
   dotenv-rails
   ed25519
   factory_bot_rails
+  fast_excel
   image_processing
   jbuilder
   jsbundling-rails
@@ -511,7 +512,6 @@ DEPENDENCIES
   sprockets-rails
   standard
   stimulus-rails
-  strong_migrations
   sucker_punch
   turbo-rails
   web-console

@@ -338,6 +338,22 @@ class Api::Femida::ParserController < ApplicationController
     # end
   end
 
+  def enrichment
+    file = ActiveStorage::Attachment.find_by(id: 18)
+
+    array = []
+    file.open do |f|
+      11.times do |i|
+        ar = f.readline.force_encoding('UTF-8').chomp.delete("\"").downcase.tr('ё', 'е').split(';')
+        next if ar[0] == 'название компании (полное)'
+        byebug
+        array << {
+
+        }
+      end
+    end
+  end
+
   private
 
   def field_by(key, index)

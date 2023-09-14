@@ -16,8 +16,10 @@
 #  middle_name                 :string
 #  passport                    :string
 #  phone                       :string
+#  phone_score                 :string
+#  phone_score_source          :string
 #  external_id                 :string
-#  file_id                     :string
+#  file_id                     :decimal(, )
 #
 # Indexes
 #

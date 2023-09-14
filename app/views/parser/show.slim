@@ -2,53 +2,64 @@
   .container.has-text-centered
     = form_for @csv_user, url: parser_path(params[:id]), method: :patch, data: { turbo: false } do |f|
       .columns
-        .column.is-2
-          .field
-            label.label.has-text-success-dark Кол-во строк
-            .control
-              = text_field_tag :rows, @csv_parser.rows, class: 'input is-medium', disabled: true
-        .column.is-2
-          .field
-            label.label.has-text-success-dark Разделитель
-            .control
-              = text_field_tag :separator, ';', class: 'input is-medium'
-        .column.is-2
-          .field
-            label.label.has-text-success-dark Статус
-            .control
-              = text_field_tag :status, "#{@csv_parser.status} - #{CsvParser::STATUSES[@csv_parser.status]}", class: 'input is-medium', disabled: true
-        .column.is-3
-        .column.is-3
-          .field
-            label.label.has-text-success-dark Действие
-            - if @csv_parser.status == 0
-              = f.submit 'Сохранить', class: 'button is-success'
-            - if @csv_parser.status == 1
-              = link_to 'Распарсить файл', parser_parse_path(@csv_parser.file_id), method: :post, data: { turbo: true, turbo_method: :post }, class: 'button is-primary'
-            - if @csv_parser.status == 3 || @csv_parser.status == 5
-              .buttons.has-addons
-                - opts = { method: :post, data: { turbo: true, turbo_method: :post }, class: 'button is-primary is-fullwidth' }
-                = link_to 'Проверка ХХХ',                  parser_xxx_check_path(@csv_parser.file_id), opts
-                = link_to 'Проверка solar по тел', parser_solar_phone_check_path(@csv_parser.file_id), opts
-                = link_to 'Проверка solar фио+др', parser_solar_passp_check_path(@csv_parser.file_id), opts
-                = link_to 'Проверка по ИНН',               parser_inn_check_path(@csv_parser.file_id), opts
-                = link_to 'Проверка parsed_users',        parser_user_check_path(@csv_parser.file_id), opts
-                = link_to 'Проверка db_req ОКБ',        parser_db_okb_check_path(@csv_parser.file_id), opts
-                = link_to 'Проверка ОКБ',                  parser_okb_check_path(@csv_parser.file_id), opts
-                = link_to 'Скачать CSV',                     parser_get_csv_path(@csv_parser.file_id), target: '_blank', class: 'button outlined is-primary is-fullwidth'
+        .column.is-6
+          .columns
+            .column.is-4
+              .field
+                label.label.has-text-success-dark Кол-во строк
+                .control
+                  = text_field_tag :rows, @csv_parser.rows, class: 'input is-medium', disabled: true
+            .column.is-4
+              .field
+                label.label.has-text-success-dark Разделитель
+                .control
+                  = text_field_tag :separator, ';', class: 'input is-medium'
+            .column.is-4
+              .field
+                label.label.has-text-success-dark Статус
+                .control
+                  = text_field_tag :status, "#{@csv_parser.status} - #{CsvParser::STATUSES[@csv_parser.status]}", class: 'input is-medium', disabled: true
+          - if @csv_users.present?
+            .columns
+              .column.is-6
+                .field
+                  label.label.has-text-success-dark Добавлено уникальных записей в БД
+                  .control
+                    = text_field_tag :rows, @csv_users.size, class: 'input is-medium', disabled: true
+              .column.is-6
+                .field
+                  label.label.has-text-success-dark Записей проверено
+                  .control
+                    = text_field_tag :rows, @csv_users.count { |x| x.is_phone_verified != nil && x.is_phone_verified != nil }, class: 'input is-medium', disabled: true
 
-      - if @csv_users.present?
-        .columns
-          .column.is-3
-            .field
-              label.label.has-text-success-dark Добавлено уникальных записей в БД
-              .control
-                = text_field_tag :rows, @csv_users.size, class: 'input is-medium', disabled: true
-          .column.is-3
-            .field
-              label.label.has-text-success-dark Записей проверено
-              .control
-                = text_field_tag :rows, @csv_users.count { |x| x.is_phone_verified != nil }, class: 'input is-medium', disabled: true
+        .column.is-6
+          .columns
+            - opts = -> (str) { { method: :post, data: { turbo: true, turbo_method: :post }, class: "button is-#{str} is-fullwidth" } }
+            .column.is-6
+              .field
+                label.label.has-text-success-dark Действие
+                - if @csv_parser.status == 3 || @csv_parser.status == 5
+                  .buttons.has-addons
+                    = link_to 'Проверка ХХХ',    parser_xxx_check_path(@csv_parser.file_id), opts.call(:danger)
+                    = link_to 'Проверка ОКБ',    parser_okb_check_path(@csv_parser.file_id), opts.call(:danger)
+                    = link_to 'Склеить скоринг', parser_add_score_path(@csv_parser.file_id), opts.call(:warning)
+                    = link_to 'Скачать CSV',       parser_get_csv_path(@csv_parser.file_id), target: '_blank', class: 'button is-primary is-fullwidth'
+                    = link_to 'Скачать XLSX',     parser_get_xlsx_path(@csv_parser.file_id), target: '_blank', class: 'button is-primary is-fullwidth'
+            .column.is-6
+              .field
+                label.label.has-text-success-dark Действие
+                - if @csv_parser.status == 0
+                  = f.submit 'Сохранить', class: 'button is-success is-fullwidth'
+                - if @csv_parser.status == 1
+                  = link_to 'Распарсить файл', parser_parse_path(@csv_parser.file_id), opts
+                - if @csv_parser.status == 3 || @csv_parser.status == 5
+                  .buttons.has-addons
+                    = link_to 'Проверка solar по тел', parser_solar_phone_check_path(@csv_parser.file_id), opts.call(:info)
+                    = link_to 'Проверка solar фио+др', parser_solar_passp_check_path(@csv_parser.file_id), opts.call(:info)
+                    = link_to 'Проверка по ИНН',               parser_inn_check_path(@csv_parser.file_id), opts.call(:info)
+                    = link_to 'Проверка parsed_users',        parser_user_check_path(@csv_parser.file_id), opts.call(:info)
+                    = link_to 'Проверка db_req ОКБ',        parser_db_okb_check_path(@csv_parser.file_id), opts.call(:info)
+
       - if @csv_users.present?
         .columns
           .column.is-6
@@ -94,7 +105,10 @@
 
 javascript:
   var elements = document.getElementsByClassName("buttons");
-  var hideButtons = () => elements[0].style.display = 'none';
+  var hideButtons = () => {
+    elements[0].style.display = 'none';
+    elements[1].style.display = 'none';
+  }
   for (var i = 0; i < elements.length; i++) {
     elements[i].addEventListener('click', hideButtons, false);
   }

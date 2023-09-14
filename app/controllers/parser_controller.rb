@@ -5,6 +5,8 @@ class ParserController < ApplicationController
   before_action :authenticate_user!
   before_action :is_admin?, except: %i[index show]
 
+  FIELDS = %w[external_id phone passport last_name first_name middle_name birth_date is_phone_verified? is_passport_verified? phone_score]
+
   def index
     @csv_parsers = CsvParser.all.order(:id)
     @blobs = ActiveStorage::Blob.where(id: @csv_parsers.map { |x| x.file_id })
@@ -77,14 +79,55 @@ class ParserController < ApplicationController
     check(CsvParserXxxJob)
   end
 
-  def get_csv
-    z = CSV.generate do |csv|
-      csv << %w[external_id phone passport last_name first_name middle_name birth_date is_phone_verified is_passport_verified]
-      CsvUser.where(file_id: params[:parser_id]).each do |d|
-        csv << [d.external_id, d.phone, d.passport, d.last_name, d.first_name, d.middle_name, d.birth_date, d.is_phone_verified, d.is_passport_verified]
+  def add_score
+    errors = []
+    array = []
+    file = ActiveStorage::Attachment.find_by(id: 20)
+    csv_users = CsvUser.where(file_id: params[:parser_id]).to_a
+
+    file.open do |f|
+      (csv_users.size + 1).times do|i|
+        line = f.readline.force_encoding('UTF-8').chomp.split(';')
+        next if line[0] == 'external_id' || line[0].blank?
+
+        u = csv_users.find { |u| u.phone == line[1] }
+        if line[9].present? && u.present?
+          score = line[9].tr(',','.').to_f
+          puts "#{i} - #{score}"
+          if score > 0 && score <= 0.980532787031913
+            array << { id: u.id, phone_score: score }
+          else
+            errors << { id: u.id, error: :wrong_score }
+          end
+        else
+          errors << { id: u.id, external_id: line[0], error: :empty_score }
+        end
       end
     end
-    send_data(z, filename: "#{ActiveStorage::Blob.find(params[:parser_id]).filename}-#{Time.now.to_i}.csv", type: 'text/csv')
+    array.each_slice(10000) { |slice| CsvUser.upsert_all(slice, update_only: :phone_score) }
+
+  end
+
+  def get_csv
+    data = CSV.generate do |csv|
+      csv << FIELDS
+      CsvUser.where(file_id: params[:parser_id]).each { |d| csv << d.slice(*FIELDS).values }
+    end
+    send_data(data, filename: "#{ActiveStorage::Blob.find(params[:parser_id]).filename}-#{Time.now.to_i}.csv", type: 'text/csv')
+  end
+
+  def get_xlsx
+    scope = CsvUser.where(file_id: params[:parser_id])
+    name = ActiveStorage::Blob.find(params[:parser_id])
+    workbook = ::FastExcel.open
+    worksheet = workbook.add_worksheet("#{name.filename}")
+    bold = workbook.bold_format
+    headers = FIELDS
+    headers.each_index { |i| worksheet.set_column_width(i, 15) }
+    worksheet.append_row(headers, bold)
+    scope.all.each { |d| worksheet.append_row(d.slice(*FIELDS).values) }
+    workbook.close
+    send_data(workbook.read_string, filename: "#{name.filename}_test_#{scope.count}.xlsx")
   end
 
   private

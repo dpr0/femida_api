@@ -19,7 +19,9 @@ Rails.application.routes.draw do
     post :db_okb_check
     post :okb_check
     post :xxx_check
+    post :add_score
     get :get_csv
+    get :get_xlsx
   end
 
   namespace :api do
@@ -55,6 +57,7 @@ Rails.application.routes.draw do
           get :turbozaim2
           get :turbozaim3
           get :narod
+          get :enrichment # !!
         end
       end
       resources :esia, only: :index do
