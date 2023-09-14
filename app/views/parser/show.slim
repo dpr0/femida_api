@@ -53,7 +53,7 @@
                 - if @csv_parser.status == 0
                   = f.submit 'Сохранить', class: 'button is-success is-fullwidth'
                 - if @csv_parser.status == 1
-                  = link_to 'Распарсить файл', parser_parse_path(@csv_parser.file_id), opts
+                  = link_to 'Распарсить файл', parser_parse_path(@csv_parser.file_id), opts.call(:info)
                 - if @csv_parser.status == 3 || @csv_parser.status == 5
                   .buttons.has-addons
                     = link_to 'Проверка solar по тел', parser_solar_phone_check_path(@csv_parser.file_id), opts.call(:info)

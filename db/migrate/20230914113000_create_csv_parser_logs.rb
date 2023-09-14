@@ -13,6 +13,6 @@ class CreateCsvParserLogs < ActiveRecord::Migration[7.0]
 
     add_column :csv_users, :phone_score, :string
     add_column :csv_users, :phone_score_source, :string
-    change_column :csv_users, :file_id, 'numeric USING CAST(file_id AS numeric)'
+    # change_column :csv_users, :file_id, 'numeric USING CAST(file_id AS numeric)'
   end
 end

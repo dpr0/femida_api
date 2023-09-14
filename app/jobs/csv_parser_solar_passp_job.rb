@@ -2,10 +2,13 @@ class CsvParserSolarPasspJob < ApplicationJob
   queue_as :default
 
   def perform(id:, limit: 100)
+    # TODO ParserService
+    # ParserService.new(self.class.name, hash[:id], [:phone, :passport]).call
     person_service = PersonService.instance
+    @array_phone = []
+    @array_passp = []
     CsvUser
       .where(file_id: id, is_passport_verified: [nil, false])
-      .order(id: :desc)
       .in_batches(of: 100)
       .each do |batch|
       array_phone = []
@@ -34,18 +37,26 @@ class CsvParserSolarPasspJob < ApplicationJob
       end
       if array_phone.present?
         Rails.logger.info("=========================== >>> insert #{array_phone.size} rows")
+        @array_phone += array_phone
         CsvUser.upsert_all(array_phone, update_only: %i[is_phone_verified is_phone_verified_source])
       end
       if array_passp.present?
         Rails.logger.info("=========================== >>> insert #{array_passp.size} rows")
+        @array_passp += array_passp
         CsvUser.upsert_all(array_passp, update_only: %i[is_passport_verified is_passport_verified_source])
       end
     end
 
-    CsvParser.find_by(file_id: id).update(
+    @parser = CsvParser.find_by(file_id: id)
+    @parser.update(
       status: 5,
-      is_phone_verified_count:    CsvUser.where(file_id: id, is_phone_verified:    true).count,
-      is_passport_verified_count: CsvUser.where(file_id: id, is_passport_verified: true).count
+      is_phone_verified_count: @parser.csv_users.where(is_phone_verified: true).count,
+      is_passport_verified_count: @parser.csv_users.where(is_passport_verified: true).count
+    )
+    @parser.csv_parser_logs.create(
+      is_phone_verified_count: @array_phone.size,
+      is_passport_verified_count: @array_passp.size,
+      info: self.class.name.underscore.sub('_job', '')
     )
   end
 end
