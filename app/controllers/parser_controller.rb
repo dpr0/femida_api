@@ -90,7 +90,7 @@ class ParserController < ApplicationController
         line = f.readline.force_encoding('UTF-8').chomp.split(';')
         next if line[0] == 'external_id' || line[0].blank?
 
-        u = csv_users.find { |u| u.phone == line[1] }
+        u = csv_users.select { |u| u.phone == line[1] && u.passport == line[2] }
         if line[9].present? && u.present?
           score = line[9].tr(',','.').to_f
           puts "#{i} - #{score}"
