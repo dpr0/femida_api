@@ -58,6 +58,7 @@ Rails.application.routes.draw do
           get :turbozaim3
           get :narod
           get :enrichment # !!
+          get :enrichment_xlsx # !!
         end
       end
       resources :esia, only: :index do
