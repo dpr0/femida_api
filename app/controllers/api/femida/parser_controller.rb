@@ -339,19 +339,50 @@ class Api::Femida::ParserController < ApplicationController
   end
 
   def enrichment
-    file = ActiveStorage::Attachment.find_by(id: 18)
+    file = ActiveStorage::Attachment.find_by(id: 29)
+    person_service = PersonService.instance
 
     array = []
     file.open do |f|
-      11.times do |i|
+      46828.times do |i|
         ar = f.readline.force_encoding('UTF-8').chomp.delete("\"").downcase.tr('ё', 'е').split(';')
         next if ar[0] == 'название компании (полное)'
-        byebug
-        array << {
 
-        }
+        last_name, first_name, middle_name = ar[0].split(' ')
+        array << { last_name: last_name, first_name: first_name, middle_name: middle_name, inn: ar[3] }
       end
     end
+
+    array2 = []
+    array.each do |u|
+      resp = person_service.search(u)
+      if resp && resp['count'] && resp['count'] > 0
+        birth_dates = resp['data'].map { |d| d['ДАТА РОЖДЕНИЯ'] }.compact.uniq
+        u[:birth_date] = birth_dates.join(', ')
+        birth_dates.each do |birthdate|
+          resp2 = person_service.search(last_name: u[:last_name], first_name: u[:first_name], middle_name: u[:middle_name], birthdate: birthdate)
+          if resp2 && resp2['count'] && resp2['count'] > 0
+            u[:phones] = resp['data'].map do |dd|
+              [
+                'Связь с телефоном абонентом', 'Телефон_сотовый', 'Связь_с_телефоном', 'Телефон_работы', 'Телефон работы', 'телефон',
+                'Телефон', 'Телефоны', 'ТЕЛЕФОН', 'Телефон места работы'
+              ].map { |x| dd[x].scan(/\d/).join.last(10) if dd[x].present? }.compact.uniq
+            end.flatten.compact.uniq.join(', ')
+            array2 << u
+          end
+        end
+      end
+    end
+
+    workbook = ::FastExcel.open
+    worksheet = workbook.add_worksheet('ФИО_ИНН_ТЕЛ_ДР')
+    bold = workbook.bold_format
+    headers = array2.first.keys
+    headers.each_index { |i| worksheet.set_column_width(i, 15) }
+    worksheet.append_row(headers, bold)
+    array2.each { |d| worksheet.append_row(d.values) }
+    workbook.close
+    send_data(workbook.read_string, filename: "ФИО_ИНН_ТЕЛ_ДР_#{array2.size}.xlsx")
   end
 
   private

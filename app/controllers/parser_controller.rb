@@ -82,7 +82,7 @@ class ParserController < ApplicationController
   def add_score
     errors = []
     array = []
-    file = ActiveStorage::Attachment.find_by(id: 23)
+    file = ActiveStorage::Attachment.find_by(id: 27)
     csv_users = CsvUser.where(file_id: params[:parser_id]).to_a
 
     file.open do |f|
@@ -92,10 +92,10 @@ class ParserController < ApplicationController
 
         u = csv_users.find { |u| u.phone == line[1] && u.passport == line[2].rjust(10, '0') }
         if line[9].present? && u.present?
-          score = line[9].tr(',','.').to_f
+          score = line[9].tr(',', '.').to_f
           Rails.logger.info i
           if score > 0 && score <= 0.980532787031913
-            array << { id: u.id, phone_score: score }
+            array << { id: u.id, phone_score: score.to_s.tr('.', ',') }
           else
             errors << { id: u.id, phone: line[1], passport: line[2], error: :wrong_score }
           end
