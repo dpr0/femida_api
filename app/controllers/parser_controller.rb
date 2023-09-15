@@ -80,9 +80,10 @@ class ParserController < ApplicationController
   end
 
   def add_score
+    id = 27
     errors = []
     array = []
-    file = ActiveStorage::Attachment.find_by(id: 27)
+    file = ActiveStorage::Attachment.find_by(id: id)
     csv_users = CsvUser.where(file_id: params[:parser_id]).to_a
 
     file.open do |f|

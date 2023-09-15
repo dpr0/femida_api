@@ -8,8 +8,18 @@ class SampleController < ApplicationController
   def index
     user = params['csv_user'].permit!.to_h.reject { |_, value| value.blank? } if params['csv_user'].present?
     @csv_user = CsvUser.new
-    @requests_results = user ? Request.where(user) : []
     @parsed_user_results = user ? ParsedUser.where(user) : []
+    @requests_results = user ? Request.where(user) : []
+    if user && user[:phone].present? && user[:birth_date].present? && user[:last_name].present? && user[:first_name].present? && user[:middle_name].present?
+      @okb_result = OkbService.call(
+        telephone_number: user[:phone],
+        birthday: user[:birth_date],
+        surname: user[:last_name].downcase,
+        name: user[:first_name].downcase,
+        patronymic: user[:middle_name].downcase,
+        consent: 'Y'
+      )
+    end
     if user
       limit = params.delete(:limit)
       offset = params.delete(:offset)

@@ -44,6 +44,9 @@
                     .column.is-12
                       p.subtitle
                         | таблица запросов в ОКБ
+                      - if @okb_result.present?
+                        p.subtitle
+                          = @okb_result
               .content
                 - @requests_results.each do |result|
                   ul
