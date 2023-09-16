@@ -1,4 +1,6 @@
 class ParserService
+  FIELDS = %i[phone birth_date last_name first_name middle_name].freeze
+
   def initialize(job_neme, id, field)
     @id = id
     @field = field
@@ -8,29 +10,22 @@ class ParserService
     @csv_users = CsvUser.where(file_id: id, "is_#{field}_verified": [nil, false]).in_batches(of: 100)
     @person_service = PersonService.instance
     @name = "is_#{@field}_verified"
+    @field = "#{@name}_count"
   end
 
   def call
-    array = []
     @csv_users.each do |batch|
-      batch.each { |u| array << log(u.id) if send(@job_name, u) }
+      array = batch.map { |u| { id: u.id, @name => true, "#{@name}_source".to_sym => @job_name } if send(@job_name, u) }.compact
       @array += array
-      CsvUser.upsert_all(array, update_only: [@name, "#{@name}_source"]) if @array.present?
+      CsvUser.upsert_all(array, update_only: [@name, "#{@name}_source"]) if array.present?
     end
 
-    field = "#{@name}_count"
-    count = CsvUser.where(file_id: @id, is_phone_verified: true).count
-    @parser.update(status: 5, field => count)
-    @parser.csv_parser_logs.create(field => @array.size, info: @job_name)
+    @parser.update(status: 5, @field => CsvUser.where(file_id: @id, @name => true).count)
+    log = @parser.csv_parser_logs.new(@field => @array.size, info: @job_name)
+    log.save(validate: false)
   end
 
   private
-
-  def log(id)
-    hash = { id: id, @name => true, "#{@name}_source".to_sym => @job_name }
-    Rails.logger.info(hash)
-    hash
-  end
 
   def csv_parser_solar_phone(u)
     resp = @person_service.search(phone: u.phone.last(10))
@@ -44,33 +39,28 @@ class ParserService
         end.present?
       end.present?
     end
-  rescue StandardError
-    # Ignored
   end
 
   def csv_parser_inn(u)
-    inn = InnService.call(
+    InnService.call(
       passport: u.passport,
       date: u.birth_date,
-      f: u.last_name&.downcase,
-      i: u.first_name&.downcase,
-      o: u.middle_name&.downcase
-      )
-    inn && inn['inn'].present?
-  rescue StandardError
-    # Ignored
+      f: u.last_name,
+      i: u.first_name,
+      o: u.middle_name
+    )&.dig('inn').present?
   end
 
   def csv_parser_user(u)
     user = ParsedUser
-           .where('lower(last_name) = ? and lower(first_name) = ?', u.last_name&.downcase, u.first_name&.downcase)
+           .where('lower(last_name) = ? and lower(first_name) = ?', u.last_name, u.first_name)
            .where(phone: u.phone&.last(10)).first
 
     user && (user.is_phone_verified.nil? || user.is_phone_verified == 't')
   end
 
   def csv_parser_db_okb(u)
-    slice = u.slice(*%i[phone birth_date last_name first_name middle_name])
+    slice = u.slice(FIELDS)
     return if slice.values.include? nil
 
     resp = Request.where(service: :okb).where(slice).order(id: :desc).first
@@ -78,18 +68,15 @@ class ParserService
   end
 
   def csv_parser_okb(u)
-    slice = u.slice(*%i[phone birth_date last_name first_name middle_name])
-    return if slice.values.include? nil
+    return if u.slice(FIELDS).values.include? nil
 
-    resp = OkbService.call(
+    OkbService.call(
       telephone_number: u.phone,
       birthday: u.birth_date,
-      surname: u.last_name.downcase,
-      name: u.first_name.downcase,
-      patronymic: u.middle_name.downcase,
-      consent: 'Y'
-    )
-    resp && resp['score'] > 2
+      surname: u.last_name,
+      name: u.first_name,
+      patronymic: u.middle_name
+    )&.dig('score')&.> 2
   end
 
   def csv_parser_xxx(u)

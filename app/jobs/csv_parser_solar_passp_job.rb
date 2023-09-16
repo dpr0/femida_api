@@ -2,7 +2,7 @@ class CsvParserSolarPasspJob < ApplicationJob
   queue_as :default
 
   def perform(id:, limit: 100)
-    # TODO ParserService
+    # TODO ParserService phone+passport
     # ParserService.new(self.class.name, hash[:id], [:phone, :passport]).call
     person_service = PersonService.instance
     @array_phone = []
@@ -53,10 +53,12 @@ class CsvParserSolarPasspJob < ApplicationJob
       is_phone_verified_count: @parser.csv_users.where(is_phone_verified: true).count,
       is_passport_verified_count: @parser.csv_users.where(is_passport_verified: true).count
     )
-    @parser.csv_parser_logs.create(
+
+    log = @parser.csv_parser_logs.new(
       is_phone_verified_count: @array_phone.size,
       is_passport_verified_count: @array_passp.size,
       info: self.class.name.underscore.sub('_job', '')
     )
+    log.save(validate: false)
   end
 end

@@ -131,18 +131,14 @@ class Api::Femida::ParserController < ApplicationController
         bool ||= ParsedUser.where(phone: ["7#{f}", f]).select { |user| user.last_name&.downcase == u.last_name.downcase && user.first_name&.downcase == u.first_name.downcase }.present?
         bool ||= begin
           if u.phone.present? && u.birth_date.present? && u.last_name.present? && u.first_name.present? && u.middlename.present?
-            resp = OkbService.call(
+            OkbService.call(
               telephone_number: u.phone,
               birthday: u.birth_date,
               surname: u.last_name.downcase,
               name: u.first_name.downcase,
-              patronymic: u.middlename.downcase,
-              consent: 'Y'
-            )
+              patronymic: u.middlename.downcase
+            )&.dig('score')&.> 2
           end
-          resp && resp['score'] > 2
-        rescue
-          false
         end
         Rails.logger.info '==================================================== ' if bool
         u.update(is_phone_verified_2: bool)
@@ -339,7 +335,7 @@ class Api::Femida::ParserController < ApplicationController
   end
 
   def enrichment
-    id = 29
+    id = 30
     file = ActiveStorage::Attachment.find_by(id: id)
     person_service = PersonService.instance
 
@@ -383,7 +379,7 @@ class Api::Femida::ParserController < ApplicationController
   end
 
   def enrichment_xlsx
-    id = 29
+    id = 30
     array = CsvUser.where(file_id: id).to_a
     workbook = ::FastExcel.open
     worksheet = workbook.add_worksheet('ФИО_ИНН_ТЕЛ_ДР')

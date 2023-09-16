@@ -15,11 +15,11 @@ class CsvParserParseJob < ApplicationJob
         array << {
           file_id: id,
           external_id: (line[parser.external_id]    if parser.external_id),
-          middle_name: (line[parser.middle_name]    if parser.middle_name),
           phone:       (line[parser.phone].last(10) if parser.phone),
           passport:    (line[parser.passport]       if parser.passport),
           last_name:   (line[parser.last_name]      if parser.last_name),
           first_name:  (line[parser.first_name]     if parser.first_name),
+          middle_name: (line[parser.middle_name]    if parser.middle_name),
           is_phone_verified:    (line[7] if line[7] == 'true'),
           is_passport_verified: (line[8] if line[8] == 'true'),
           birth_date:  (line[parser.birth_date].to_date&.strftime('%d.%m.%Y') if parser.birth_date)

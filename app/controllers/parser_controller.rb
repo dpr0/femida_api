@@ -9,12 +9,13 @@ class ParserController < ApplicationController
 
   def index
     @csv_parsers = CsvParser.all.order(:id)
-    @blobs = ActiveStorage::Blob.where(id: @csv_parsers.map { |x| x.file_id })
+    @blobs = ActiveStorage::Blob.where(id: @csv_parsers.map(&:file_id))
   end
 
   def show
     @csv_user = CsvUser.new
     @csv_parser = CsvParser.find_by(file_id: params[:id])
+    @csv_parser_logs = @csv_parser.csv_parser_logs.order(id: :desc)
     @csv_users = @csv_parser.csv_users
     @headers = @csv_parser.headers.split(@csv_parser.separator)
   end

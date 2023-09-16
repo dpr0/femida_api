@@ -53,6 +53,8 @@ class InnService
       resp = RestClient::Request.execute(hash)
       Rails.logger.info "Response: #{resp}"
       JSON.parse resp
+    rescue
+      { 'error' => -5 }
     end
   end
 end

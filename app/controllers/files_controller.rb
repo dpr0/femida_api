@@ -7,7 +7,7 @@ class FilesController < ApplicationController
 
   def index
     @csv_parser_ids = CsvParser.all.map { |x| x.file_id }
-    @attachments = ActiveStorage::Attachment.where.not(id: @csv_parser_ids).all
+    @attachments = ActiveStorage::Attachment.where.not(id: @csv_parser_ids).order(id: :desc)
   end
 
   def create
