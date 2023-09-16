@@ -1,6 +1,6 @@
 class OkbService
   class << self
-    def call(params, db = true)
+    def call(params)
       params[:consent] = 'Y'
       if params[:document].present?
         params[:document] = params[:document].to_i
@@ -28,9 +28,12 @@ class OkbService
         middle_name: params[:patronymic],
         birth_date:  params[:birthday].to_date.strftime('%d.%m.%Y')
       }
-      okb = Request.find_by(hash_req) if db
-
-      return { 'score' => okb.response&.to_i || -5 } if okb
+      okb = Request.find_by(hash_req)
+      if okb
+        score = { 'score' => okb.response&.to_i || -5 }
+        Rails.logger.info(score)
+        return score
+      end
 
       curl = "/opt/cprocsp/bin/amd64/curl -i -X POST -vvv --cert #{ENV['CERT_SHA1_THUMBPRINT']}:#{ENV['CERT_PASSWORD']} --cert-type CERT_SHA1_HASH_PROP_ID:CERT_SYSTEM_STORE_CURRENT_USER:MY"
       hash = { client_id: ENV['OKB_CLIENT_ID'], client_secret: ENV['OKB_CLIENT_SECRET'], grant_type: 'client_credentials', scope: 'openid' }
