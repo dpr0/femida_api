@@ -335,50 +335,48 @@ class Api::Femida::ParserController < ApplicationController
   end
 
   def enrichment
-    with_error_handling do
-      id = 31
-      file = ActiveStorage::Attachment.find_by(id: id)
-      person_service = PersonService.instance
+    id = 31
+    file = ActiveStorage::Attachment.find_by(id: id)
+    person_service = PersonService.instance
 
-      array = []
-      file.open do |f|
-        46828.times do |i|
-          ar = f.readline.force_encoding('UTF-8').chomp.delete("\"").downcase.tr('ё', 'е').split(';')
-          next if ar[0] == 'название компании (полное)'
+    array = []
+    file.open do |f|
+      46828.times do |i|
+        ar = f.readline.force_encoding('UTF-8').chomp.delete("\"").downcase.tr('ё', 'е').split(';')
+        next if ar[0] == 'название компании (полное)'
 
-          last_name, first_name, middle_name = ar[0].split(' ')
-          array << { last_name: last_name, first_name: first_name, middle_name: middle_name, inn: ar[3] }
-        rescue
-          break
-        end
+        last_name, first_name, middle_name = ar[0].split(' ')
+        array << { last_name: last_name, first_name: first_name, middle_name: middle_name, inn: ar[3] }
+      rescue
+        break
       end
-      array2 = []
-      array.each do |u|
-        resp = person_service.search(u)
-        if resp && resp['count'] && resp['count'] > 0
-          birth_dates = resp['data'].map { |d| d['ДАТА РОЖДЕНИЯ'] }.compact.uniq
-          u[:birth_date] = birth_dates.join(', ')
-          birth_dates.each do |birthdate|
-            resp2 = person_service.search(last_name: u[:last_name], first_name: u[:first_name], middle_name: u[:middle_name], birth_date: birthdate)
-            if resp2 && resp2['count'] && resp2['count'] > 0
-              phones = resp['data'].map do |dd|
-                [
-                  'Связь с телефоном абонентом', 'Телефон_сотовый', 'Связь_с_телефоном', 'Телефон_работы', 'Телефон работы', 'телефон',
-                  'Телефон', 'Телефоны', 'ТЕЛЕФОН', 'Телефон места работы'
-                ].map { |x| dd[x].scan(/\d/).join.last(10) if dd[x].present? }.compact.uniq
-              end.flatten.compact.uniq
-              u[:phone] = phones.shift
-              u[:info] = phones.join(', ')
-              u[:external_id] = u.delete(:inn)
-              u[:file_id] = id
-              array2 << u
-            end
+    end
+    array2 = []
+    array.each do |u|
+      resp = person_service.search(u)
+      if resp && resp['count'] && resp['count'] > 0
+        birth_dates = resp['data'].map { |d| d['ДАТА РОЖДЕНИЯ'] }.compact.uniq
+        u[:birth_date] = birth_dates.join(', ')
+        birth_dates.each do |birthdate|
+          resp2 = person_service.search(last_name: u[:last_name], first_name: u[:first_name], middle_name: u[:middle_name], birth_date: birthdate)
+          if resp2 && resp2['count'] && resp2['count'] > 0
+            phones = resp['data'].map do |dd|
+              [
+                'Связь с телефоном абонентом', 'Телефон_сотовый', 'Связь_с_телефоном', 'Телефон_работы', 'Телефон работы', 'телефон',
+                'Телефон', 'Телефоны', 'ТЕЛЕФОН', 'Телефон места работы'
+              ].map { |x| dd[x].scan(/\d/).join.last(10) if dd[x].present? }.compact.uniq
+            end.flatten.compact.uniq
+            u[:phone] = phones.shift
+            u[:info] = phones.join(', ')
+            u[:external_id] = u.delete(:inn)
+            u[:file_id] = id
+            array2 << u
           end
         end
       end
-      array2.each_slice(10000) { |slice| CsvUser.insert_all(slice) }
-      { count: array2.size, data: array2 }
     end
+    array2.each_slice(10000) { |slice| CsvUser.insert_all(slice) }
+    { count: array2.size, data: array2 }
   end
 
   def enrichment_xlsx
