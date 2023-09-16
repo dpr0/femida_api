@@ -3,14 +3,13 @@ class ParserService
 
   def initialize(job_neme, id, field)
     @id = id
-    @field = field
+    @name = "is_#{field}_verified"
+    @count_field = "#{@name}_count"
     @job_name = job_neme.underscore.sub('_job', '')
     @array = []
     @parser = CsvParser.find_by(file_id: id)
-    @csv_users = CsvUser.where(file_id: id, "is_#{field}_verified": [nil, false]).in_batches(of: 100)
+    @csv_users = CsvUser.where(file_id: id, @name => [nil, false]).in_batches(of: 100)
     @person_service = PersonService.instance
-    @name = "is_#{@field}_verified"
-    @field = "#{@name}_count"
   end
 
   def call
@@ -20,8 +19,8 @@ class ParserService
       CsvUser.upsert_all(array, update_only: [@name, "#{@name}_source"]) if array.present?
     end
 
-    @parser.update(status: 5, @field => CsvUser.where(file_id: @id, @name => true).count)
-    log = @parser.csv_parser_logs.new(@field => @array.size, info: @job_name)
+    @parser.update(status: 5, @count_field => CsvUser.where(file_id: @id, @name => true).count)
+    log = @parser.csv_parser_logs.new(@count_field => @array.size, info: @job_name)
     log.save(validate: false)
   end
 
@@ -79,9 +78,5 @@ class ParserService
     )&.dig('score')&.> 2
   end
 
-  def csv_parser_xxx(u)
-    csv_parser_db_okb(u) || csv_parser_user(u) || csv_parser_solar_phone(u)
-  end
-
-  def csv_parser_(_); end
+  def csv_parser_xxx(_); end
 end
