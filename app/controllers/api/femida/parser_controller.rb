@@ -335,7 +335,7 @@ class Api::Femida::ParserController < ApplicationController
   end
 
   def enrichment
-    id = 33
+    id = params[:id]
     file = ActiveStorage::Attachment.find_by(id: id)
     person_service = PersonService.instance
 
@@ -389,7 +389,7 @@ class Api::Femida::ParserController < ApplicationController
   end
 
   def enrichment_xlsx
-    id = 33
+    id = params[:id]
     array = CsvUser.where(file_id: id).to_a
     return if array.blank?
 
