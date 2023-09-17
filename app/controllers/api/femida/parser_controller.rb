@@ -352,30 +352,39 @@ class Api::Femida::ParserController < ApplicationController
       end
     end
     array2 = []
-    array.each do |u|
+    array.each_with_index do |u, i|
+      hash = u.slice(*%i[last_name first_name middle_name])
+      csv_users = CsvUser.where(hash.merge(file_id: id))
+      csv_users.each do |csv_user|
+        csv_user.update(external_id: u[:inn]) if csv_user.external_id.nil?
+      end
+      Rails.logger.info "#{i}: #{csv_users.present?} - #{u}"
+      next if csv_users.present?
+
       resp = person_service.search(u)
       if resp && resp['count'] && resp['count'] > 0
         birth_dates = resp['data'].map { |d| d['ДАТА РОЖДЕНИЯ'] }.compact.uniq
-        u[:birth_date] = birth_dates.join(', ')
+        hash[:birth_date] = birth_dates.join(', ')
+
         birth_dates.each do |birthdate|
-          resp2 = person_service.search(last_name: u[:last_name], first_name: u[:first_name], middle_name: u[:middle_name], birth_date: birthdate)
+          resp2 = person_service.search(hash.merge(birth_date: birthdate))
           if resp2 && resp2['count'] && resp2['count'] > 0
             phones = resp['data'].map do |dd|
               [
-                'Связь с телефоном абонентом', 'Телефон_сотовый', 'Связь_с_телефоном', 'Телефон_работы', 'Телефон работы', 'телефон',
-                'Телефон', 'Телефоны', 'ТЕЛЕФОН', 'Телефон места работы'
+                'Связь с телефоном абонентом', 'Телефон_сотовый', 'Связь_с_телефоном', 'Телефон_работы',
+                'Телефон работы', 'телефон', 'Телефон', 'Телефоны', 'ТЕЛЕФОН', 'Телефон места работы'
               ].map { |x| dd[x].scan(/\d/).join.last(10) if dd[x].present? }.compact.uniq
             end.flatten.compact.uniq
-            u[:phone] = phones.shift
-            u[:info] = phones.join(', ')
-            u[:external_id] = u.delete(:inn)
-            u[:file_id] = id
-            array2 << u
+            hash[:phone] = phones.shift
+            hash[:info] = phones.join(', ')
+            hash[:external_id] = u[:inn]
+            hash[:file_id] = id
+            array2 << hash
           end
         end
       end
     end
-    array2.each_slice(10000) { |slice| CsvUser.insert_all(slice) }
+    array2.each_slice(10_000) { |slice| CsvUser.insert_all(slice) }
     { count: array2.size, data: array2 }
   end
 
