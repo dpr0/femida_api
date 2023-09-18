@@ -81,7 +81,7 @@ class ParserController < ApplicationController
   end
 
   def add_score
-    id = 44
+    id = 45
     errors = []
     array = []
     array_ = []
@@ -111,12 +111,12 @@ class ParserController < ApplicationController
         end
         next unless array.size == 1000
 
-        CsvUser.upsert_all(array, update_only: :phone_score)
-        array_ += array
+        CsvUser.upsert_all(array.uniq, update_only: :phone_score)
+        array_ += array.uniq
         array = []
       end
     end
-    array.each_slice(10000) { |slice| CsvUser.upsert_all(slice, update_only: :phone_score) }
+    array.uniq.each_slice(10000) { |slice| CsvUser.upsert_all(slice, update_only: :phone_score) }
 
     render status: :ok, json: { updated: array_.size, errors: errors }
   end
