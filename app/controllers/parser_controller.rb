@@ -81,14 +81,14 @@ class ParserController < ApplicationController
   end
 
   def add_score
-    id = 42
+    id = 44
     errors = []
     array = []
     array_ = []
     file = ActiveStorage::Attachment.find_by(id: id)
     return unless file
 
-    csv_users = CsvUser.where(file_id: params[:parser_id]).where.not(phone_score: nil).to_a
+    csv_users = CsvUser.where(file_id: params[:parser_id], phone_score: nil).to_a
 
     file.open do |f|
       (csv_users.size + 1).times do|i|
@@ -109,12 +109,11 @@ class ParserController < ApplicationController
         else
           errors << { id: line[0], phone: line[1], passport: line[2], error: :empty_score }
         end
+        next unless array.size == 1000
 
-        # if array.size == 1000
-        #   CsvUser.upsert_all(array, update_only: :phone_score)
-        #   array_ += array
-        #   array = []
-        # end
+        CsvUser.upsert_all(array, update_only: :phone_score)
+        array_ += array
+        array = []
       end
     end
     array.each_slice(10000) { |slice| CsvUser.upsert_all(slice, update_only: :phone_score) }
