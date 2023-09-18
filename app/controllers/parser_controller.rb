@@ -81,33 +81,43 @@ class ParserController < ApplicationController
   end
 
   def add_score
-    id = 27
-    errors = []
-    array = []
-    file = ActiveStorage::Attachment.find_by(id: id)
-    csv_users = CsvUser.where(file_id: params[:parser_id]).to_a
-
-    file.open do |f|
-      (csv_users.size + 1).times do|i|
-        line = f.readline.force_encoding('UTF-8').chomp.split(';')
-        next if line[0] == 'external_id' || line[0].blank?
-
-        u = csv_users.find { |u| u.phone == line[1] && u.passport == line[2].rjust(10, '0') }
-        if line[9].present? && u.present?
-          score = line[9].tr(',', '.').to_f
-          Rails.logger.info i
-          if score > 0 && score <= 0.980532787031913
-            array << { id: u.id, phone_score: score.to_s.tr('.', ',') }
+    with_error_handling do
+      id = 41
+      errors = []
+      array = []
+      array_ = []
+      file = ActiveStorage::Attachment.find_by(id: id)
+      return unless file
+  
+      csv_users = CsvUser.where(file_id: params[:parser_id]).to_a
+  
+      file.open do |f|
+        (csv_users.size + 1).times do|i|
+          line = f.readline.force_encoding('UTF-8').chomp.split(';')
+          next if line[0] == 'external_id' || line[0].blank?
+  
+          u = csv_users.find { |u| u.phone == line[1] && u.passport == line[2].rjust(10, '0') }
+          if line[9].present? && u.present?
+            score = line[9].tr(',', '.').to_f
+            Rails.logger.info i
+            if score > 0 && score <= 0.980532787031913
+              array << { id: u.id, phone_score: score.to_s.tr('.', ',') }
+            else
+              errors << { id: line[0], phone: line[1], passport: line[2], error: :wrong_score }
+            end
           else
-            errors << { id: u.id, phone: line[1], passport: line[2], error: :wrong_score }
+            errors << { id: line[0], phone: line[1], passport: line[2], error: :empty_score }
           end
-        else
-          errors << { id: u.id, phone: line[1], passport: line[2], error: :empty_score }
+          next unless i == 10000
+
+          CsvUser.upsert_all(array, update_only: :phone_score)
+          array_ += array
+          array = []
         end
       end
+      array.each_slice(10000) { |slice| CsvUser.upsert_all(slice, update_only: :phone_score) }
+      { updated: array_.size, errors: errors }
     end
-    array.each_slice(10000) { |slice| CsvUser.upsert_all(slice, update_only: :phone_score) }
-    { updated: array.size, errors: errors }
   end
 
   def get_csv

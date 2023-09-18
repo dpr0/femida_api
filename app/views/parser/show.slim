@@ -47,6 +47,19 @@
                   label.label.has-text-success-dark Паспорт подтвержден
                   .control
                     = text_field_tag :rows, @csv_users.count(&:is_passport_verified?), class: 'input is-medium', disabled: true
+            / .columns
+            /   .column.is-12
+            /     .field
+            /       label.label.has-text-success-dark
+            /         h3.subtitle Серегины странности
+            /       .control
+            /         = text_field_tag :qwe, 'какая-то хуйня со скорингом', class: 'input is-medium', disabled: true
+            /       .control
+            /         = text_field_tag :qwe, 'фио-паспорт подтвержден менее 95%', class: 'input is-medium', disabled: true
+            /       .control
+            /         = text_field_tag :qwe, 'СБП не отбился: 100', class: 'input is-medium', disabled: true
+            /       .control
+            /         = text_field_tag :qwe, 'qiwi', class: 'input is-medium', disabled: true
 
         .column.is-6
           .columns
