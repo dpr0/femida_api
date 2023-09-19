@@ -5,8 +5,8 @@
     .tile.is-vertical.is-12
       .tile.is-parent
         article.tile.is-child.notification
-          p.title
-            | Wide tile
+          p.subtitle
+            | Ретро
           p.subtitle
             = form_for current_user, url: parser_index_path, method: :post, data: { turbo: false } do |f|
               = f.label :attachment
@@ -17,7 +17,8 @@
               table.table.is-fullwidth.is-striped
                 thead
                   tr
-                    th FILE_ID
+                    th file_id
+                    th file_name
                     th Строк в файле
                     th Уникальный строк в БД
                     th Телефонов подтверждено
@@ -26,8 +27,8 @@
                 tbody
                   - @csv_parsers.each do |parser|
                     tr
-                      td.level-right
-                        = link_to @blobs.find { |x| x.id == parser.file_id }.filename, parser_path(parser.file_id)
+                      td = parser.file_id
+                      td = link_to @blobs.find { |x| x.id == parser.file_id }.filename, parser_path(parser.file_id)
                       td = parser.rows
                       td = parser.csv_users.count
                       td = parser.is_phone_verified_count

@@ -52,7 +52,6 @@ dump.rdb
 /config/credentials/development.key
 /config/credentials/production.key
 /yarn-error.log
-/config/cred.byebug_history
 .byebug_history
 package-lock.json
 test.rb

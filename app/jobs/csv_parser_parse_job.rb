@@ -12,6 +12,8 @@ class CsvParserParseJob < ApplicationJob
         next if str == parser.headers || str.blank?
 
         line = str.downcase.delete("\"").tr('ё', 'е').split(parser.separator)
+        next if line.include? 'last_name'
+
         array << {
           file_id: id,
           external_id: (line[parser.external_id]    if parser.external_id),

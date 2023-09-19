@@ -94,14 +94,14 @@
                 table.table.is-fullwidth.is-striped
                   thead
                     th Дата
-                    th Тип
+                    th Проверка
                     th Телефонов
                     th Паспортов
                   tbody
                     - @csv_parser_logs.each do |log|
                       tr
-                        td = log.created_at.strftime('%d.%m.%Y %H:%M')
-                        td = log.info
+                        td = log.created_at.in_time_zone('Moscow').strftime('%d.%m.%Y %H:%M')
+                        td = log.info.sub('csv_parser_', '')
                         td = log.is_phone_verified_count
                         td = log.is_passport_verified_count
 

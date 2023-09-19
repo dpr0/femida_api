@@ -391,16 +391,24 @@ class Api::Femida::ParserController < ApplicationController
   def enrichment_xlsx
     id = params[:id]
     array = CsvUser.where(file_id: id).to_a
+      .uniq { |x| [x.last_name, x.first_name, x.middle_name, x.external_id] }
+      .filter { |x| x.phone&.size == 10 || x.info.split(',').filter { |y| y&.size == 10 }.present? }
+    array = array.map do |x|
+      phone1 = x.phone.size == 10 && x.phone[0] == '9' ? [x.phone] : []
+      phone2 = x.info.split(',').filter { |y| y&.size == 10 && y&.first == '9' }
+      phone = (phone1 + phone2).join(', ')
+      { external_id: x.external_id, phone: phone, last_name: x.last_name, first_name: x.first_name, middle_name: x.middle_name, birth_date: x.birth_date } if phone.present?
+    end.compact
+
     return if array.blank?
 
     workbook = ::FastExcel.open
     worksheet = workbook.add_worksheet('ФИО_ИНН_ТЕЛ_ДР')
     bold = workbook.bold_format
-    attrs = %i[external_id last_name first_name middle_name birth_date phone info]
-    headers = array.first.slice(attrs).keys
+    headers = array.first.keys
     headers.each_index { |i| worksheet.set_column_width(i, 15) }
     worksheet.append_row(headers, bold)
-    array.each { |d| worksheet.append_row(d.slice(attrs).values) }
+    array.each { |d| worksheet.append_row(d.values) }
     workbook.close
     send_data(workbook.read_string, filename: "ФИО_ИНН_ТЕЛ_ДР_#{array.size}.xlsx")
   end

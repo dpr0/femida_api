@@ -5,7 +5,7 @@ class ParserController < ApplicationController
   before_action :authenticate_user!
   before_action :is_admin?, except: %i[index show]
 
-  FIELDS = %w[external_id phone passport last_name first_name middle_name birth_date is_phone_verified? is_passport_verified? phone_score]
+  FIELDS = %w[external_id phone passport last_name first_name middle_name birth_date is_phone_verified? is_passport_verified? phone_score].freeze
 
   def index
     @csv_parsers = CsvParser.all.order(:id)
@@ -81,6 +81,23 @@ class ParserController < ApplicationController
   end
 
   def add_score
+    # id = 14
+    # file = ActiveStorage::Attachment.find_by(id: 48)
+    # hash = {}
+    # rows = file.open(&:count)
+    # file.open do |f|
+    #   rows.times do|i|
+    #     line = f.readline.force_encoding('UTF-8').chomp.split(';')
+    #     hash[line[1].rjust(10, '0')] = line[9]
+    #   end
+    # end
+    #
+    # csv_users = CsvUser.where(file_id: params[:parser_id], phone_score: nil).to_a
+    # csv_users.each do |user|
+    #   user.update(phone_score: hash[user.phone])
+    # end
+    # return
+
     id = 45
     errors = []
     array = []
@@ -133,7 +150,7 @@ class ParserController < ApplicationController
     scope = CsvUser.where(file_id: params[:parser_id])
     name = ActiveStorage::Blob.find(params[:parser_id])
     workbook = ::FastExcel.open
-    worksheet = workbook.add_worksheet("#{name.filename}")
+    worksheet = workbook.add_worksheet(name.filename.to_s)
     bold = workbook.bold_format
     headers = FIELDS
     headers.each_index { |i| worksheet.set_column_width(i, 15) }

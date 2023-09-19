@@ -13,6 +13,8 @@ class ParserService
   end
 
   def call
+    log = @parser.csv_parser_logs.new(info: @job_name)
+    log.save(validate: false)
     @csv_users.each do |batch|
       array = batch.map { |u| { id: u.id, @name => true, "#{@name}_source".to_sym => @job_name } if send(@job_name, u) }.compact
       @array += array
@@ -20,7 +22,7 @@ class ParserService
     end
 
     @parser.update(status: 5, @count_field => CsvUser.where(file_id: @id, @name => true).count)
-    log = @parser.csv_parser_logs.new(@count_field => @array.size, info: @job_name)
+    log.send(@count_field + '=', @array.size)
     log.save(validate: false)
   end
 
