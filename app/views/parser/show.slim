@@ -83,11 +83,11 @@
                   = link_to 'Распарсить файл', parser_parse_path(@csv_parser.file_id), opts.call(:info)
                 - if @csv_parser.status == 3 || @csv_parser.status == 5
                   .buttons.has-addons
-                    = link_to '1 Проверка - db_req ОКБ',        parser_db_okb_check_path(@csv_parser.file_id), opts.call(:info)
-                    = link_to '2 Проверка - parsed_users',        parser_user_check_path(@csv_parser.file_id), opts.call(:info)
-                    = link_to '3 Проверка - solar по тел', parser_solar_phone_check_path(@csv_parser.file_id), opts.call(:info)
-                    = link_to '4 Проверка - solar фио+др', parser_solar_passp_check_path(@csv_parser.file_id), opts.call(:info)
-                    = link_to '5 Проверка - по ИНН',               parser_inn_check_path(@csv_parser.file_id), opts.call(:info)
+                    = link_to '1 Проверка - db_okb',           parser_db_okb_check_path(@csv_parser.file_id), opts.call(:info)
+                    = link_to '2 Проверка - user',               parser_user_check_path(@csv_parser.file_id), opts.call(:info)
+                    = link_to '3 Проверка - solar_phone', parser_solar_phone_check_path(@csv_parser.file_id), opts.call(:info)
+                    = link_to '4 Проверка - solar_passp', parser_solar_passp_check_path(@csv_parser.file_id), opts.call(:info)
+                    = link_to '5 Проверка - inn',                 parser_inn_check_path(@csv_parser.file_id), opts.call(:info)
           - if @csv_parser_logs.present?
             .columns
               .column.is-12
