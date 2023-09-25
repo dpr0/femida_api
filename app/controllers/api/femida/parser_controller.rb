@@ -321,7 +321,7 @@ class Api::Femida::ParserController < ApplicationController
           z = 0
         end
       end
-      array.uniq.each_slice(10000) { |slice| Request.insert_all(slice) }
+      array.uniq.each_slice(BATCH_SIZE) { |slice| Request.insert_all(slice) }
       # regexp = /\d{10}$/
       # batch_size = 50_000
       # (0..(ParsedUser.count.to_f / batch_size).ceil).each do |num|
@@ -384,7 +384,7 @@ class Api::Femida::ParserController < ApplicationController
         end
       end
     end
-    array2.each_slice(10_000) { |slice| CsvUser.insert_all(slice) }
+    array2.each_slice(BATCH_SIZE) { |slice| CsvUser.insert_all(slice) }
     { count: array2.size, data: array2 }
   end
 

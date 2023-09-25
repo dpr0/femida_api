@@ -69,11 +69,11 @@
                 label.label.has-text-success-dark Действие
                 - if @csv_parser.status == 3 || @csv_parser.status == 5
                   .buttons.has-addons
-                    = link_to 'Проверка ХХХ',    parser_xxx_check_path(@csv_parser.file_id), opts.call(:danger)
-                    = link_to 'Проверка ОКБ',    parser_okb_check_path(@csv_parser.file_id), opts.call(:danger)
-                    = link_to 'Склеить скоринг', parser_add_score_path(@csv_parser.file_id), opts.call(:warning)
-                    = link_to 'Скачать CSV',       parser_get_csv_path(@csv_parser.file_id), target: '_blank', class: 'button is-primary is-fullwidth'
-                    = link_to 'Скачать XLSX',     parser_get_xlsx_path(@csv_parser.file_id), target: '_blank', class: 'button is-primary is-fullwidth'
+                    = link_to '1-5 Проверки',     parser_xxx_check_path(@csv_parser.file_id), opts.call(:danger)
+                    = link_to '6 Проверка - ОКБ', parser_okb_check_path(@csv_parser.file_id), opts.call(:danger)
+                    = link_to 'Склеить скоринг',  parser_add_score_path(@csv_parser.file_id), opts.call(:warning)
+                    = link_to 'Скачать CSV',        parser_get_csv_path(@csv_parser.file_id), target: '_blank', class: 'button is-primary is-fullwidth'
+                    = link_to 'Скачать XLSX',      parser_get_xlsx_path(@csv_parser.file_id), target: '_blank', class: 'button is-primary is-fullwidth'
             .column.is-6
               .field
                 label.label.has-text-success-dark Действие
@@ -83,11 +83,11 @@
                   = link_to 'Распарсить файл', parser_parse_path(@csv_parser.file_id), opts.call(:info)
                 - if @csv_parser.status == 3 || @csv_parser.status == 5
                   .buttons.has-addons
-                    = link_to 'Проверка solar по тел', parser_solar_phone_check_path(@csv_parser.file_id), opts.call(:info)
-                    = link_to 'Проверка solar фио+др', parser_solar_passp_check_path(@csv_parser.file_id), opts.call(:info)
-                    = link_to 'Проверка по ИНН',               parser_inn_check_path(@csv_parser.file_id), opts.call(:info)
-                    = link_to 'Проверка parsed_users',        parser_user_check_path(@csv_parser.file_id), opts.call(:info)
-                    = link_to 'Проверка db_req ОКБ',        parser_db_okb_check_path(@csv_parser.file_id), opts.call(:info)
+                    = link_to '1 Проверка - db_req ОКБ',        parser_db_okb_check_path(@csv_parser.file_id), opts.call(:info)
+                    = link_to '2 Проверка - parsed_users',        parser_user_check_path(@csv_parser.file_id), opts.call(:info)
+                    = link_to '3 Проверка - solar по тел', parser_solar_phone_check_path(@csv_parser.file_id), opts.call(:info)
+                    = link_to '4 Проверка - solar фио+др', parser_solar_passp_check_path(@csv_parser.file_id), opts.call(:info)
+                    = link_to '5 Проверка - по ИНН',               parser_inn_check_path(@csv_parser.file_id), opts.call(:info)
           - if @csv_parser_logs.present?
             .columns
               .column.is-12
@@ -125,15 +125,17 @@
                   - else
                     .has-text-danger = col
       - if @csv_parser.status < 2
-        - %w[external_id phone passport last_name first_name middle_name birth_date].each_slice(4) do |slice|
+        - %w[external_id last_name first_name middle_name birth_date phone passport info date_mask].each_slice(4) do |slice|
           .columns
-            - slice.each do |ff|
+            - slice.each do |f|
               .column.is-3
                 .field
-                  label.label.has-text-success-dark = ff
+                  label.label.has-text-success-dark = f
                   .control
-                    - fff = @headers.select { |col| ff.include?(col[0..3]) || col.include?(ff[0..3]) }
-                    = text_field_tag ff, @csv_parser.status == 1 && @csv_parser.send(ff) ? @headers[@csv_parser.send(ff)] : fff, class: 'input is-medium'
+                    - ff = @headers.select { |col| (f.include?(col[0..3]) || col.include?(f[0..3])) && f != 'date_mask' }
+                    - fff = @csv_parser.send(f)
+                    - str = @csv_parser.status == 1 && fff ? (fff.is_a?(Integer) ? @headers[fff] : fff) : ff
+                    = text_field_tag f, str, class: 'input is-medium'
 
 javascript:
   var elements = document.getElementsByClassName("buttons");

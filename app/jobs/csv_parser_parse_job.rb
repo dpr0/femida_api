@@ -14,21 +14,24 @@ class CsvParserParseJob < ApplicationJob
         line = str.downcase.delete("\"").tr('ё', 'е').split(parser.separator)
         next if line.include? 'last_name'
 
+        str = line[parser.birth_date] if parser.birth_date
+        birth_date = parser.date_mask.present? ? Date.strptime(str, parser.date_mask) : str.to_date
         array << {
-          file_id: id,
+          file_id:      id,
+          birth_date:  (birth_date.strftime('%d.%m.%Y') if parser.birth_date),
           external_id: (line[parser.external_id]    if parser.external_id),
           phone:       (line[parser.phone].last(10) if parser.phone),
           passport:    (line[parser.passport]       if parser.passport),
           last_name:   (line[parser.last_name]      if parser.last_name),
           first_name:  (line[parser.first_name]     if parser.first_name),
           middle_name: (line[parser.middle_name]    if parser.middle_name),
+          info:        (line[parser.info]           if parser.info),
           is_phone_verified:    (line[7] if line[7] == 'true'),
-          is_passport_verified: (line[8] if line[8] == 'true'),
-          birth_date:  (line[parser.birth_date].to_date&.strftime('%d.%m.%Y') if parser.birth_date)
+          is_passport_verified: (line[8] if line[8] == 'true')
         }
       end
     end
-    array.each_slice(10000) { |slice| CsvUser.insert_all(slice) }
+    array.each_slice(ApplicationController::BATCH_SIZE) { |slice| CsvUser.insert_all(slice) }
     parser.update(status: 3)
   end
 end

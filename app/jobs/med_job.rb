@@ -14,7 +14,7 @@ class MedJob < ApplicationJob
         phone: to_phone(z[6]) || to_phone(z[5]),
         address: z[4]
       )
-      if array.size == 20000
+      if array.size == 20_000
         ParsedUser.insert_all(array)
         array = []
       end

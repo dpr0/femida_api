@@ -22,7 +22,7 @@ class ParserService
     end
 
     @parser.update(status: 5, @count_field => CsvUser.where(file_id: @id, @name => true).count)
-    log.send(@count_field + '=', @array.size)
+    log.send("#{@count_field}=", @array.size)
     log.save(validate: false)
   end
 
@@ -80,5 +80,7 @@ class ParserService
     )&.dig('score')&.> 2
   end
 
-  def csv_parser_xxx(_); end
+  def csv_parser_xxx(u)
+    csv_parser_db_okb(u)
+  end
 end

@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
+  BATCH_SIZE = 10_000
   RETRY = 30
-  URL = 'http://rucaptcha.com'
-  URL2 = 'http://cptch.net'
+  URL   = 'http://rucaptcha.com'
+  URL2  = 'http://cptch.net'
+  KEY1  = 'RUCAPTCHA_KEY'
+  KEY2  = 'CPTCH_NET_KEY'
+  HOST  = 'https://esia.gosuslugi.ru'
   ERROR = 'ERROR_CAPTCHA_UNSOLVABLE'
-  KEY1 = 'RUCAPTCHA_KEY'
-  KEY2 = 'CPTCH_NET_KEY'
-  HOST = 'https://esia.gosuslugi.ru'
 
   private
 
@@ -32,13 +33,9 @@ class ApplicationController < ActionController::Base
   end
 
   def with_error_handling
-    error = nil
-    body = begin
-             yield
-           rescue Exception => e
-             error = e.message
-           end
-    render status: :ok, json: error.present? ? { status: false, error: error } : body
+    render status: :ok, json: yield
+  rescue StandardError => e
+    render status: :ok, json: { status: false, error: e.message }
   end
 
   def get(path, headers: {}, parse: true, key: :str, host: HOST)

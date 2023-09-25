@@ -37,13 +37,15 @@ class ParserController < ApplicationController
     @headers = csv_parser.headers.split(csv_parser.separator)
     csv_parser.update(
       status:      1,
+      info:        index_by(:info),
       phone:       index_by(:phone),
       passport:    index_by(:passport),
       last_name:   index_by(:last_name),
       first_name:  index_by(:first_name),
       middle_name: index_by(:middle_name),
       birth_date:  index_by(:birth_date),
-      external_id: index_by(:external_id)
+      external_id: index_by(:external_id),
+      date_mask:   params[:date_mask]
     )
     redirect_to parser_path(csv_parser.file_id)
   end
@@ -77,33 +79,25 @@ class ParserController < ApplicationController
   end
 
   def xxx_check
-    check(CsvParserXxxJob)
+    check([CsvParserDbOkbJob, CsvParserUserJob, CsvParserSolarPhoneJob, CsvParserSolarPasspJob, CsvParserInnJob])
   end
 
   def add_score
-    id = 54
+    id = params[:file_id]
     file = ActiveStorage::Attachment.find_by(id: id)
     hash = {}
     rows = file.open(&:count)
     file.open do |f|
       rows.times do |i|
         line = f.readline.force_encoding('UTF-8').chomp.split(';')
-        # score = line[11].tr(',', '.').to_f
-        # score.to_s.tr('.', ',')
-        hash[line[4].last(10).rjust(10, '0')] = line[11] if line[1] != 'first_name'
+        hash[line[4].last(10).rjust(10, '0')] = line[9].to_s.tr('.', ',') if line[1] != 'first_name'
       end
     end
 
-    CsvUser.where(file_id: params[:parser_id], phone_score: nil).each_slice(10000) do |slice|
+    CsvUser.where(file_id: params[:parser_id], phone_score: nil).each_slice(10_000) do |slice|
       array = slice.map { |user| { id: user.id, phone_score: hash[user.phone] } }
       CsvUser.upsert_all(array.uniq, update_only: :phone_score)
     end
-    # if score > 0 && score <= 0.980532787031913
-    #   array << { id: u.id, phone_score: score.to_s.tr('.', ',') }
-    # else
-    #   errors << { id: line[0], phone: line[1], passport: line[2], error: :wrong_score }
-    # end
-    # render status: :ok, json: { updated: array_.size, errors: errors }
   end
 
   def get_csv
@@ -130,10 +124,10 @@ class ParserController < ApplicationController
 
   private
 
-  def check(job, status: 4)
+  def check(jobs = [], status: 4)
     id = params[:parser_id]
     CsvParser.find_by(file_id: id).update(status: status)
-    job.perform_later(id: id, limit: params[:limit] || 100)
+    [jobs].flatten.each { |job| job.perform_later(id: id, limit: params[:limit] || 100) }
     redirect_to parser_path(id)
   end
 
