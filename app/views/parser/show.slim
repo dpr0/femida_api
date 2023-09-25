@@ -102,12 +102,13 @@
                   tbody
                     - @csv_parser_logs.each do |log|
                       tr
+                        - min = Time.at(log.updated_at - log.created_at).to_i / 60
                         td = log.info.sub('csv_parser_', '')
                         td = log.is_phone_verified_count
                         td = log.is_passport_verified_count
                         td = log.created_at.in_time_zone('Moscow').strftime('%d.%m.%Y %H:%M')
-                        td = log.updated_at.in_time_zone('Moscow').strftime('%d.%m.%Y %H:%M')
-                        td = log.updated_at - log.created_at
+                        td = log.updated_at.in_time_zone('Moscow').strftime('%d.%m.%Y %H:%M') if log.updated_at != log.created_at
+                        td = min >= 60 ? "#{min / 60}ч #{min%60}мин" : "#{min}мин"
 
       - if @csv_parser.status == 0
         .columns

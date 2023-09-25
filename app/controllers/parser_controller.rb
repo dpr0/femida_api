@@ -81,61 +81,29 @@ class ParserController < ApplicationController
   end
 
   def add_score
-    # id = 14
-    # file = ActiveStorage::Attachment.find_by(id: 48)
-    # hash = {}
-    # rows = file.open(&:count)
-    # file.open do |f|
-    #   rows.times do|i|
-    #     line = f.readline.force_encoding('UTF-8').chomp.split(';')
-    #     hash[line[1].rjust(10, '0')] = line[9]
-    #   end
-    # end
-    #
-    # csv_users = CsvUser.where(file_id: params[:parser_id], phone_score: nil).to_a
-    # csv_users.each do |user|
-    #   user.update(phone_score: hash[user.phone])
-    # end
-    # return
-
-    id = 53
-    errors = []
-    array = []
-    array_ = []
+    id = 54
     file = ActiveStorage::Attachment.find_by(id: id)
-    return unless file
-
-    csv_users = CsvUser.where(file_id: params[:parser_id], phone_score: nil).to_a
-
+    hash = {}
+    rows = file.open(&:count)
     file.open do |f|
-      (csv_users.size + 1).times do|i|
+      rows.times do |i|
         line = f.readline.force_encoding('UTF-8').chomp.split(';')
-        next if line[0] == 'external_id' || line[0].blank?
-
-        u = csv_users.find { |u| u.phone == line[1] && u.passport == line[2].rjust(10, '0') }
-        next unless u
-
-        if line[9].present? && u.present?
-          score = line[9].tr(',', '.').to_f
-          Rails.logger.info i
-          if score > 0 && score <= 0.980532787031913
-            array << { id: u.id, phone_score: score.to_s.tr('.', ',') }
-          else
-            errors << { id: line[0], phone: line[1], passport: line[2], error: :wrong_score }
-          end
-        else
-          errors << { id: line[0], phone: line[1], passport: line[2], error: :empty_score }
-        end
-        next unless array.size == 1000
-
-        CsvUser.upsert_all(array.uniq, update_only: :phone_score)
-        array_ += array.uniq
-        array = []
+        # score = line[11].tr(',', '.').to_f
+        # score.to_s.tr('.', ',')
+        hash[line[4].last(10).rjust(10, '0')] = line[11] if line[1] != 'first_name'
       end
     end
-    array.uniq.each_slice(10000) { |slice| CsvUser.upsert_all(slice, update_only: :phone_score) }
 
-    render status: :ok, json: { updated: array_.size, errors: errors }
+    CsvUser.where(file_id: params[:parser_id], phone_score: nil).each_slice(10000) do |slice|
+      array = slice.map { |user| { id: user.id, phone_score: hash[user.phone] } }
+      CsvUser.upsert_all(array.uniq, update_only: :phone_score)
+    end
+    # if score > 0 && score <= 0.980532787031913
+    #   array << { id: u.id, phone_score: score.to_s.tr('.', ',') }
+    # else
+    #   errors << { id: line[0], phone: line[1], passport: line[2], error: :wrong_score }
+    # end
+    # render status: :ok, json: { updated: array_.size, errors: errors }
   end
 
   def get_csv
