@@ -414,7 +414,7 @@ class Api::Femida::ParserController < ApplicationController
   end
 
   def cards
-    filename = Rails.root.join('tmp', 'parser', 'spasibosberbank.csv')
+    filename = Rails.root.join('tmp', 'parser', 'spasibosberbank2.csv')
     array = []
     File.readlines(filename, chomp: true).each do |line|
       # next if line == "День\tМесяц\tГод\tТелефон\tEmail\tИнформация"

@@ -35,7 +35,7 @@
                   .control
                     = text_field_tag :rows, @csv_users.count { |x| x.is_phone_verified != nil && x.is_passport_verified != nil }, class: 'input is-medium', disabled: true
             .columns
-              .column.is-6
+              .column.is-4
                 .field
                   label.label.has-text-success-dark Телефон подтвержден
                   .control
@@ -43,11 +43,16 @@
                     / - map = verified.group_by(&:is_phone_verified_source).map { |k, v| [k, v.size] }.map { |val| "#{val[0] || 'nil'}: #{val[1]}" }
                     / = text_field_tag :rows, "#{verified.size} (#{map.join(', ')})", class: 'input is-medium', disabled: true
                     = text_field_tag :rows, @csv_users.count(&:is_phone_verified?), class: 'input is-medium', disabled: true
-              .column.is-6
+              .column.is-4
                 .field
                   label.label.has-text-success-dark Паспорт подтвержден
                   .control
                     = text_field_tag :rows, @csv_users.count(&:is_passport_verified?), class: 'input is-medium', disabled: true
+              .column.is-4
+                .field
+                  label.label.has-text-success-dark Карта подтверждена
+                  .control
+                    = text_field_tag :rows, @csv_users.count(&:is_card_verified?), class: 'input is-medium', disabled: true
             / .columns
             /   .column.is-12
             /     .field
@@ -71,7 +76,6 @@
                 - if @csv_parser.status == 1
                   .select.is-medium.is-primary
                     = select '', :encoding, %w[utf-8 windows-1251]
-                    / = f.select :encoding, %w[utf-8 windows-1251]
                 - if @csv_parser.status == 3 || @csv_parser.status == 5
                   .buttons.has-addons
                     = link_to '1-5 Проверки',     parser_xxx_check_path(@csv_parser.file_id), opts.call(:danger)

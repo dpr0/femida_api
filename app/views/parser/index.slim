@@ -23,6 +23,7 @@
                     th Уникальный строк в БД
                     th Телефонов подтверждено
                     th Паспортов подтверждено
+                    th Карт подтверждено
                     th Сохранен
                 tbody
                   - @csv_parsers.each do |parser|
@@ -33,5 +34,6 @@
                       td = parser.csv_users.count
                       td = parser.is_phone_verified_count
                       td = parser.is_passport_verified_count
+                      td = parser.is_card_verified_count
                       td = "#{parser.status} - #{CsvParser::STATUSES[parser.status]}"
                       / i.fa-solid class="fa-square-#{ parser.status == 1 ? 'check has-text-primary' : 'xmark has-text-danger'}"
