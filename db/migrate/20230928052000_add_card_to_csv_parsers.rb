@@ -5,5 +5,6 @@ class AddCardToCsvParsers < ActiveRecord::Migration[7.0]
     add_column :csv_parsers, :is_card_verified_count, :integer
     add_column :csv_users, :is_card_verified, :boolean
     add_column :csv_users, :is_card_verified_source, :string
+    add_column :csv_parser_logs, :is_card_verified_count, :integer
   end
 end
