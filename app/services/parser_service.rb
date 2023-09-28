@@ -81,17 +81,21 @@ class ParserService
   end
 
   def csv_parser_card(u)
-    cards = if u.phone.present?
-      Card.where(phone: u.phone).select(:card).map(&:card).compact
+    phones = if u.phone.present?
+      u.phone
     else
-      # @person_service.search(
-      #   last_name: u.last_name,
-      #   first_name: u.last_name,
-      #   middle_name: u.last_name
-      # )
-      [] # TODO fio persons_service - phones
+      resp = @person_service.search(u.slice(%i[last_name first_name middle_name]))
+      return unless resp || resp['count'] > 0
+
+      resp['data'].map do |dd|
+        [
+          'Связь с телефоном абонентом', 'Телефон_сотовый', 'Связь_с_телефоном', 'Телефон_работы', 'Телефон работы',
+          'телефон', 'Телефон', 'Телефоны', 'ТЕЛЕФОН', 'Телефон места работы', 'Телефон_регистрации', 'Телефон_проживания'
+        ].map { |x| dd[x].scan(/\d/).join.last(10) if dd[x].present? }.compact.uniq
+      end.flatten.compact.uniq
     end
-    cards.select { |card| card.present? && (card.include?(u.info) || u.info == "#{card[0..5]}******#{card[-4..-1]}") }.present? if u.info.present?
+    cards = Card.where(phone: phones).select(:card).map(&:card).compact
+    cards.select { |card| card.present? && (card[0..9] == u.info || u.info == "#{card[0..5]}******#{card[-4..-1]}") }.present? if u.info.present?
   end
 
   def csv_parser_xxx(u)
