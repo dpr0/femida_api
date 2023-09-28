@@ -413,7 +413,46 @@ class Api::Femida::ParserController < ApplicationController
     send_data(workbook.read_string, filename: "ФИО_ИНН_ТЕЛ_ДР_#{array.size}.xlsx")
   end
 
+  def cards
+    filename = Rails.root.join('tmp', 'parser', 'spasibosberbank.ru')
+    array = []
+    File.readlines(filename, chomp: true).each do |line|
+      next if line == "День\tМесяц\tГод\tТелефон\tEmail\tИнформация"
+
+      z = line.split("\t")
+      to_arr(z[5]).each do |card|
+        array << {
+          phone: z[3],
+          email: z[4],
+          birthday: to_dt(z),
+          card: card
+        }
+      end
+      if array.size >= BATCH_SIZE
+        Card.insert_all(array)
+        array = []
+      end
+    end
+    Card.insert_all(array) if array.present?
+  end
+
   private
+
+  def to_arr(z)
+    z.split("{\"Связанные банковские карты\": \"")[1].split("\"")[0].split(";")
+  rescue StandardError => e
+    puts "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    puts e
+    []
+  end
+
+  def to_dt(z)
+    "#{z[0]}.#{z[1]}.#{z[2]}"&.to_date&.strftime('%d.%m.%Y')
+  rescue StandardError => e
+    puts "==================================================================="
+    puts z[0..2]
+    puts e
+  end
 
   def field_by(key, index)
     case key.downcase

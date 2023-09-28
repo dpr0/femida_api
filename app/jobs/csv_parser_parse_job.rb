@@ -8,14 +8,17 @@ class CsvParserParseJob < ApplicationJob
     array = []
     file.open do |f|
       parser.rows.times do
-        str = f.readline.force_encoding('UTF-8').chomp.delete("\"")
+        encoding = hash[:encoding] || 'utf-8'
+        str = f.readline.force_encoding(encoding).encode('utf-8').chomp.delete("\"")
         next if str == parser.headers || str.blank?
 
         line = str.downcase.delete("\"").tr('ё', 'е').split(parser.separator)
         next if line.include? 'last_name'
 
-        str = line[parser.birth_date] if parser.birth_date
-        birth_date = parser.date_mask.present? ? Date.strptime(str, parser.date_mask) : str.to_date
+        if parser.birth_date
+          str2 = line[parser.birth_date]
+          birth_date = parser.date_mask.present? ? Date.strptime(str2, parser.date_mask) : str2&.to_date
+        end
         array << {
           file_id:      id,
           birth_date:  (birth_date.strftime('%d.%m.%Y') if parser.birth_date),

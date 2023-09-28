@@ -2,7 +2,8 @@
   .container.has-text-centered
     h3.title = ActiveStorage::Blob.find_by(id: params[:id]).filename
 
-    = form_for @csv_user, url: parser_path(params[:id]), method: :patch, data: { turbo: false } do |f|
+    - form_hash = @csv_parser.status == 1 ? { url: parser_parse_path(@csv_parser.file_id), method: :post } : { url: parser_path(params[:id]), method: :patch }
+    = form_for @csv_user, form_hash.merge(data: { turbo: false }) do |f|
       .columns
         .column.is-6
           .columns
@@ -63,14 +64,18 @@
 
         .column.is-6
           .columns
-            - opts = -> (str) { { method: :post, data: { turbo: true, turbo_method: :post }, class: "button is-#{str} is-fullwidth" } }
+            - opts = ->(str) { { method: :post, data: { turbo: true, turbo_method: :post }, class: "button is-#{str} is-fullwidth" } }
             .column.is-6
               .field
                 label.label.has-text-success-dark Действие
+                - if @csv_parser.status == 1
+                  .select.is-medium.is-primary
+                    = select '', :encoding, %w[utf-8 windows-1251]
+                    / = f.select :encoding, %w[utf-8 windows-1251]
                 - if @csv_parser.status == 3 || @csv_parser.status == 5
                   .buttons.has-addons
                     = link_to '1-5 Проверки',     parser_xxx_check_path(@csv_parser.file_id), opts.call(:danger)
-                    = link_to '6 Проверка - ОКБ', parser_okb_check_path(@csv_parser.file_id), opts.call(:danger)
+                    = link_to '7 Проверка - ОКБ', parser_okb_check_path(@csv_parser.file_id), opts.call(:danger)
                     = link_to 'Склеить скоринг',  parser_add_score_path(@csv_parser.file_id), opts.call(:warning)
                     = link_to 'Скачать CSV',        parser_get_csv_path(@csv_parser.file_id), target: '_blank', class: 'button is-primary is-fullwidth'
                     = link_to 'Скачать XLSX',      parser_get_xlsx_path(@csv_parser.file_id), target: '_blank', class: 'button is-primary is-fullwidth'
@@ -80,7 +85,7 @@
                 - if @csv_parser.status == 0
                   = f.submit 'Сохранить', class: 'button is-success is-fullwidth'
                 - if @csv_parser.status == 1
-                  = link_to 'Распарсить файл', parser_parse_path(@csv_parser.file_id), opts.call(:info)
+                  = f.submit 'Распарсить файл', class: 'button is-success is-fullwidth'
                 - if @csv_parser.status == 3 || @csv_parser.status == 5
                   .buttons.has-addons
                     = link_to '1 Проверка - db_okb',           parser_db_okb_check_path(@csv_parser.file_id), opts.call(:info)
@@ -88,6 +93,7 @@
                     = link_to '3 Проверка - solar_phone', parser_solar_phone_check_path(@csv_parser.file_id), opts.call(:info)
                     = link_to '4 Проверка - solar_passp', parser_solar_passp_check_path(@csv_parser.file_id), opts.call(:info)
                     = link_to '5 Проверка - inn',                 parser_inn_check_path(@csv_parser.file_id), opts.call(:info)
+                    = link_to '6 Проверка - cards',             parser_cards_check_path(@csv_parser.file_id), opts.call(:info)
           - if @csv_parser_logs.present?
             .columns
               .column.is-12

@@ -80,6 +80,15 @@ class ParserService
     )&.dig('score')&.> 2
   end
 
+  def csv_parser_card(u)
+    cards = if u.phone.present?
+      Card.where(phone: u.phone).select(:card).map(&:card)
+    else
+      [] # TODO fio persons_service - phones
+    end
+    cards.select { |card| card.include?(u.info) || u.info == "#{card[0..5]}******#{card[-4..-1]}" }.present?
+  end
+
   def csv_parser_xxx(u)
     csv_parser_db_okb(u)
   end

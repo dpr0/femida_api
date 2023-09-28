@@ -5,10 +5,10 @@ class ParserController < ApplicationController
   before_action :authenticate_user!
   before_action :is_admin?, except: %i[index show]
 
-  FIELDS = %w[external_id phone passport last_name first_name middle_name birth_date is_phone_verified? is_passport_verified? phone_score].freeze
+  FIELDS = %w[external_id phone passport last_name first_name middle_name birth_date is_phone_verified? is_passport_verified? is_card_verified? phone_score].freeze
 
   def index
-    @csv_parsers = CsvParser.all.order(:id)
+    @csv_parsers = CsvParser.all.order(id: :desc)
     @blobs = ActiveStorage::Blob.where(id: @csv_parsers.map(&:file_id))
   end
 
@@ -24,11 +24,9 @@ class ParserController < ApplicationController
     current_user.attachments.attach(params[:user][:attachment])
     file = current_user.attachments.last
     headers = file.open(&:first).chomp
-    rows = file.open(&:count)
-    a1 = headers.split(';').size
-    a2 = headers.split(',').size
-    sep = [' ', ';', ','][a1 <=> a2]
-    CsvParser.create(file_id: file.id, headers: headers, rows: rows, separator: sep)
+    size = ->(s) { headers.split(s).size }
+    sep = [' ', ';', ','][size.(';') <=> size.(',')]
+    CsvParser.create(file_id: file.id, headers: headers, rows: file.open(&:count), separator: sep)
     redirect_to parser_path(file.id)
   end
 
@@ -76,6 +74,10 @@ class ParserController < ApplicationController
 
   def okb_check
     check(CsvParserOkbJob)
+  end
+
+  def cards_check
+    check(CsvParserCardJob)
   end
 
   def xxx_check
@@ -126,8 +128,10 @@ class ParserController < ApplicationController
 
   def check(jobs = [], status: 4)
     id = params[:parser_id]
-    CsvParser.find_by(file_id: id).update(status: status)
-    [jobs].flatten.each { |job| job.perform_later(id: id, limit: params[:limit] || 100) }
+    # CsvParser.find_by(file_id: id).update(status: status)
+    hash = { id: id, limit: params[:limit] || 100 }
+    hash[:encoding] = params[:encoding] if params[:encoding]
+    [jobs].flatten.each { |job| job.perform_later(hash) }
     redirect_to parser_path(id)
   end
 

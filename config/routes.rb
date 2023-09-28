@@ -15,6 +15,7 @@ Rails.application.routes.draw do
     post :solar_phone_check
     post :solar_passp_check
     post :inn_check
+    post :cards_check
     post :user_check
     post :db_okb_check
     post :okb_check
@@ -59,6 +60,7 @@ Rails.application.routes.draw do
           get :narod
           get :enrichment # !!
           get :enrichment_xlsx # !!
+          get :cards
         end
       end
       resources :esia, only: :index do
