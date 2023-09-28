@@ -128,7 +128,7 @@ class ParserController < ApplicationController
 
   def check(jobs = [], status: 4)
     id = params[:parser_id]
-    # CsvParser.find_by(file_id: id).update(status: status)
+    CsvParser.find_by(file_id: id).update(status: status)
     hash = { id: id, limit: params[:limit] || 100 }
     hash[:encoding] = params[:encoding] if params[:encoding]
     [jobs].flatten.each { |job| job.perform_later(hash) }
