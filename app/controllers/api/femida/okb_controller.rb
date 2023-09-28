@@ -7,4 +7,9 @@ class Api::Femida::OkbController < ApplicationController
   def create
     with_error_handling { OkbService.call(params[:okb]) }
   end
+
+  api :POST, '/okb_req', 'Проверка ОКБ в бд'
+  def okb_req
+    with_error_handling { OkbService.check_in_db(params) }
+  end
 end

@@ -1,5 +1,10 @@
 class OkbService
   class << self
+    def check_in_db(params)
+      okb = Request.find_by(db_req_params(params))
+      { 'score' => okb.response&.to_i || -5 } if okb
+    end
+
     def call(params)
       params[:consent] = 'Y'
       if params[:document].present?
@@ -20,14 +25,7 @@ class OkbService
 
       return if params[:telephone_number].blank?
 
-      hash_req = {
-        service:     :okb,
-        phone:       params[:telephone_number].last(10),
-        last_name:   params[:surname],
-        first_name:  params[:name],
-        middle_name: params[:patronymic],
-        birth_date:  params[:birthday].to_date.strftime('%d.%m.%Y')
-      }
+      hash_req = db_req_params(params)
       okb = Request.find_by(hash_req)
       if okb
         score = { 'score' => okb.response&.to_i || -5 }
@@ -60,6 +58,17 @@ class OkbService
       JSON.parse(s)
     rescue StandardError
       { 'score' => -5 }
+    end
+
+    def db_req_params(params)
+      {
+        service:     :okb,
+        phone:       params[:telephone_number].last(10),
+        last_name:   params[:surname         ].downcase,
+        first_name:  params[:name            ].downcase,
+        middle_name: params[:patronymic      ].downcase,
+        birth_date:  params[:birthday        ].to_date.strftime('%d.%m.%Y')
+      }
     end
   end
 end

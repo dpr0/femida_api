@@ -27,7 +27,9 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :femida do
-      resources :okb,     only: :create
+      resources :okb, only: :create do
+        post :okb_req
+      end
       resources :debtors, only: :show
       resources :fsin,    only: :show
       resources :egrul,   only: :show
