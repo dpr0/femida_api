@@ -3,25 +3,26 @@ section.hero.is-large
     .container.has-text-centered
       .columns
         .column.is-2
-        .column.is-4
+        .column.is-3
           h1.title.is-1.has-text-link.has-text-left
             | Femida
           h1.subtitle.is-3.has-text-left
-            | Административная панель
+            | административная панель
           p.has-text-left
             | Внутренний ресурс для сотрудников компании Femida
+        .column.is-1
         .column.is-4
-          h2 Вход в личный кабинет
+          h2.subtitle.is-3 Вход в личный кабинет
           = form_for resource, as: resource_name, url: session_path(resource_name), data: { turbo: false } do |f|
             .field
-              = f.email_field :email, autofocus: true, autocomplete: 'email', placeholder: 'Email'
+              = f.email_field :email, autofocus: true, autocomplete: 'email', placeholder: 'Email', class: 'input form-control'
             .field
-              = f.password_field :password, autocomplete: 'current-password', placeholder: 'Пароль'
+              = f.password_field :password, autocomplete: 'current-password', placeholder: 'Пароль', class: 'input form-control'
             - if devise_mapping.rememberable?
-              .field
+              .field.has-text-left
                 = f.check_box :remember_me
                 = f.label 'Запомнить меня'
             .actions
-              = f.submit 'Войти', class: 'button is-rounded is-link'
+              = f.submit 'Войти', class: 'button is-rounded is-link is-fullwidth'
           / = render 'devise/shared/links'
         .column.is-2

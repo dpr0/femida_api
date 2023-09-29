@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   apipie
   devise_for :users
 
+  root 'parser#index'
+
   resources :admin
   resources :sample
   resources :users

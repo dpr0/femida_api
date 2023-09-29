@@ -7,34 +7,34 @@ section.hero.is-lower-alpha
             .field
               label.label.has-text-link Фамилия
               .control
-                = f.text_field :last_name, class: 'input is-medium form-control', value: params.dig(:csv_user, :last_name)
+                = f.text_field :last_name, class: 'input is-rounded is-medium form-control', value: params.dig(:csv_user, :last_name)
           .column.is-3
             .field
               label.label.has-text-link Имя
               .control
-                = f.text_field :first_name, class: 'input is-medium form-control', value: params.dig(:csv_user, :first_name)
+                = f.text_field :first_name, class: 'input is-rounded is-medium form-control', value: params.dig(:csv_user, :first_name)
           .column.is-3
             .field
               label.label.has-text-link Отчество
               .control
-                = f.text_field :middle_name, class: 'input is-medium form-control', value: params.dig(:csv_user, :middle_name)
+                = f.text_field :middle_name, class: 'input is-rounded is-medium form-control', value: params.dig(:csv_user, :middle_name)
           .column.is-3
             .field
               label.label.has-text-link Дата рождения
               .control
-                = f.text_field :birth_date, class: 'input is-medium form-control', value: params.dig(:csv_user, :birth_date)
+                = f.text_field :birth_date, class: 'input is-rounded is-medium form-control', value: params.dig(:csv_user, :birth_date)
 
         .columns
           .column.is-3
             .field
               label.label.has-text-link ГРН
               .control
-                = f.text_field :grn, class: 'input is-medium form-control', value: params.dig(:csv_user, :grn)
+                = f.text_field :grn, class: 'input is-rounded is-medium form-control', value: params.dig(:csv_user, :grn)
           .column.is-3
             .field
               label.label.has-text-link ИНН
               .control
-                = f.text_field :inn, class: 'input is-medium form-control', value: params.dig(:csv_user, :inn)
+                = f.text_field :inn, class: 'input is-rounded is-medium form-control', value: params.dig(:csv_user, :inn)
           .column.is-3
             .field
               label.label.has-text-link Телефон
@@ -42,27 +42,29 @@ section.hero.is-lower-alpha
                 = f.text_field :phone, class: 'input is-rounded is-medium form-control', value: params.dig(:csv_user, :phone)
           .column.is-3
             .field
-              label.label.has-text-link !
+              label.label.has-text-link .
               .control
-                = f.submit 'Найти', class: 'button is-link is-rounded is-fullwidth'
+                = f.submit 'Найти', class: 'button is-link is-medium is-rounded is-fullwidth'
 
         .columns
           .column.is-6
             .columns
-              .column.is-12
-                br
-                .card
-                  .card-content
-                    .media
-                      .media-content
-                        .columns
-                          .column.is-12
-                            p.subtitle
-                              | ИНН (по ФИО+ДР)
-                    .content
-                      ul
-                        - @inn&.each do |resp|
-                          li.has-text-left = "Паспорт: #{resp[:passport]} - ИНН: #{resp[:inn]}"
+              - if @inn.present?
+                .column.is-12
+                  br
+                  .card
+                    .card-content
+                      .media
+                        .media-content
+                          .columns
+                            .column.is-12
+                              p.subtitle
+                                | ИНН (по ФИО+ДР)
+                      .content
+                        ul
+                          - @inn.each do |resp|
+                            li.has-text-left = "Паспорт: #{resp[:passport]} - ИНН: #{resp[:inn]}"
+              - if @requests_results.present?
                 br
                 .card
                   .card-content
@@ -83,23 +85,25 @@ section.hero.is-lower-alpha
                           li.has-text-left = "#{result.phone}"
                           li.has-text-left = "Score: #{result.response}"
           .column.is-6
-            br
-            .card
-              .card-content
-                .media
-                  .media-content
-                    .columns
-                      .column.is-12
-                        p.subtitle
-                          | таблица parsed_users
-                .content
-                  - @parsed_user_results&.each do |result|
-                    ul
-                      li.has-text-left = "#{result.last_name} #{result.first_name} #{result.middle_name}"
-                      li.has-text-left = "#{result.birth_date}"
-                      li.has-text-left = "#{result.passport}"
-                      li.has-text-left = "#{result.phone}"
-                      li.has-text-left = "#{result.address}"
+            - if @parsed_user_results.present?
+              br
+              .card
+                .card-content
+                  .media
+                    .media-content
+                      .columns
+                        .column.is-12
+                          p.subtitle
+                            | parsed_users
+                  .content
+                    table
+                      - @parsed_user_results.each do |result|
+                        tr
+                          td.has-text-left = "#{result.last_name} #{result.first_name} #{result.middle_name}"
+                          td.has-text-left = "#{result.birth_date}"
+                          td.has-text-left = "#{result.passport}"
+                          td.has-text-left = "#{result.phone}"
+                          td.has-text-left = "#{result.address}"
 
         .columns
           .column.is-12
