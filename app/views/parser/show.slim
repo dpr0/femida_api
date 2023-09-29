@@ -22,7 +22,7 @@ section.hero.is-lower-alpha
                 .field
                   label.label.has-text-link Статус
                   .control
-                    = text_field_tag :status, "#{@csv_parser.status} - #{CsvParser::STATUSES[@csv_parser.status]}", class: 'input is-medium', disabled: true
+                    = text_field_tag :status, CsvParser::STATUSES[@csv_parser.status], class: 'input is-medium', disabled: true
             - if @csv_users.present?
               .columns
                 .column.is-4

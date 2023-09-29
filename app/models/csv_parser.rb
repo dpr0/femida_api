@@ -25,10 +25,10 @@ class CsvParser < ApplicationRecord
   has_many :csv_parser_logs, foreign_key: :csv_parser_id, primary_key: :file_id
 
   STATUSES = [
-    'загружен',
-    'распознаны заголовки',
-    'начало инсерта в БД',
-    'сохранено в БД',
+    'Загружен',
+    'Распознан',
+    'Сохранение',
+    'Готов к обогащению',
     'Идет обогащение',
     'Файл готов'
   ].freeze

@@ -59,12 +59,12 @@ section.hero.is-lower-alpha
                           .columns
                             .column.is-12
                               p.subtitle
-                                | ИНН (по ФИО+ДР)
+                                | ИНН
                       .content
                         ul
                           - @inn.each do |resp|
                             li.has-text-left = "Паспорт: #{resp[:passport]} - ИНН: #{resp[:inn]}"
-              - if @requests_results.present?
+              - if @requests_results.present? || @okb_result.present?
                 br
                 .card
                   .card-content
@@ -73,7 +73,7 @@ section.hero.is-lower-alpha
                         .columns
                           .column.is-12
                             p.subtitle
-                              | запрос в ОКБ
+                              | ОКБ
                             - if @okb_result.present?
                               p.subtitle
                                 = @okb_result

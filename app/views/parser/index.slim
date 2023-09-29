@@ -29,6 +29,6 @@ section.hero.is-lower-alpha
                         td = parser.file_id
                         td = @blobs.find { |x| x.id == parser.file_id }.filename
                         td = parser.rows
-                        td = "#{parser.status} - #{CsvParser::STATUSES[parser.status]}"
+                        td = CsvParser::STATUSES[parser.status]
                         td = link_to 'подробнее', parser_path(parser.file_id), class: 'button is-ghost'
                         / i.fa-solid class="fa-square-#{ parser.status == 1 ? 'check has-text-primary' : 'xmark has-text-danger'}"

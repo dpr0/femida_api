@@ -90,7 +90,7 @@ class ParserService
       resp['data'].map { |dd| dd['ТЕЛЕФОН'].scan(/\d/).join.last(10) if dd['ТЕЛЕФОН'].present? }.flatten.compact.uniq
     end
     cards = Card.where(phone: phones).select(:card).map(&:card).compact
-    cards.select { |card| card.present? && (card[0..9] == u.info || u.info == "#{card[0..5]}******#{card[-4..-1]}") }.present? if u.info.present?
+    cards.select { |card| card.present? && (["#{card[0..5]}#{card[-4..-1]}", "#{card[0..5]}******#{card[-4..-1]}"].include? u.info) }.present? if u.info.present?
   end
 
   def csv_parser_xxx(u)
