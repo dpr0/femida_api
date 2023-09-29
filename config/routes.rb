@@ -63,6 +63,7 @@ Rails.application.routes.draw do
           get :enrichment # !!
           get :enrichment_xlsx # !!
           get :cards
+          get :cards2
         end
       end
       resources :esia, only: :index do

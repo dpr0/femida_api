@@ -1,142 +1,143 @@
-.hero-body
-  .container.has-text-centered
-    h3.title = ActiveStorage::Blob.find_by(id: params[:id]).filename
+section.hero.is-lower-alpha
+  .hero-body
+    .container.has-text-centered
+      h3.title = ActiveStorage::Blob.find_by(id: params[:id]).filename
 
-    - form_hash = @csv_parser.status == 1 ? { url: parser_parse_path(@csv_parser.file_id), method: :post } : { url: parser_path(params[:id]), method: :patch }
-    = form_for @csv_user, form_hash.merge(data: { turbo: false }) do |f|
-      .columns
-        .column.is-6
-          .columns
-            .column.is-4
-              .field
-                label.label.has-text-success-dark Строк в БД
-                .control
-                  = text_field_tag :rows, @csv_users.size, class: 'input is-medium', disabled: true
-            .column.is-4
-              .field
-                label.label.has-text-success-dark Разделитель
-                .control
-                  = text_field_tag :separator, ';', class: 'input is-medium'
-            .column.is-4
-              .field
-                label.label.has-text-success-dark Статус
-                .control
-                  = text_field_tag :status, "#{@csv_parser.status} - #{CsvParser::STATUSES[@csv_parser.status]}", class: 'input is-medium', disabled: true
-          - if @csv_users.present?
+      - form_hash = @csv_parser.status == 1 ? { url: parser_parse_path(@csv_parser.file_id), method: :post } : { url: parser_path(params[:id]), method: :patch }
+      = form_for @csv_user, form_hash.merge(data: { turbo: false }) do |f|
+        .columns
+          .column.is-6
             .columns
               .column.is-4
                 .field
-                  label.label.has-text-success-dark Телефон подтвержден
+                  label.label.has-text-link Строк в БД
                   .control
-                    / - verified = @csv_users.select { |x| x.is_phone_verified == true }
-                    / - map = verified.group_by(&:is_phone_verified_source).map { |k, v| [k, v.size] }.map { |val| "#{val[0] || 'nil'}: #{val[1]}" }
-                    / = text_field_tag :rows, "#{verified.size} (#{map.join(', ')})", class: 'input is-medium', disabled: true
-                    = text_field_tag :rows, @csv_users.count(&:is_phone_verified?), class: 'input is-medium', disabled: true
+                    = text_field_tag :rows, @csv_users.size, class: 'input is-medium', disabled: true
               .column.is-4
                 .field
-                  label.label.has-text-success-dark Паспорт подтвержден
+                  label.label.has-text-link Разделитель
                   .control
-                    = text_field_tag :rows, @csv_users.count(&:is_passport_verified?), class: 'input is-medium', disabled: true
+                    = text_field_tag :separator, ';', class: 'input is-medium'
               .column.is-4
                 .field
-                  label.label.has-text-success-dark Карта подтверждена
+                  label.label.has-text-link Статус
                   .control
-                    = text_field_tag :rows, @csv_users.count(&:is_card_verified?), class: 'input is-medium', disabled: true
-            / .columns
-            /   .column.is-12
-            /     .field
-            /       label.label.has-text-success-dark
-            /         h3.subtitle Серегины странности
-            /       .control
-            /         = text_field_tag :qwe, 'какая-то хуйня со скорингом', class: 'input is-medium', disabled: true
-            /       .control
-            /         = text_field_tag :qwe, 'фио-паспорт подтвержден менее 95%', class: 'input is-medium', disabled: true
-            /       .control
-            /         = text_field_tag :qwe, 'СБП не отбился: 100', class: 'input is-medium', disabled: true
-            /       .control
-            /         = text_field_tag :qwe, 'qiwi', class: 'input is-medium', disabled: true
+                    = text_field_tag :status, "#{@csv_parser.status} - #{CsvParser::STATUSES[@csv_parser.status]}", class: 'input is-medium', disabled: true
+            - if @csv_users.present?
+              .columns
+                .column.is-4
+                  .field
+                    label.label.has-text-link Телефон подтвержден
+                    .control
+                      / - verified = @csv_users.select { |x| x.is_phone_verified == true }
+                      / - map = verified.group_by(&:is_phone_verified_source).map { |k, v| [k, v.size] }.map { |val| "#{val[0] || 'nil'}: #{val[1]}" }
+                      / = text_field_tag :rows, "#{verified.size} (#{map.join(', ')})", class: 'input is-medium', disabled: true
+                      = text_field_tag :rows, @csv_users.count(&:is_phone_verified?), class: 'input is-medium', disabled: true
+                .column.is-4
+                  .field
+                    label.label.has-text-link Паспорт подтвержден
+                    .control
+                      = text_field_tag :rows, @csv_users.count(&:is_passport_verified?), class: 'input is-medium', disabled: true
+                .column.is-4
+                  .field
+                    label.label.has-text-link Карта подтверждена
+                    .control
+                      = text_field_tag :rows, @csv_users.count(&:is_card_verified?), class: 'input is-medium', disabled: true
+              / .columns
+              /   .column.is-12
+              /     .field
+              /       label.label.has-text-link
+              /         h3.subtitle Серегины странности
+              /       .control
+              /         = text_field_tag :qwe, 'какая-то хуйня со скорингом', class: 'input is-medium', disabled: true
+              /       .control
+              /         = text_field_tag :qwe, 'фио-паспорт подтвержден менее 95%', class: 'input is-medium', disabled: true
+              /       .control
+              /         = text_field_tag :qwe, 'СБП не отбился: 100', class: 'input is-medium', disabled: true
+              /       .control
+              /         = text_field_tag :qwe, 'qiwi', class: 'input is-medium', disabled: true
 
-        .column.is-6
-          .columns
-            - opts = ->(str) { { method: :post, data: { turbo: true, turbo_method: :post }, class: "button is-#{str} is-fullwidth" } }
-            .column.is-6
-              .field
-                label.label.has-text-success-dark Действие
-                - if @csv_parser.status == 1
-                  .select.is-medium.is-primary
-                    = select '', :encoding, %w[utf-8 windows-1251]
-                - if @csv_parser.status == 3 || @csv_parser.status == 5
-                  .buttons.has-addons
-                    = link_to '1-5 Проверки',     parser_xxx_check_path(@csv_parser.file_id), opts.call(:danger)
-                    = link_to '7 Проверка - ОКБ', parser_okb_check_path(@csv_parser.file_id), opts.call(:danger)
-                    = link_to 'Склеить скоринг',  parser_add_score_path(@csv_parser.file_id), opts.call(:warning)
-                    = link_to 'Скачать CSV',        parser_get_csv_path(@csv_parser.file_id), target: '_blank', class: 'button is-primary is-fullwidth'
-                    = link_to 'Скачать XLSX',      parser_get_xlsx_path(@csv_parser.file_id), target: '_blank', class: 'button is-primary is-fullwidth'
-            .column.is-6
-              .field
-                label.label.has-text-success-dark Действие
-                - if @csv_parser.status == 0
-                  = f.submit 'Сохранить', class: 'button is-success is-fullwidth'
-                - if @csv_parser.status == 1
-                  = f.submit 'Распарсить файл', class: 'button is-success is-fullwidth'
-                - if @csv_parser.status == 3 || @csv_parser.status == 5
-                  .buttons.has-addons
-                    = link_to '1 Проверка - db_okb',           parser_db_okb_check_path(@csv_parser.file_id), opts.call(:info)
-                    = link_to '2 Проверка - user',               parser_user_check_path(@csv_parser.file_id), opts.call(:info)
-                    = link_to '3 Проверка - solar_phone', parser_solar_phone_check_path(@csv_parser.file_id), opts.call(:info)
-                    = link_to '4 Проверка - solar_passp', parser_solar_passp_check_path(@csv_parser.file_id), opts.call(:info)
-                    = link_to '5 Проверка - inn',                 parser_inn_check_path(@csv_parser.file_id), opts.call(:info)
-                    = link_to '6 Проверка - cards',             parser_cards_check_path(@csv_parser.file_id), opts.call(:info)
-          - if @csv_parser_logs.present?
+          .column.is-6
             .columns
-              .column.is-12
-                table.table.is-fullwidth.is-striped
-                  thead
-                    th Проверка
-                    th Тел.
-                    th Пасп.
-                    th Карта
-                    th Начало
-                    th Конец
-                    th Продолж.
-                  tbody
-                    - @csv_parser_logs.each do |log|
-                      tr
-                        - min = Time.at(log.updated_at - log.created_at).to_i / 60
-                        td = log.info.sub('csv_parser_', '')
-                        td = log.is_phone_verified_count
-                        td = log.is_passport_verified_count
-                        td = log.is_card_verified_count
-                        td = log.created_at.in_time_zone('Moscow').strftime('%d.%m.%Y %H:%M')
-                        td = log.updated_at.in_time_zone('Moscow').strftime('%d.%m.%Y %H:%M') if log.updated_at != log.created_at
-                        td = min >= 60 ? "#{min / 60}ч #{min%60}мин" : "#{min}мин"
-
-      - if @csv_parser.status == 0
-        .columns
-          label.label.has-text-success-dark Аттрибуты из первой строки
-        .columns
-          .content
-            ol type="1"
-              - @headers.each do |col|
-                li
-                  - if @csv_user.attribute_names.include?(col)
-                    .has-text-primary = col
-                  - elsif @csv_user.attribute_names.find { |x| x.include?(col[0..3]) || col.include?(x[0..3]) }
-                    .has-text-grey = col
-                  - else
-                    .has-text-danger = col
-      - if @csv_parser.status < 2
-        - %w[external_id last_name first_name middle_name birth_date phone passport info date_mask].each_slice(4) do |slice|
-          .columns
-            - slice.each do |f|
-              .column.is-3
+              - opts = ->(str) { { method: :post, data: { turbo: true, turbo_method: :post }, class: "button is-#{str} is-fullwidth" } }
+              .column.is-6
                 .field
-                  label.label.has-text-success-dark = f
-                  .control
-                    - ff = @headers.select { |col| (f.include?(col[0..3]) || col.include?(f[0..3])) && f != 'date_mask' }
-                    - fff = @csv_parser.send(f)
-                    - str = @csv_parser.status == 1 && fff ? (fff.is_a?(Integer) ? @headers[fff] : fff) : ff
-                    = text_field_tag f, str, class: 'input is-medium'
+                  label.label.has-text-link Действие
+                  - if @csv_parser.status == 1
+                    .select.is-medium.is-primary
+                      = select '', :encoding, %w[utf-8 windows-1251]
+                  - if @csv_parser.status == 3 || @csv_parser.status == 5
+                    .buttons.has-addons
+                      = link_to '1-5 Проверки',     parser_xxx_check_path(@csv_parser.file_id), opts.call(:danger)
+                      = link_to '7 Проверка - ОКБ', parser_okb_check_path(@csv_parser.file_id), opts.call(:danger)
+                      = link_to 'Склеить скоринг',  parser_add_score_path(@csv_parser.file_id), opts.call(:warning)
+                      = link_to 'Скачать CSV',        parser_get_csv_path(@csv_parser.file_id), target: '_blank', class: 'button is-primary is-fullwidth'
+                      = link_to 'Скачать XLSX',      parser_get_xlsx_path(@csv_parser.file_id), target: '_blank', class: 'button is-primary is-fullwidth'
+              .column.is-6
+                .field
+                  label.label.has-text-link Действие
+                  - if @csv_parser.status == 0
+                    = f.submit 'Сохранить', class: 'button is-success is-fullwidth'
+                  - if @csv_parser.status == 1
+                    = f.submit 'Распарсить файл', class: 'button is-success is-fullwidth'
+                  - if @csv_parser.status == 3 || @csv_parser.status == 5
+                    .buttons.has-addons
+                      = link_to '1 Проверка - db_okb',           parser_db_okb_check_path(@csv_parser.file_id), opts.call(:info)
+                      = link_to '2 Проверка - user',               parser_user_check_path(@csv_parser.file_id), opts.call(:info)
+                      = link_to '3 Проверка - solar_phone', parser_solar_phone_check_path(@csv_parser.file_id), opts.call(:info)
+                      = link_to '4 Проверка - solar_passp', parser_solar_passp_check_path(@csv_parser.file_id), opts.call(:info)
+                      = link_to '5 Проверка - inn',                 parser_inn_check_path(@csv_parser.file_id), opts.call(:info)
+                      = link_to '6 Проверка - cards',             parser_cards_check_path(@csv_parser.file_id), opts.call(:info)
+            - if @csv_parser_logs.present?
+              .columns
+                .column.is-12
+                  table.table.is-fullwidth.is-striped
+                    thead
+                      th Проверка
+                      th Тел.
+                      th Пасп.
+                      th Карта
+                      th Начало
+                      th Конец
+                      th Продолж.
+                    tbody
+                      - @csv_parser_logs.each do |log|
+                        tr
+                          - min = Time.at(log.updated_at - log.created_at).to_i / 60
+                          td = log.info.sub('csv_parser_', '')
+                          td = log.is_phone_verified_count
+                          td = log.is_passport_verified_count
+                          td = log.is_card_verified_count
+                          td = log.created_at.in_time_zone('Moscow').strftime('%d.%m.%Y %H:%M')
+                          td = log.updated_at.in_time_zone('Moscow').strftime('%d.%m.%Y %H:%M') if log.updated_at != log.created_at
+                          td = min >= 60 ? "#{min / 60}ч #{min%60}мин" : "#{min}мин"
+
+        - if @csv_parser.status == 0
+          .columns
+            label.label.has-text-link Аттрибуты из первой строки
+          .columns
+            .content
+              ol type="1"
+                - @headers.each do |col|
+                  li
+                    - if @csv_user.attribute_names.include?(col)
+                      .has-text-primary = col
+                    - elsif @csv_user.attribute_names.find { |x| x.include?(col[0..3]) || col.include?(x[0..3]) }
+                      .has-text-grey = col
+                    - else
+                      .has-text-danger = col
+        - if @csv_parser.status < 2
+          - %w[external_id last_name first_name middle_name birth_date phone passport info date_mask].each_slice(4) do |slice|
+            .columns
+              - slice.each do |f|
+                .column.is-3
+                  .field
+                    label.label.has-text-link = f
+                    .control
+                      - ff = @headers.select { |col| (f.include?(col[0..3]) || col.include?(f[0..3])) && f != 'date_mask' }
+                      - fff = @csv_parser.send(f)
+                      - str = @csv_parser.status == 1 && fff ? (fff.is_a?(Integer) ? @headers[fff] : fff) : ff
+                      = text_field_tag f, str, class: 'input is-medium'
 
 javascript:
   var elements = document.getElementsByClassName("buttons");

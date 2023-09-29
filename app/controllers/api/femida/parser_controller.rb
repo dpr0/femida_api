@@ -414,10 +414,10 @@ class Api::Femida::ParserController < ApplicationController
   end
 
   def cards
-    filename = Rails.root.join('tmp', 'parser', 'spasibosberbank2.csv')
+    filename = Rails.root.join('tmp', 'parser', '[info] spasibosberbank.ru 02.2022.csv')
     array = []
     File.readlines(filename, chomp: true).each do |line|
-      # next if line == "День\tМесяц\tГод\tТелефон\tEmail\tИнформация"
+      next if line == "День\tМесяц\tГод\tТелефон\tEmail\tИнформация"
 
       z = line.split("\t")
       to_arr(z[5]).each do |card|
@@ -436,7 +436,42 @@ class Api::Femida::ParserController < ApplicationController
     Card.insert_all(array) if array.present?
   end
 
+  def cards2
+    person_service = PersonService.instance
+    filename = Rails.root.join('tmp', 'parser', '[info] spasibosberbank.ru 02.2022.csv')
+    array = []
+    File.readlines(filename, chomp: true).each do |line|
+      next if line == "День\tМесяц\tГод\tТелефон\tEmail\tИнформация"
+
+      z = line.split("\t")
+      resp = person_service.search(phone: z[3])
+      next if resp['count'] == 0
+
+      last_name, first_name, middle_name = ddd(resp['data'])
+      array << Card.where(phone: z[3], birthday: to_dt(z))
+                   .map { |card| { id: card.id, last_name: last_name, first_name: first_name, middle_name: middle_name } } if last_name.present?
+      if array.size >= BATCH_SIZE
+        Card.upsert_all(array, update_only: %i[last_name first_name middle_name])
+        array = []
+      end
+    end
+    Card.upsert_all(array, update_only: %i[last_name first_name middle_name]) if array.present?
+  end
+
   private
+
+  def ddd(data)
+    element = data.select { |x| x['ИМЯ'] && x['ТЕЛЕФОН'] && x['ДАТА РОЖДЕНИЯ'] }
+                  .map { |x| { name: x['ИМЯ'], phone: x['ТЕЛЕФОН'], year: x['ДАТА РОЖДЕНИЯ'].to_date.year } }
+                  .compact
+                  .uniq
+                  .find { |x| x[:year] == z[2].to_i }
+                  .first
+    element&.dig(:name)&.split(' ')
+  rescue StandardError => e
+    puts "-------------------------------------------------------------------"
+    puts e
+  end
 
   def to_arr(z)
     z.split("{\"Связанные банковские карты\": \"")[1].split("\"")[0].split(";")

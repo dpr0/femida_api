@@ -2,36 +2,34 @@ section.hero.is-lower-alpha
   .hero-head
     .container
       nav.navbar aria-label=("main navigation") role="navigation"
-        #navbarBasicExample.navbar-menu
+        .navbar-brand
+          .navbar-item.has-text-link
+            i.fa-solid.fa-scale-balanced
+            | &nbsp
+            | Femida
+        .navbar-menu
           .navbar-start
-            .navbar-item
-              = link_to 'Админка', admin_index_path
-            .navbar-item
-              = link_to 'Мониторинг', rails_performance_path
-            .navbar-item
-              = link_to 'Файлообменник', files_path
-            .navbar-item
-              = link_to 'Ретро парсер', parser_index_path
-            .navbar-item
-              = link_to 'Поиск в ОС(solar/db_okb/parsed_users)', sample_index_path
-            .navbar-item
-              - if current_user
-                = link_to users_path(current_user) do
-                  = current_user.email.present? ? current_user.email : current_user.phone
-            .navbar-item
-              - if current_user
-                = link_to destroy_user_session_path, data: { 'turbo-method': :delete } do
-                  i.fa-solid.fa-right-from-bracket
+            - if current_user
+              .navbar-item
+                = link_to 'Админка', admin_index_path
+              .navbar-item
+                = link_to 'Мониторинг', rails_performance_path
+              .navbar-item
+                = link_to 'Файлы', files_path
+              .navbar-item
+                = link_to 'Обогащения', parser_index_path
+              .navbar-item
+                = link_to 'Поиск', sample_index_path
 
           .navbar-end
             .navbar-item
               .has-text-primary = notice
             .navbar-item
               .has-text-danger = alert
-
-  .hero-body
-    .container.has-text-centered
-      h1.title
-        i.fa-solid.fa-scale-balanced
-        | &nbsp
-        | Femida
+            - if current_user
+              .navbar-item
+                = link_to users_path(current_user) do
+                  = current_user.email.present? ? current_user.email : current_user.phone
+              .navbar-item
+                = link_to destroy_user_session_path, data: { 'turbo-method': :delete } do
+                  i.fa-solid.fa-right-from-bracket

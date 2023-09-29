@@ -1,12 +1,10 @@
 footer
   .content.has-text-centered
-    br
-    p
-      strong = ENV['HOST']
-    p
-      | The source code is licensed
-      a href="http://opensource.org/licenses/mit-license.php"  MIT
-      | &nbsp
-      | Copyright &copy;
-      = " 2022-#{Time.now.year}"
-    br
+    .columns
+      .column.is-1
+      .column.is-5.has-text-left
+        strong = ENV['HOST']
+      .column.is-5.has-text-right
+        | &copy;
+        = " 2022-#{Time.now.year} Все права защищены"
+      .column.is-1

@@ -1,119 +1,121 @@
-.hero-body
-  .container.has-text-centered
-    = form_for @csv_user, url: sample_index_path, method: :get, data: { turbo: false } do |f|
-      .columns
-        .column.is-3
-          .field
-            label.label.has-text-success-dark Фамилия
-            .control
-              = f.text_field :last_name, class: 'input is-medium form-control', value: params.dig(:csv_user, :last_name)
-        .column.is-3
-          .field
-            label.label.has-text-success-dark Имя
-            .control
-              = f.text_field :first_name, class: 'input is-medium form-control', value: params.dig(:csv_user, :first_name)
-        .column.is-3
-          .field
-            label.label.has-text-success-dark Отчество
-            .control
-              = f.text_field :middle_name, class: 'input is-medium form-control', value: params.dig(:csv_user, :middle_name)
-        .column.is-3
-          .field
-            label.label.has-text-success-dark
-            .control
+section.hero.is-lower-alpha
+  .hero-body
+    .container.has-text-centered
+      = form_for @csv_user, url: sample_index_path, method: :get, data: { turbo: false } do |f|
+        .columns
+          .column.is-3
+            .field
+              label.label.has-text-link Фамилия
+              .control
+                = f.text_field :last_name, class: 'input is-medium form-control', value: params.dig(:csv_user, :last_name)
+          .column.is-3
+            .field
+              label.label.has-text-link Имя
+              .control
+                = f.text_field :first_name, class: 'input is-medium form-control', value: params.dig(:csv_user, :first_name)
+          .column.is-3
+            .field
+              label.label.has-text-link Отчество
+              .control
+                = f.text_field :middle_name, class: 'input is-medium form-control', value: params.dig(:csv_user, :middle_name)
+          .column.is-3
+            .field
+              label.label.has-text-link Дата рождения
+              .control
+                = f.text_field :birth_date, class: 'input is-medium form-control', value: params.dig(:csv_user, :birth_date)
 
-      .columns
-        .column.is-3
-          .field
-            label.label.has-text-success-dark ИНН
-            .control
-              = f.text_field :inn, class: 'input is-medium form-control', value: params.dig(:csv_user, :inn)
-        .column.is-3
-          .field
-            label.label.has-text-success-dark Дата рождения
-            .control
-              = f.text_field :birth_date, class: 'input is-medium form-control', value: params.dig(:csv_user, :birth_date)
-        .column.is-3
-          .field
-            label.label.has-text-success-dark Телефон
-            .control
-              = f.text_field :phone, class: 'input is-medium form-control', value: params.dig(:csv_user, :phone)
-        .column.is-3
-          .field
-            label.label.has-text-success-dark !
-            .control
-              = f.submit 'Проверить', class: 'button is-primary is-fullwidth'
+        .columns
+          .column.is-3
+            .field
+              label.label.has-text-link ГРН
+              .control
+                = f.text_field :grn, class: 'input is-medium form-control', value: params.dig(:csv_user, :grn)
+          .column.is-3
+            .field
+              label.label.has-text-link ИНН
+              .control
+                = f.text_field :inn, class: 'input is-medium form-control', value: params.dig(:csv_user, :inn)
+          .column.is-3
+            .field
+              label.label.has-text-link Телефон
+              .control
+                = f.text_field :phone, class: 'input is-rounded is-medium form-control', value: params.dig(:csv_user, :phone)
+          .column.is-3
+            .field
+              label.label.has-text-link !
+              .control
+                = f.submit 'Найти', class: 'button is-link is-rounded is-fullwidth'
 
-      .columns
-        .column.is-6
-          .columns
-            .column.is-12
-              br
-              .card
-                .card-content
-                  .media
-                    .media-content
-                      .columns
-                        .column.is-12
-                          p.subtitle
-                            | ИНН (по ФИО+ДР)
-                  .content
-                    ul
-                      - @inn&.each do |resp|
-                        li.has-text-left = "Паспорт: #{resp[:passport]} - ИНН: #{resp[:inn]}"
-              br
-              .card
-                .card-content
-                  .media
-                    .media-content
-                      .columns
-                        .column.is-12
-                          p.subtitle
-                            | запрос в ОКБ
-                          - if @okb_result.present?
+        .columns
+          .column.is-6
+            .columns
+              .column.is-12
+                br
+                .card
+                  .card-content
+                    .media
+                      .media-content
+                        .columns
+                          .column.is-12
                             p.subtitle
-                              = @okb_result
-                  .content
-                    - @requests_results&.each do |result|
+                              | ИНН (по ФИО+ДР)
+                    .content
                       ul
-                        li.has-text-left = "#{result.last_name} #{result.first_name} #{result.middle_name}"
-                        li.has-text-left = "#{result.birth_date}"
-                        li.has-text-left = "#{result.phone}"
-                        li.has-text-left = "Score: #{result.response}"
-        .column.is-6
-          br
-          .card
-            .card-content
-              .media
-                .media-content
-                  .columns
-                    .column.is-12
-                      p.subtitle
-                        | таблица parsed_users
-              .content
-                - @parsed_user_results&.each do |result|
-                  ul
-                    li.has-text-left = "#{result.last_name} #{result.first_name} #{result.middle_name}"
-                    li.has-text-left = "#{result.birth_date}"
-                    li.has-text-left = "#{result.passport}"
-                    li.has-text-left = "#{result.phone}"
-                    li.has-text-left = "#{result.address}"
-
-      .columns
-        .column.is-12
-          - @results&.each do |result|
+                        - @inn&.each do |resp|
+                          li.has-text-left = "Паспорт: #{resp[:passport]} - ИНН: #{resp[:inn]}"
+                br
+                .card
+                  .card-content
+                    .media
+                      .media-content
+                        .columns
+                          .column.is-12
+                            p.subtitle
+                              | запрос в ОКБ
+                            - if @okb_result.present?
+                              p.subtitle
+                                = @okb_result
+                    .content
+                      - @requests_results&.each do |result|
+                        ul
+                          li.has-text-left = "#{result.last_name} #{result.first_name} #{result.middle_name}"
+                          li.has-text-left = "#{result.birth_date}"
+                          li.has-text-left = "#{result.phone}"
+                          li.has-text-left = "Score: #{result.response}"
+          .column.is-6
             br
             .card
               .card-content
                 .media
                   .media-content
-                    p.title.is-4
-                      = result['ИМЯ']
                     .columns
                       .column.is-12
                         p.subtitle
-                          = result['ТЕЛЕФОН']
+                          | таблица parsed_users
                 .content
-                  ul
-                    - result.each do |k, v|
-                      li.has-text-left = "#{k}: #{v}"
+                  - @parsed_user_results&.each do |result|
+                    ul
+                      li.has-text-left = "#{result.last_name} #{result.first_name} #{result.middle_name}"
+                      li.has-text-left = "#{result.birth_date}"
+                      li.has-text-left = "#{result.passport}"
+                      li.has-text-left = "#{result.phone}"
+                      li.has-text-left = "#{result.address}"
+
+        .columns
+          .column.is-12
+            - @results&.each do |result|
+              br
+              .card
+                .card-content
+                  .media
+                    .media-content
+                      p.title.is-4
+                        = result['ИМЯ']
+                      .columns
+                        .column.is-12
+                          p.subtitle
+                            = result['ТЕЛЕФОН']
+                  .content
+                    ul
+                      - result.each do |k, v|
+                        li.has-text-left = "#{k}: #{v}"

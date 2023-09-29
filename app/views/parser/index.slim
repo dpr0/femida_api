@@ -1,39 +1,34 @@
-.hero-body
-  .container.is-fullhd.has-text-centered
-
-  .tile.is-ancestor
-    .tile.is-vertical.is-12
-      .tile.is-parent
-        article.tile.is-child.notification
-          p.subtitle
-            | Ретро
-          p.subtitle
-            = form_for current_user, url: parser_index_path, method: :post, data: { turbo: false } do |f|
-              = f.label :attachment
-              = f.file_field :attachment
-              = f.submit 'Загрузить файл'
-          p.content
+section.hero.is-lower-alpha
+  .hero-body
+    .tile.is-ancestor
+      .tile.is-vertical.is-12
+        .tile.is-parent
+          article.tile.is-child.notification
             .columns
-              table.table.is-fullwidth.is-striped
-                thead
-                  tr
-                    th file_id
-                    th file_name
-                    th Строк в файле
-                    th Уникальный строк в БД
-                    th Телефонов подтверждено
-                    th Паспортов подтверждено
-                    th Карт подтверждено
-                    th Сохранен
-                tbody
-                  - @csv_parsers.each do |parser|
+              .column.is-6
+                p.title
+                  | Обогащения
+              .column.is-6
+                = form_for current_user, url: parser_index_path, method: :post, data: { turbo: false } do |f|
+                  = f.label 'Прикрепить csv-файл '
+                  = f.file_field :attachment
+                  = f.submit 'Добавить обогащение'
+            p.content
+              .columns
+                table.table.is-fullwidth.is-striped
+                  thead
                     tr
-                      td = parser.file_id
-                      td = link_to @blobs.find { |x| x.id == parser.file_id }.filename, parser_path(parser.file_id)
-                      td = parser.rows
-                      td = parser.csv_users.count
-                      td = parser.is_phone_verified_count
-                      td = parser.is_passport_verified_count
-                      td = parser.is_card_verified_count
-                      td = "#{parser.status} - #{CsvParser::STATUSES[parser.status]}"
-                      / i.fa-solid class="fa-square-#{ parser.status == 1 ? 'check has-text-primary' : 'xmark has-text-danger'}"
+                      th.has-text-link ID файла
+                      th.has-text-link Название файла
+                      th.has-text-link Строк в файле
+                      th.has-text-link Статус
+                      th.has-text-link
+                  tbody
+                    - @csv_parsers.each do |parser|
+                      tr
+                        td = parser.file_id
+                        td = @blobs.find { |x| x.id == parser.file_id }.filename
+                        td = parser.rows
+                        td = "#{parser.status} - #{CsvParser::STATUSES[parser.status]}"
+                        td = link_to 'подробнее', parser_path(parser.file_id), class: 'button is-ghost'
+                        / i.fa-solid class="fa-square-#{ parser.status == 1 ? 'check has-text-primary' : 'xmark has-text-danger'}"
