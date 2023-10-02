@@ -1,0 +1,52 @@
+section.hero.is-lower-alpha
+  .hero-body
+    .container
+      .columns
+        .column.is-6.has-text-left
+          h3.title = ActiveStorage::Blob.find_by(id: params[:id]).filename
+        .column.is-6
+
+      = form_for @csv_user, url: parser_path(params[:id]), method: :patch, data: { turbo: false } do |f|
+        .columns
+          .column.is-3
+            article.message
+              .message-header.has-background-info-light
+                strong.has-text-link = "Столбцы в файле (#{@headers.size})"
+              .message-body
+                - @headers.each do |col|
+                  .columns
+                    .column.is-12
+                      - klass = :primary if @csv_user.attribute_names.include?(col)
+                      - klass ||= :grey if @csv_user.attribute_names.find { |x| x.include?(col[0..3]) || col.include?(x[0..3]) }
+                      - klass ||= :danger
+                      input.input.has-background-info-light disabled=true class="has-text-#{klass}" type="text" name="middle_name" id="middle_name" value=col
+          .column.is-9
+            .columns
+              .column.is-12
+                strong.has-text-link Сопоставление столбцов из файла
+            - { 'external_id' => 'Внешний ID', 'last_name' => 'Фамилия', 'first_name' => 'Имя', 'middle_name' => 'Отчество', 'birth_date' => 'Дата рождения', 'phone' => 'Телефон', 'passport' => 'Паспорт', 'info' => 'Добавьте своё поле', 'date_mask' => 'Маска даты ДР' }.each_slice(3).map { |slice| Hash[slice] }.each do |slice|
+              .columns
+                - slice.each do |f, value|
+                  .column.is-4
+                    .field
+                      label = value
+                      .control
+                        - ff = @headers.select { |col| (f.include?(col[0..3]) || col.include?(f[0..3])) && f != 'date_mask' }
+                        - fff = @csv_parser.send(f)
+                        - str = @csv_parser.status == 1 && fff ? (fff.is_a?(Integer) ? @headers[fff] : fff) : ff
+                        = text_field_tag f, str, class: 'input is-medium has-background-info-light'
+            .columns
+              .column.is-4
+                .field
+                  label.label.has-text-link Разделитель
+                  .control
+                    = text_field_tag :separator, ';', class: 'input is-medium has-background-info-light'
+              .column.is-4
+                .field
+                  label.label.has-text-link Кодировка
+                  .select.is-medium.is-fullwidth
+                    = select '', :encoding, %w[utf-8 windows-1251], {}, class: 'has-background-info-light'
+              .column.is-4
+                .field
+                  label.label.has-text-link .
+                  = f.submit 'Сохранить', class: 'button is-medium is-link is-fullwidth'

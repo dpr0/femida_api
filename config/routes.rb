@@ -13,7 +13,6 @@ Rails.application.routes.draw do
   resources :users
   resources :files
   resources :parser do
-    post :parse
     post :solar_phone_check
     post :solar_passp_check
     post :inn_check
@@ -23,8 +22,7 @@ Rails.application.routes.draw do
     post :okb_check
     post :xxx_check
     post :add_score
-    get :get_csv
-    get :get_xlsx
+    get :download
   end
 
   namespace :api do
