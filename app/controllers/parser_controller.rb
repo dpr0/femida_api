@@ -91,24 +91,24 @@ class ParserController < ApplicationController
   def start
     array = []
     array += [CsvParserDbOkbJob, CsvParserUserJob, CsvParserSolarPhoneJob] if params[:check1] == '1'
-    array += [CsvParserSolarPasspJob, CsvParserInnJob] if params[:check2] == '1'
-    array += [CsvParserCardJob] if params[:check3] == '1'
-    array += [CsvParserOkbJob] if params[:check4] == '1'
-    array += [] if params[:check5] == '1'
+    array += [CsvParserSolarPasspJob, CsvParserInnJob]                     if params[:check2] == '1'
+    array += [CsvParserCardJob]                                            if params[:check3] == '1'
+    array += [CsvParserOkbJob]                                             if params[:check4] == '1'
+    array += []                                                            if params[:check5] == '1'
     check(array)
   end
 
   def add_score
-    id = 66
+    id = 68
     file = ActiveStorage::Attachment.find_by(id: id)
     hash = {}
     rows = file.open(&:count)
     file.open do |f|
       rows.times do |i|
-        # line = f.readline.force_encoding('UTF-8').chomp.split(';')
-        # hash[line[4].last(10).rjust(10, '0')] = line[9].to_s.tr('.', ',') if line[1] != 'first_name'
-        line = f.readline.force_encoding('UTF-8').chomp.split(',')
-        hash[line[1].to_i.to_s.last(10).rjust(10, '0')] = line[10].to_s.tr('.', ',') if line[1] != 'phone'
+        line = f.readline.force_encoding('UTF-8').chomp.split(';')
+        hash[line[7].last(10).rjust(10, '0')] = line[10].to_s.tr('.', ',') if line[0] != 'Id'
+        # line = f.readline.force_encoding('UTF-8').chomp.split(',')
+        # hash[line[1].to_i.to_s.last(10).rjust(10, '0')] = line[10].to_s.tr('.', ',') if line[1] != 'phone'
       end
     end
 
@@ -141,10 +141,6 @@ class ParserController < ApplicationController
   end
 
   private
-
-  def is_parser?
-    redirect_to '/' unless current_user.user_roles.find { |role| role.role == 'parser' }
-  end
 
   def check(jobs = [], status: 4)
     id = params[:parser_id]

@@ -49,4 +49,8 @@ class ApplicationController < ActionController::Base
   def is_admin?
     redirect_to '/' unless current_user.admin?
   end
+
+  def is_parser?
+    redirect_to '/' unless current_user.user_roles.find { |role| role.role == 'parser' }
+  end
 end

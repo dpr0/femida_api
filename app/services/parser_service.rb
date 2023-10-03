@@ -89,7 +89,7 @@ class ParserService
 
       resp['data'].map { |dd| dd['ТЕЛЕФОН'].scan(/\d/).join.last(10) if dd['ТЕЛЕФОН'].present? }.flatten.compact.uniq
     end
-    cards = Card.where(phone: phones).select(:card).map(&:card).compact
+    cards = Card.where(phone: phones).select(:card).map(&:card).compact.uniq
     cards.select { |card| card.present? && (["#{card[0..5]}#{card[-4..-1]}", "#{card[0..5]}******#{card[-4..-1]}"].include? u.info) }.present? if u.info.present?
   end
 
