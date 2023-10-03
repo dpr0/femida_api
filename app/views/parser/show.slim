@@ -2,69 +2,61 @@ section.hero.is-lower-alpha
   .hero-body
     .container.has-text-centered
       .columns
-        .column.is-6.has-text-left
-          h3.title = ActiveStorage::Blob.find_by(id: params[:id]).filename
-        .column.is-6
+        .column.is-3
+          .field
+            label.label.has-text-link Имя файле
+            .control
+              = text_field_tag :rows, ActiveStorage::Blob.find_by(id: params[:id]).filename, class: 'input is-medium', disabled: true
+        .column.is-3
+          .field
+            label.label.has-text-link Количество строк в файле
+            .control
+              = text_field_tag :rows, @csv_users.size, class: 'input is-medium', disabled: true
+        .column.is-3
+          .field
+            label.label.has-text-link Статус
+            .control
+              = text_field_tag :status, CsvParser::STATUSES[@csv_parser.status], class: 'input is-medium', disabled: true
+        .column.is-3
+          label.label.has-text-link Скачать обогащенный файл
           - [:csv, :xlsx].each do |format|
-            = link_to "Скачать обогащенный #{format} файл",  parser_download_path(@csv_parser.file_id, format: format),  target: '_blank', class: 'button is-link is-rounded'
+            = link_to format,  parser_download_path(@csv_parser.file_id, format: format),  target: '_blank', class: 'button is-link is-rounded'
 
       .columns
         .column.is-3
-          article.message.is-link
-            .message-body
-              .field
-                label.label.has-text-link Строк в БД
-                .control
-                  = text_field_tag :rows, @csv_users.size, class: 'input is-medium'
-              .field
-                label.label.has-text-link Статус
-                .control
-                  = text_field_tag :status, CsvParser::STATUSES[@csv_parser.status], class: 'input is-medium'
-              - if @csv_users.present?
-                .field
-                  label.label.has-text-link Телефон подтвержден
-                  .control
-                    / - verified = @csv_users.select { |x| x.is_phone_verified == true }
-                    / - map = verified.group_by(&:is_phone_verified_source).map { |k, v| [k, v.size] }.map { |val| "#{val[0] || 'nil'}: #{val[1]}" }
-                    / = text_field_tag :rows, "#{verified.size} (#{map.join(', ')})", class: 'input is-medium', disabled: true
-                    = text_field_tag :rows, @csv_users.count(&:is_phone_verified?), class: 'input is-medium'
-                .field
-                  label.label.has-text-link Паспорт подтвержден
-                  .control
-                    = text_field_tag :rows, @csv_users.count(&:is_passport_verified?), class: 'input is-medium'
-                .field
-                  label.label.has-text-link Карта подтверждена
-                  .control
-                    = text_field_tag :rows, @csv_users.count(&:is_card_verified?), class: 'input is-medium'
-        .column.is-8
-          - if @csv_parser_logs.present?
-            article.message.is-info
-              .message-body
-                .columns
-                  .column.is-12
-                    table.table.is-fullwidth.is-striped
-                      thead
-                        th Проверка
-                        th Тел.
-                        th Пасп.
-                        th Карта
-                        th Начало
-                        th Конец
-                        th Продолж.
-                      tbody
-                        - @csv_parser_logs.each do |log|
-                          tr
-                            - min = Time.at(log.updated_at - log.created_at).to_i / 60
-                            td = log.info.sub('csv_parser_', '')
-                            td = log.is_phone_verified_count
-                            td = log.is_passport_verified_count
-                            td = log.is_card_verified_count
-                            td = log.created_at.in_time_zone('Moscow').strftime('%d.%m.%Y %H:%M')
-                            td = log.updated_at.in_time_zone('Moscow').strftime('%d.%m.%Y %H:%M') if log.updated_at != log.created_at
-                            td = min >= 60 ? "#{min / 60}ч #{min % 60}мин" : "#{min}мин"
-        .column.is-2
           article.message.is-info
             .message-body
+              label.label.has-text-link Выберите проверки
+              = form_for @csv_parser, url: parser_start_path(params[:id]), method: :post, data: { turbo: false } do |f|
+                .has-text-left
+                  p
+                    label.checkbox
+                      = check_box_tag :check1
+                      | &nbsp
+                      | Связка ФИО + телефон
+                  p
+                    label.checkbox
+                      = check_box_tag :check2
+                      | &nbsp
+                      | Связка ФИО + паспорт
+                  p
+                    label.checkbox
+                      = check_box_tag :check3
+                      | &nbsp
+                      | Связка ФИО + маска карты
+                  p
+                    label.checkbox
+                      = check_box_tag :check4
+                      | &nbsp
+                      | Проверка в ОКБ
+                  p
+                    label.checkbox
+                      = check_box_tag :check5
+                      | &nbsp
+                      | Скоринг по телефону
+                .field.has-text-left
+                  = f.submit 'Запустить обогащение', class: 'button is-link is-rounded'
+              br
               - opts = ->(str) { { method: :post, data: { turbo: true, turbo_method: :post }, class: "button is-#{str} is-fullwidth" } }
               - if @csv_parser.status == 3 || @csv_parser.status == 5
                 .buttons.has-addons
@@ -77,6 +69,37 @@ section.hero.is-lower-alpha
                   = link_to '5 Проверка - inn',                 parser_inn_check_path(@csv_parser.file_id), opts.call(:link)
                   = link_to '6 Проверка - cards',             parser_cards_check_path(@csv_parser.file_id), opts.call(:link)
                   = link_to '7 Проверка - ОКБ', parser_okb_check_path(@csv_parser.file_id), opts.call(:danger)
+        .column.is-9
+          - if @csv_parser_logs.present?
+            article.message.is-info
+              .message-body
+                .columns
+                  .column.is-12
+                    table.table.is-fullwidth.is-striped
+                      thead
+                        th Проверка
+                        th Тел.
+                        th Пасп.
+                        th Карта
+                        th Начало
+                        th Продолж.
+                      tbody
+                        - @csv_parser_logs.each do |log|
+                          tr
+                            - min = Time.at(log.updated_at - log.created_at).to_i / 60
+                            td = log.info.sub('csv_parser_', '')
+                            td = log.is_phone_verified_count
+                            td = log.is_passport_verified_count
+                            td = log.is_card_verified_count
+                            td = log.created_at.in_time_zone('Moscow').strftime('%d.%m.%Y %H:%M')
+                            td = min >= 60 ? "#{min / 60}ч #{min % 60}мин" : "#{min}мин"
+                        tr
+                          th Всего:
+                          th = @csv_users.count(&:is_phone_verified?)
+                          th = @csv_users.count(&:is_passport_verified?)
+                          th = @csv_users.count(&:is_card_verified?)
+                          th =
+                          th =
 
 javascript:
   var elements = document.getElementsByClassName("buttons");

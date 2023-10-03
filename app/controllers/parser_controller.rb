@@ -4,6 +4,7 @@ class ParserController < ApplicationController
   protect_from_forgery with: :null_session
   before_action :authenticate_user!
   before_action :is_admin?, except: %i[index show]
+  before_action :is_parser?, except: %i[index show edit create update download add_score]
 
   FIELDS = %w[external_id phone passport last_name first_name middle_name birth_date is_phone_verified? is_passport_verified? is_card_verified? phone_score].freeze
 
@@ -87,6 +88,16 @@ class ParserController < ApplicationController
     check([CsvParserDbOkbJob, CsvParserUserJob, CsvParserSolarPhoneJob, CsvParserSolarPasspJob, CsvParserInnJob])
   end
 
+  def start
+    array = []
+    array += [CsvParserDbOkbJob, CsvParserUserJob, CsvParserSolarPhoneJob] if params[:check1] == '1'
+    array += [CsvParserSolarPasspJob, CsvParserInnJob] if params[:check2] == '1'
+    array += [CsvParserCardJob] if params[:check3] == '1'
+    array += [CsvParserOkbJob] if params[:check4] == '1'
+    array += [] if params[:check5] == '1'
+    check(array)
+  end
+
   def add_score
     id = 66
     file = ActiveStorage::Attachment.find_by(id: id)
@@ -131,12 +142,16 @@ class ParserController < ApplicationController
 
   private
 
+  def is_parser?
+    redirect_to '/' unless current_user.user_roles.find { |role| role.role == 'parser' }
+  end
+
   def check(jobs = [], status: 4)
     id = params[:parser_id]
     CsvParser.find_by(file_id: id).update(status: status)
     hash = { id: id, limit: params[:limit] || 100 }
     hash[:encoding] = params[:encoding] if params[:encoding]
-    [jobs].flatten.each { |job| job.perform_later(hash) }
+    [jobs].flatten.each { |job| job.perform_async(hash) }
     redirect_to parser_path(id)
   end
 

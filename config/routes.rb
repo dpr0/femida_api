@@ -1,7 +1,9 @@
 # frozen_string_literal: true
+require 'sidekiq/web'
 
 Rails.application.routes.draw do
   mount LetterOpenerWeb::Engine, at: '/letter_opener' if Rails.env.development?
+  mount Sidekiq::Web => '/sidekiq'
 
   apipie
   devise_for :users
@@ -22,6 +24,7 @@ Rails.application.routes.draw do
     post :okb_check
     post :xxx_check
     post :add_score
+    post :start
     get :download
   end
 

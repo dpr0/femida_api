@@ -1,7 +1,9 @@
 class CsvParserSolarPasspJob < ApplicationJob
   queue_as :default
 
-  def perform(id:, limit: 100)
+  def perform(hash)
+    id = hash['id']
+    limit = hash['linit']
     # TODO ParserService phone+passport
     # ParserService.new(self.class.name, hash[:id], [:phone, :passport]).call
     person_service = PersonService.instance

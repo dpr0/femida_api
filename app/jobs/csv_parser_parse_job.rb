@@ -2,13 +2,13 @@ class CsvParserParseJob < ApplicationJob
   queue_as :default
 
   def perform(hash)
-    id = hash[:id]
+    id = hash['id']
     parser = CsvParser.find_by(file_id: id)
     file = ActiveStorage::Attachment.find_by(id: id)
     array = []
     file.open do |f|
       parser.rows.times do
-        encoding = hash[:encoding] || 'utf-8'
+        encoding = hash['encoding'] || 'utf-8'
         str = f.readline.force_encoding(encoding).encode('utf-8').chomp.delete("\"")
         next if str == parser.headers || str.blank?
 

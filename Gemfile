@@ -46,6 +46,7 @@ group :development, :test do
   gem 'capistrano-nvm',     require: false
   gem 'capistrano-rails',   require: false
   gem 'capistrano-rbenv',   require: false
+  gem 'capistrano-sidekiq', require: false
   gem 'capistrano-yarn',    require: false
   gem 'debug'
   gem 'ed25519'

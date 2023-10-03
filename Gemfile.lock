@@ -124,6 +124,10 @@ GEM
     capistrano-rbenv (2.2.0)
       capistrano (~> 3.1)
       sshkit (~> 1.3)
+    capistrano-sidekiq (2.3.1)
+      capistrano (>= 3.9.0)
+      capistrano-bundler
+      sidekiq (>= 6.0)
     capistrano-yarn (2.0.2)
       capistrano (~> 3.0)
     capistrano3-puma (4.0.0)
@@ -342,7 +346,7 @@ GEM
       rspec-support (~> 3.12)
     rspec-support (3.12.1)
     rtesseract (3.1.2)
-    rubocop (1.56.3)
+    rubocop (1.56.4)
       base64 (~> 0.1.1)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
@@ -376,7 +380,7 @@ GEM
       sentry-ruby (~> 5.11.0)
     sentry-ruby (5.11.0)
       concurrent-ruby (~> 1.0, >= 1.0.2)
-    sidekiq (7.1.4)
+    sidekiq (7.1.5)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
@@ -434,7 +438,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.8.2)
-    unicode-display_width (2.4.2)
+    unicode-display_width (2.5.0)
     warden (1.2.9)
       rack (>= 2.0.9)
     web-console (4.2.1)
@@ -473,6 +477,7 @@ DEPENDENCIES
   capistrano-nvm
   capistrano-rails
   capistrano-rbenv
+  capistrano-sidekiq
   capistrano-yarn
   capistrano3-puma (= 4.0.0)
   capybara!

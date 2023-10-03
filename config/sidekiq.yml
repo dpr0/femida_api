@@ -16,4 +16,9 @@
 
 # you can override concurrency based on environment
 production:
+  :concurrency: 10
+
+development:
   :concurrency: 5
+
+:max_retries: 1
