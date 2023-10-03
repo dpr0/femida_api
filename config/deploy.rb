@@ -9,6 +9,7 @@ set :linked_files,    fetch(:linked_files, []).push('config/cable.yml', 'config/
 set :linked_dirs,     fetch(:linked_dirs, []).push('storage', 'log', 'tmp/parser', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'tmp/session_store', 'vendor/bundle', 'public/system', 'public/uploads')
 set :keep_releases,   5
 set :user,            'support'
+set :sidekiq_user,    fetch(:user)
 set :use_sudo,        false
 set :stage,           :production
 set :deploy_to,       "/home/#{fetch(:user)}/#{fetch(:application)}"
@@ -26,7 +27,7 @@ namespace :deploy do
   desc 'Make sure local git is in sync with remote.'
   task :check_revision do
     on roles(:app) do
-      unless `git rev-parse HEAD` == `git rev-parse origin/development`
+      unless `git rev-parse HEAD` == `git rev-parse origin/master`
         puts 'WARNING: HEAD is not the same as origin/master'
         puts 'Run `git push` to sync changes.'
         exit
@@ -71,5 +72,5 @@ namespace :deploy do
     end
   end
 
-  # before :starting, :check_revision
+  before :starting, :check_revision
 end
