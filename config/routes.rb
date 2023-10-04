@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   apipie
   devise_for :users
 
-  root 'parser#index'
+  root 'admin#index'
 
   resources :admin
   resources :sample

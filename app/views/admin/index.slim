@@ -4,23 +4,25 @@
       .tile
         .tile.is-parent.is-vertical
           article.tile.is-child.notification.is-primary
-            p.subtitle
-              | Количество запросов в ОКБ
-            p.subtitle
-              = "до импорта логов #{@dt.to_date.strftime('%d.%m.%Y')}:"
-            p.title
-              = @old_request_count
-            p.subtitle
-              = "после:"
-            p.title
-              = @request_count
-            p.subtitle
-              = "#{@req_per_day} в день"
+            - if current_user&.admin?
+              p.subtitle
+                | Количество запросов в ОКБ
+              p.subtitle
+                = "до импорта логов #{@dt.to_date.strftime('%d.%m.%Y')}:"
+              p.title
+                = @old_request_count
+              p.subtitle
+                = "после:"
+              p.title
+                = @request_count
+              p.subtitle
+                = "#{@req_per_day} в день"
           article.tile.is-child.notification.is-warning
-            p.title
-              = "₽ #{@balane_kapcha}"
-            p.subtitle
-              | Баланс капча-сервиса
+            - if current_user&.admin?
+              p.title
+                = "₽ #{@balane_kapcha}"
+              p.subtitle
+                | Баланс капча-сервиса
         .tile.is-parent
           article.tile.is-child.notification.is-info
             p.title

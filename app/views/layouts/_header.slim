@@ -9,7 +9,7 @@ section.hero.is-lower-alpha
             | FEMIDA
         .navbar-menu
           .navbar-start
-            - if current_user
+            - if current_user&.admin?
               .navbar-item
                 = link_to 'Админка', admin_index_path
               .navbar-item
