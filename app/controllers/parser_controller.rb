@@ -3,7 +3,7 @@
 class ParserController < ApplicationController
   protect_from_forgery with: :null_session
   before_action :authenticate_user!
-  before_action :is_admin?, except: %i[index show]
+  before_action :is_admin?
   before_action :is_parser?, except: %i[index show edit create update download add_score]
 
   FIELDS = %w[external_id phone passport last_name first_name middle_name birth_date is_phone_verified? is_passport_verified? is_card_verified? phone_score].freeze
