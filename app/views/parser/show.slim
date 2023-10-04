@@ -60,7 +60,6 @@ section.hero.is-lower-alpha
               / - opts = ->(str) { { method: :post, data: { turbo: true, turbo_method: :post }, class: "button is-#{str} is-fullwidth" } }
               / - if @csv_parser.status == 3 || @csv_parser.status == 5
               /   .buttons.has-addons
-              /     = link_to '1-5 Проверки',     parser_xxx_check_path(@csv_parser.file_id), opts.call(:link)
               /     = link_to 'Склеить скоринг',  parser_add_score_path(@csv_parser.file_id), opts.call(:link)
               /     = link_to '1 Проверка - db_okb',           parser_db_okb_check_path(@csv_parser.file_id), opts.call(:link)
               /     = link_to '2 Проверка - user',               parser_user_check_path(@csv_parser.file_id), opts.call(:link)

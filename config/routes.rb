@@ -24,7 +24,6 @@ Rails.application.routes.draw do
     post :user_check
     post :db_okb_check
     post :okb_check
-    post :xxx_check
     post :add_score
     post :start
     get :download

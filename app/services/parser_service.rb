@@ -92,8 +92,4 @@ class ParserService
     cards = Card.where(phone: phones).select(:card).map(&:card).compact.uniq
     cards.select { |card| card.present? && (["#{card[0..5]}#{card[-4..-1]}", "#{card[0..5]}******#{card[-4..-1]}"].include? u.info) }.present? if u.info.present?
   end
-
-  def csv_parser_xxx(u)
-    csv_parser_db_okb(u)
-  end
 end

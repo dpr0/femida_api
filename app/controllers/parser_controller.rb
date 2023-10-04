@@ -84,10 +84,6 @@ class ParserController < ApplicationController
     check(CsvParserCardJob)
   end
 
-  def xxx_check
-    check([CsvParserDbOkbJob, CsvParserUserJob, CsvParserSolarPhoneJob, CsvParserSolarPasspJob, CsvParserInnJob])
-  end
-
   def start
     array = []
     array += [CsvParserDbOkbJob, CsvParserUserJob, CsvParserSolarPhoneJob] if params[:check1] == '1'
