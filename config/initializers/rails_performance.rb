@@ -14,9 +14,9 @@ RailsPerformance.setup do |config|
   config.http_basic_authentication_password = ENV['RAILS_PERFORMANCE_PASSWORD']
 
   # if you need an additional rules to check user permissions
-  config.verify_access_proc = proc { |controller| true }
+  # config.verify_access_proc = proc { |controller| true }
   # for example when you have `current_user`
-  # config.verify_access_proc = proc { |controller| controller.current_user && controller.current_user.admin? }
+  config.verify_access_proc = proc { |controller| controller.current_user&.admin? }
 
   # You can ignore endpoints with Rails standard notation controller#action
   # config.ignored_endpoints = ['HomeController#contact']

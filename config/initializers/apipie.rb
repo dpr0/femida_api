@@ -9,4 +9,7 @@ Apipie.configure do |config|
 
   config.languages = ['ru', 'en']
   config.default_locale = 'ru'
+  config.authenticate = Proc.new do
+    redirect_to '/' unless current_user&.admin?
+  end
 end
