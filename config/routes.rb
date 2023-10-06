@@ -51,6 +51,7 @@ Rails.application.routes.draw do
       resources :inn,     only: [:index, :show]
       resources :opendata,only: [:index, :show]
       resources :driver,  only: :index
+      resources :fssp,    only: :index
       resources :sro,     only: :index
       resources :websbor, only: :index
       resources :bonalog, only: :index
