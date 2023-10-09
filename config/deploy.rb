@@ -11,6 +11,7 @@ set :keep_releases,   5
 set :user,            'support'
 set :sidekiq_user,    fetch(:user)
 set :use_sudo,        false
+set :stage,           :production
 set :deploy_to,       "/home/#{fetch(:user)}/#{fetch(:application)}"
 set :whenever_identifier, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
 set :ruby_string,     '$HOME/.rbenv/bin/rbenv exec bundle exec'
