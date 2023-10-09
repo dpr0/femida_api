@@ -12,4 +12,4 @@ task :faster_migrations do
     `git status db/migrate/ --porcelain`.present?
 end
 
-task "db:migrate": "faster_migrations"
+# task "db:migrate": "faster_migrations"

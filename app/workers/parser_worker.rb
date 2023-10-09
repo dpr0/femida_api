@@ -3,6 +3,6 @@ class ParserWorker
   sidekiq_options retry: false
 
   def perform(hash)
-    byebug
+
   end
 end

@@ -8,6 +8,8 @@
 #  birth_date                  :string
 #  first_name                  :string
 #  info                        :text
+#  is_card_verified            :boolean
+#  is_card_verified_source     :string
 #  is_passport_verified        :boolean
 #  is_passport_verified_source :string
 #  is_phone_verified           :boolean

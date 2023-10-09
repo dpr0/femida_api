@@ -6,8 +6,11 @@
 #
 #  id                         :bigint           not null, primary key
 #  birth_date                 :integer
+#  date_mask                  :string
 #  first_name                 :integer
 #  headers                    :string
+#  info                       :integer
+#  is_card_verified_count     :integer
 #  is_passport_verified_count :integer
 #  is_phone_verified_count    :integer
 #  last_name                  :integer

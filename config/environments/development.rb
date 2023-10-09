@@ -2,6 +2,7 @@ require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
   config.active_job.queue_adapter = :sidekiq
+  config.active_record.dump_schema_after_migration = `git status db/migrate/ --porcelain`.present?
 
   # Settings specified here will take precedence over those in config/application.rb.
 
