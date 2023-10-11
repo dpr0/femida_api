@@ -10,10 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
-  create_schema "fraud_scoring"
-  create_schema "gateway"
-
+ActiveRecord::Schema[7.0].define(version: 2023_10_11_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
   enable_extension "plpgsql"
@@ -35,9 +32,9 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.timestamptz "updated_at", default: -> { "now()" }, null: false, comment: "The timestamp of when the action was updated"
     t.text "visualization_settings", comment: "The UI visualization_settings for this action"
     t.index ["creator_id"], name: "idx_action_creator_id"
+    t.index ["entity_id"], name: "action_entity_id_key", unique: true
+    t.index ["public_uuid"], name: "action_public_uuid_key", unique: true
     t.index ["public_uuid"], name: "idx_action_public_uuid"
-    t.unique_constraint ["entity_id"], name: "action_entity_id_key"
-    t.unique_constraint ["public_uuid"], name: "action_public_uuid_key"
   end
 
   create_table "active_storage_attachments", force: :cascade do |t|
@@ -113,9 +110,9 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.integer "ordering", null: false, comment: "order of bookmark for user"
     t.string "type", limit: 255, null: false, comment: "type of the Bookmark"
     t.integer "user_id", null: false, comment: "ID of the User who ordered bookmarks"
+    t.index ["user_id", "ordering"], name: "unique_bookmark_user_id_ordering", unique: true
+    t.index ["user_id", "type", "item_id"], name: "unique_bookmark_user_id_type_item_id", unique: true
     t.index ["user_id"], name: "idx_bookmark_ordering_user_id"
-    t.unique_constraint ["user_id", "ordering"], name: "unique_bookmark_user_id_ordering"
-    t.unique_constraint ["user_id", "type", "item_id"], name: "unique_bookmark_user_id_type_item_id"
   end
 
   create_table "card_bookmark", id: :integer, default: nil, comment: "Table holding bookmarks on cards", force: :cascade do |t|
@@ -123,16 +120,16 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.timestamptz "created_at", default: -> { "now()" }, null: false, comment: "The timestamp of when the bookmark was created"
     t.integer "user_id", null: false, comment: "ID of the User who bookmarked the Card"
     t.index ["card_id"], name: "idx_card_bookmark_card_id"
+    t.index ["user_id", "card_id"], name: "unique_card_bookmark_user_id_card_id", unique: true
     t.index ["user_id"], name: "idx_card_bookmark_user_id"
-    t.unique_constraint ["user_id", "card_id"], name: "unique_card_bookmark_user_id_card_id"
   end
 
   create_table "card_label", id: :integer, default: nil, force: :cascade do |t|
     t.integer "card_id", null: false
     t.integer "label_id", null: false
+    t.index ["card_id", "label_id"], name: "unique_card_label_card_id_label_id", unique: true
     t.index ["card_id"], name: "idx_card_label_card_id"
     t.index ["label_id"], name: "idx_card_label_label_id"
-    t.unique_constraint ["card_id", "label_id"], name: "unique_card_label_card_id_label_id"
   end
 
   create_table "cards", force: :cascade do |t|
@@ -169,10 +166,10 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.integer "personal_owner_id", comment: "If set, this Collection is a personal Collection, for exclusive use of the User with this ID."
     t.string "slug", limit: 254, null: false, comment: "Sluggified version of the Collection name. Used only for display purposes in URL; not unique or indexed."
     t.string "type", limit: 256, comment: "This is used to differentiate instance-analytics collections from all other collections."
+    t.index ["entity_id"], name: "collection_entity_id_key", unique: true
     t.index ["location"], name: "idx_collection_location"
     t.index ["personal_owner_id"], name: "idx_collection_personal_owner_id"
-    t.unique_constraint ["entity_id"], name: "collection_entity_id_key"
-    t.unique_constraint ["personal_owner_id"], name: "unique_collection_personal_owner_id"
+    t.index ["personal_owner_id"], name: "unique_collection_personal_owner_id", unique: true
   end
 
   create_table "collection_bookmark", id: :integer, default: nil, comment: "Table holding bookmarks on collections", force: :cascade do |t|
@@ -180,8 +177,8 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.timestamptz "created_at", default: -> { "now()" }, null: false, comment: "The timestamp of when the bookmark was created"
     t.integer "user_id", null: false, comment: "ID of the User who bookmarked the Collection"
     t.index ["collection_id"], name: "idx_collection_bookmark_collection_id"
+    t.index ["user_id", "collection_id"], name: "unique_collection_bookmark_user_id_collection_id", unique: true
     t.index ["user_id"], name: "idx_collection_bookmark_user_id"
-    t.unique_constraint ["user_id", "collection_id"], name: "unique_collection_bookmark_user_id_collection_id"
   end
 
   create_table "collection_permission_graph_revision", id: :integer, default: nil, comment: "Used to keep track of changes made to collections.", force: :cascade do |t|
@@ -215,8 +212,8 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.integer "db_id", null: false, comment: "ID of the database this connection impersonation policy affects"
     t.integer "group_id", null: false, comment: "ID of the permissions group this connection impersonation policy affects"
     t.index ["db_id"], name: "idx_conn_impersonations_db_id"
+    t.index ["group_id", "db_id"], name: "conn_impersonation_unique_group_id_db_id", unique: true
     t.index ["group_id"], name: "idx_conn_impersonations_group_id"
-    t.unique_constraint ["group_id", "db_id"], name: "conn_impersonation_unique_group_id_db_id"
   end
 
   create_table "core_session", id: { type: :string, limit: 254 }, force: :cascade do |t|
@@ -245,7 +242,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.string "sso_source", limit: 254, comment: "String to indicate the SSO backend the user is from"
     t.datetime "updated_at", precision: nil, comment: "When was this User last updated?"
     t.index "lower((email)::text)", name: "idx_lower_email"
-    t.unique_constraint ["email"], name: "core_user_email_key"
+    t.index ["email"], name: "core_user_email_key", unique: true
   end
 
   create_table "csv_parser_logs", force: :cascade do |t|
@@ -274,6 +271,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.integer "passport"
     t.integer "phone"
     t.integer "rows"
+    t.string "score_uuid"
     t.string "separator"
     t.integer "status", default: 0
   end
@@ -305,16 +303,16 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.integer "dashboard_id", null: false, comment: "ID of the Dashboard bookmarked by the user"
     t.integer "user_id", null: false, comment: "ID of the User who bookmarked the Dashboard"
     t.index ["dashboard_id"], name: "idx_dashboard_bookmark_dashboard_id"
+    t.index ["user_id", "dashboard_id"], name: "unique_dashboard_bookmark_user_id_dashboard_id", unique: true
     t.index ["user_id"], name: "idx_dashboard_bookmark_user_id"
-    t.unique_constraint ["user_id", "dashboard_id"], name: "unique_dashboard_bookmark_user_id_dashboard_id"
   end
 
   create_table "dashboard_favorite", id: :integer, default: nil, comment: "Presence of a row here indicates a given User has favorited a given Dashboard.", force: :cascade do |t|
     t.integer "dashboard_id", null: false, comment: "ID of the Dashboard favorited by the User."
     t.integer "user_id", null: false, comment: "ID of the User who favorited the Dashboard."
     t.index ["dashboard_id"], name: "idx_dashboard_favorite_dashboard_id"
+    t.index ["user_id", "dashboard_id"], name: "unique_dashboard_favorite_user_id_dashboard_id", unique: true
     t.index ["user_id"], name: "idx_dashboard_favorite_user_id"
-    t.unique_constraint ["user_id", "dashboard_id"], name: "unique_dashboard_favorite_user_id_dashboard_id"
   end
 
   create_table "dashboard_tab", id: :integer, default: nil, comment: "Join table connecting dashboard to dashboardcards", force: :cascade do |t|
@@ -324,8 +322,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.text "name", null: false, comment: "Displayed name of the tab"
     t.integer "position", null: false, comment: "Position of the tab with respect to others tabs in dashboard"
     t.timestamptz "updated_at", default: -> { "now()" }, null: false, comment: "The timestamp at which the tab was last updated"
-
-    t.unique_constraint ["entity_id"], name: "dashboard_tab_entity_id_key"
+    t.index ["entity_id"], name: "dashboard_tab_entity_id_key", unique: true
   end
 
   create_table "dashboardcard_series", id: :integer, default: nil, force: :cascade do |t|
@@ -356,8 +353,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.string "md5sum", limit: 35
     t.integer "orderexecuted", null: false
     t.string "tag", limit: 255
-
-    t.unique_constraint ["id", "author", "filename"], name: "idx_databasechangelog_id_author_filename"
+    t.index ["id", "author", "filename"], name: "idx_databasechangelog_id_author_filename", unique: true
   end
 
   create_table "databasechangeloglock", id: :integer, default: nil, force: :cascade do |t|
@@ -386,9 +382,9 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.string "name", limit: 254, null: false, comment: "Short description used as the display name of this new column"
     t.string "type", limit: 254, null: false, comment: "Either internal for a user defined remapping or external for a foreign key based remapping"
     t.datetime "updated_at", precision: nil, null: false, comment: "The timestamp of when these dimension was last updated."
+    t.index ["entity_id"], name: "dimension_entity_id_key", unique: true
     t.index ["field_id"], name: "idx_dimension_field_id"
-    t.unique_constraint ["entity_id"], name: "dimension_entity_id_key"
-    t.unique_constraint ["field_id"], name: "unique_dimension_field_id"
+    t.index ["field_id"], name: "unique_dimension_field_id", unique: true
   end
 
   create_table "expired_passports", force: :cascade do |t|
@@ -431,7 +427,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.string "name", limit: 254, null: false
     t.string "slug", limit: 254, null: false
     t.index ["slug"], name: "idx_label_slug"
-    t.unique_constraint ["slug"], name: "label_slug_key"
+    t.index ["slug"], name: "label_slug_key", unique: true
   end
 
   create_table "login_history", id: :integer, default: nil, comment: "Keeps track of various logins for different users and additional info such as location and device", force: :cascade do |t|
@@ -507,8 +503,8 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.string "visibility_type", limit: 32, default: "normal", null: false
     t.index ["parent_id"], name: "idx_field_parent_id"
     t.index ["table_id", "name"], name: "idx_uniq_field_table_id_parent_id_name_2col", unique: true, where: "(parent_id IS NULL)"
+    t.index ["table_id", "parent_id", "name"], name: "idx_uniq_field_table_id_parent_id_name", unique: true
     t.index ["table_id"], name: "idx_field_table_id"
-    t.unique_constraint ["table_id", "parent_id", "name"], name: "idx_uniq_field_table_id_parent_id_name"
   end
 
   create_table "metabase_fieldvalues", id: :integer, default: nil, force: :cascade do |t|
@@ -542,10 +538,10 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.timestamptz "updated_at", null: false
     t.string "visibility_type", limit: 254
     t.index ["db_id", "name"], name: "idx_uniq_table_db_id_schema_name_2col", unique: true, where: "(schema IS NULL)"
+    t.index ["db_id", "schema", "name"], name: "idx_uniq_table_db_id_schema_name", unique: true
     t.index ["db_id", "schema"], name: "idx_metabase_table_db_id_schema"
     t.index ["db_id"], name: "idx_table_db_id"
     t.index ["show_in_getting_started"], name: "idx_metabase_table_show_in_getting_started"
-    t.unique_constraint ["db_id", "schema", "name"], name: "idx_uniq_table_db_id_schema_name"
   end
 
   create_table "metric", id: :integer, default: nil, force: :cascade do |t|
@@ -563,17 +559,17 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.integer "table_id", null: false
     t.timestamptz "updated_at", null: false
     t.index ["creator_id"], name: "idx_metric_creator_id"
+    t.index ["entity_id"], name: "metric_entity_id_key", unique: true
     t.index ["show_in_getting_started"], name: "idx_metric_show_in_getting_started"
     t.index ["table_id"], name: "idx_metric_table_id"
-    t.unique_constraint ["entity_id"], name: "metric_entity_id_key"
   end
 
   create_table "metric_important_field", id: :integer, default: nil, force: :cascade do |t|
     t.integer "field_id", null: false
     t.integer "metric_id", null: false
     t.index ["field_id"], name: "idx_metric_important_field_field_id"
+    t.index ["metric_id", "field_id"], name: "unique_metric_important_field_metric_id_field_id", unique: true
     t.index ["metric_id"], name: "idx_metric_important_field_metric_id"
-    t.unique_constraint ["metric_id", "field_id"], name: "unique_metric_important_field_metric_id_field_id"
   end
 
   create_table "model_index", id: :integer, default: nil, comment: "Used to keep track of which models have indexed columns.", force: :cascade do |t|
@@ -593,8 +589,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.integer "model_index_id", comment: "The ID of the indexed model."
     t.integer "model_pk", null: false, comment: "The primary key of the indexed value"
     t.text "name", null: false, comment: "The label to display identifying the indexed value."
-
-    t.unique_constraint ["model_index_id", "model_pk"], name: "unique_model_index_value_model_index_id_model_pk"
+    t.index ["model_index_id", "model_pk"], name: "unique_model_index_value_model_index_id_model_pk", unique: true
   end
 
   create_table "moderation_review", id: :integer, default: nil, comment: "Reviews (from moderators) for a given question/dashboard (BUCM)", force: :cascade do |t|
@@ -628,9 +623,9 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.string "name", limit: 254, null: false, comment: "Name of the query snippet"
     t.timestamptz "updated_at", default: -> { "now()" }, null: false
     t.index ["collection_id"], name: "idx_snippet_collection_id"
+    t.index ["entity_id"], name: "native_query_snippet_entity_id_key", unique: true
     t.index ["name"], name: "idx_snippet_name"
-    t.unique_constraint ["entity_id"], name: "native_query_snippet_entity_id_key"
-    t.unique_constraint ["name"], name: "native_query_snippet_name_key"
+    t.index ["name"], name: "native_query_snippet_name_key", unique: true
   end
 
   create_table "oauth_access_grants", force: :cascade do |t|
@@ -1002,9 +997,9 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.string "parameterized_object_type", limit: 32, null: false, comment: "Type of the entity consuming the values (dashboard, card, etc.)"
     t.timestamptz "updated_at", default: -> { "now()" }, null: false, comment: "most recent modification time"
     t.index ["card_id"], name: "idx_parameter_card_card_id"
+    t.index ["entity_id"], name: "parameter_card_entity_id_key", unique: true
+    t.index ["parameterized_object_id", "parameterized_object_type", "parameter_id"], name: "unique_parameterized_object_card_parameter", unique: true
     t.index ["parameterized_object_id"], name: "idx_parameter_card_parameterized_object_id"
-    t.unique_constraint ["entity_id"], name: "parameter_card_entity_id_key"
-    t.unique_constraint ["parameterized_object_id", "parameterized_object_type", "parameter_id"], name: "unique_parameterized_object_card_parameter"
   end
 
   create_table "parsed_users", force: :cascade do |t|
@@ -1035,15 +1030,15 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.integer "group_id", null: false
     t.string "object", limit: 254, null: false
     t.index ["group_id", "object"], name: "idx_permissions_group_id_object"
+    t.index ["group_id", "object"], name: "permissions_group_id_object_key", unique: true
     t.index ["group_id"], name: "idx_permissions_group_id"
     t.index ["object"], name: "idx_permissions_object"
-    t.unique_constraint ["group_id", "object"], name: "permissions_group_id_object_key"
   end
 
   create_table "permissions_group", id: :integer, default: nil, force: :cascade do |t|
     t.string "name", limit: 255, null: false
     t.index ["name"], name: "idx_permissions_group_name"
-    t.unique_constraint ["name"], name: "unique_permissions_group_name"
+    t.index ["name"], name: "unique_permissions_group_name", unique: true
   end
 
   create_table "permissions_group_membership", id: :integer, default: nil, force: :cascade do |t|
@@ -1052,8 +1047,8 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.integer "user_id", null: false
     t.index ["group_id", "user_id"], name: "idx_permissions_group_membership_group_id_user_id"
     t.index ["group_id"], name: "idx_permissions_group_membership_group_id"
+    t.index ["user_id", "group_id"], name: "unique_permissions_group_membership_user_id_group_id", unique: true
     t.index ["user_id"], name: "idx_permissions_group_membership_user_id"
-    t.unique_constraint ["user_id", "group_id"], name: "unique_permissions_group_membership_user_id_group_id"
   end
 
   create_table "permissions_revision", id: :integer, default: nil, comment: "Used to keep track of changes made to permissions.", force: :cascade do |t|
@@ -1079,8 +1074,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.text "state", null: false, comment: "Persisted table state (creating, persisted, refreshing, deleted)"
     t.timestamptz "state_change_at", comment: "The timestamp of when the most recent state changed"
     t.text "table_name", null: false, comment: "Name of the table persisted"
-
-    t.unique_constraint ["card_id"], name: "persisted_info_card_id_key"
+    t.index ["card_id"], name: "persisted_info_card_id_key", unique: true
   end
 
   create_table "phone_rates", force: :cascade do |t|
@@ -1108,7 +1102,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.timestamptz "updated_at", null: false
     t.index ["collection_id"], name: "idx_pulse_collection_id"
     t.index ["creator_id"], name: "idx_pulse_creator_id"
-    t.unique_constraint ["entity_id"], name: "pulse_entity_id_key"
+    t.index ["entity_id"], name: "pulse_entity_id_key", unique: true
   end
 
   create_table "pulse_card", id: :integer, default: nil, force: :cascade do |t|
@@ -1120,8 +1114,8 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.integer "position", null: false
     t.integer "pulse_id", null: false
     t.index ["card_id"], name: "idx_pulse_card_card_id"
+    t.index ["entity_id"], name: "pulse_card_entity_id_key", unique: true
     t.index ["pulse_id"], name: "idx_pulse_card_pulse_id"
-    t.unique_constraint ["entity_id"], name: "pulse_card_entity_id_key"
   end
 
   create_table "pulse_channel", id: :integer, default: nil, force: :cascade do |t|
@@ -1136,9 +1130,9 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.integer "schedule_hour"
     t.string "schedule_type", limit: 32, null: false
     t.timestamptz "updated_at", null: false
+    t.index ["entity_id"], name: "pulse_channel_entity_id_key", unique: true
     t.index ["pulse_id"], name: "idx_pulse_channel_pulse_id"
     t.index ["schedule_type"], name: "idx_pulse_channel_schedule_type"
-    t.unique_constraint ["entity_id"], name: "pulse_channel_entity_id_key"
   end
 
   create_table "pulse_channel_recipient", id: :integer, default: nil, force: :cascade do |t|
@@ -1344,9 +1338,9 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.text "visualization_settings", null: false
     t.index ["collection_id"], name: "idx_card_collection_id"
     t.index ["creator_id"], name: "idx_card_creator_id"
+    t.index ["entity_id"], name: "report_card_entity_id_key", unique: true
     t.index ["public_uuid"], name: "idx_card_public_uuid"
-    t.unique_constraint ["entity_id"], name: "report_card_entity_id_key"
-    t.unique_constraint ["public_uuid"], name: "report_card_public_uuid_key"
+    t.index ["public_uuid"], name: "report_card_public_uuid_key", unique: true
   end
 
   create_table "report_cardfavorite", id: :integer, default: nil, force: :cascade do |t|
@@ -1354,9 +1348,9 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.timestamptz "created_at", null: false
     t.integer "owner_id", null: false
     t.timestamptz "updated_at", null: false
+    t.index ["card_id", "owner_id"], name: "idx_unique_cardfavorite_card_id_owner_id", unique: true
     t.index ["card_id"], name: "idx_cardfavorite_card_id"
     t.index ["owner_id"], name: "idx_cardfavorite_owner_id"
-    t.unique_constraint ["card_id", "owner_id"], name: "idx_unique_cardfavorite_card_id_owner_id"
   end
 
   create_table "report_dashboard", id: :integer, default: nil, force: :cascade do |t|
@@ -1382,10 +1376,10 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.timestamptz "updated_at", null: false
     t.index ["collection_id"], name: "idx_dashboard_collection_id"
     t.index ["creator_id"], name: "idx_dashboard_creator_id"
+    t.index ["entity_id"], name: "report_dashboard_entity_id_key", unique: true
     t.index ["public_uuid"], name: "idx_dashboard_public_uuid"
+    t.index ["public_uuid"], name: "report_dashboard_public_uuid_key", unique: true
     t.index ["show_in_getting_started"], name: "idx_report_dashboard_show_in_getting_started"
-    t.unique_constraint ["entity_id"], name: "report_dashboard_entity_id_key"
-    t.unique_constraint ["public_uuid"], name: "report_dashboard_public_uuid_key"
   end
 
   create_table "report_dashboardcard", id: :integer, default: nil, force: :cascade do |t|
@@ -1404,7 +1398,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.text "visualization_settings", null: false
     t.index ["card_id"], name: "idx_dashboardcard_card_id"
     t.index ["dashboard_id"], name: "idx_dashboardcard_dashboard_id"
-    t.unique_constraint ["entity_id"], name: "report_dashboardcard_entity_id_key"
+    t.index ["entity_id"], name: "report_dashboardcard_entity_id_key", unique: true
   end
 
   create_table "requests", force: :cascade do |t|
@@ -1490,7 +1484,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.integer "permission_id", comment: "The ID of the corresponding permissions path for this sandbox"
     t.integer "table_id", null: false, comment: "ID of the Table that should get automatically replaced as query source for the Permissions Group."
     t.index ["table_id", "group_id"], name: "idx_gtap_table_id_group_id"
-    t.unique_constraint ["table_id", "group_id"], name: "unique_gtap_table_id_group_id"
+    t.index ["table_id", "group_id"], name: "unique_gtap_table_id_group_id", unique: true
   end
 
   create_table "secret", primary_key: ["id", "version"], comment: "Storage for managed secrets (passwords, binary data, etc.)", force: :cascade do |t|
@@ -1519,9 +1513,9 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.integer "table_id", null: false
     t.timestamptz "updated_at", null: false
     t.index ["creator_id"], name: "idx_segment_creator_id"
+    t.index ["entity_id"], name: "segment_entity_id_key", unique: true
     t.index ["show_in_getting_started"], name: "idx_segment_show_in_getting_started"
     t.index ["table_id"], name: "idx_segment_table_id"
-    t.unique_constraint ["entity_id"], name: "segment_entity_id_key"
   end
 
   create_table "setting", primary_key: "key", id: { type: :string, limit: 254 }, force: :cascade do |t|
@@ -1590,7 +1584,7 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
     t.string "name", limit: 255, null: false, comment: "Name of the timeline"
     t.timestamptz "updated_at", default: -> { "now()" }, null: false, comment: "The timestamp of when the timeline was updated"
     t.index ["collection_id"], name: "idx_timeline_collection_id"
-    t.unique_constraint ["entity_id"], name: "timeline_entity_id_key"
+    t.index ["entity_id"], name: "timeline_entity_id_key", unique: true
   end
 
   create_table "timeline_event", id: :integer, default: nil, comment: "Events table", force: :cascade do |t|
@@ -1825,11 +1819,11 @@ ActiveRecord::Schema[7.1].define(version: 2023_10_09_133000) do
   add_foreign_key "pulse_channel", "pulse", name: "fk_pulse_channel_ref_pulse_id", on_delete: :cascade
   add_foreign_key "pulse_channel_recipient", "core_user", column: "user_id", name: "fk_pulse_channel_recipient_ref_user_id", on_delete: :cascade
   add_foreign_key "pulse_channel_recipient", "pulse_channel", name: "fk_pulse_channel_recipient_ref_pulse_channel_id", on_delete: :cascade
-  add_foreign_key "qrtz_blob_triggers", "qrtz_triggers", column: ["sched_name", "trigger_name", "trigger_group"], primary_key: ["sched_name", "trigger_name", "trigger_group"], name: "fk_qrtz_blob_triggers_triggers"
-  add_foreign_key "qrtz_cron_triggers", "qrtz_triggers", column: ["sched_name", "trigger_name", "trigger_group"], primary_key: ["sched_name", "trigger_name", "trigger_group"], name: "fk_qrtz_cron_triggers_triggers"
-  add_foreign_key "qrtz_simple_triggers", "qrtz_triggers", column: ["sched_name", "trigger_name", "trigger_group"], primary_key: ["sched_name", "trigger_name", "trigger_group"], name: "fk_qrtz_simple_triggers_triggers"
-  add_foreign_key "qrtz_simprop_triggers", "qrtz_triggers", column: ["sched_name", "trigger_name", "trigger_group"], primary_key: ["sched_name", "trigger_name", "trigger_group"], name: "fk_qrtz_simprop_triggers_triggers"
-  add_foreign_key "qrtz_triggers", "qrtz_job_details", column: ["sched_name", "job_name", "job_group"], primary_key: ["sched_name", "job_name", "job_group"], name: "fk_qrtz_triggers_job_details"
+  add_foreign_key "qrtz_blob_triggers", "qrtz_triggers", column: "sched_name", primary_key: "sched_name", name: "fk_qrtz_blob_triggers_triggers"
+  add_foreign_key "qrtz_cron_triggers", "qrtz_triggers", column: "sched_name", primary_key: "sched_name", name: "fk_qrtz_cron_triggers_triggers"
+  add_foreign_key "qrtz_simple_triggers", "qrtz_triggers", column: "sched_name", primary_key: "sched_name", name: "fk_qrtz_simple_triggers_triggers"
+  add_foreign_key "qrtz_simprop_triggers", "qrtz_triggers", column: "sched_name", primary_key: "sched_name", name: "fk_qrtz_simprop_triggers_triggers"
+  add_foreign_key "qrtz_triggers", "qrtz_job_details", column: "sched_name", primary_key: "sched_name", name: "fk_qrtz_triggers_job_details"
   add_foreign_key "query_action", "action", name: "fk_query_action_ref_action_id", on_delete: :cascade
   add_foreign_key "query_action", "metabase_database", column: "database_id", name: "fk_query_action_database_id", on_delete: :cascade
   add_foreign_key "report_card", "collection", name: "fk_card_collection_id", on_delete: :nullify

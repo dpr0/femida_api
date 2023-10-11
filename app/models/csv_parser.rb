@@ -18,6 +18,7 @@
 #  passport                   :integer
 #  phone                      :integer
 #  rows                       :integer
+#  score_uuid                 :string
 #  separator                  :string
 #  status                     :integer          default(0)
 #  external_id                :integer

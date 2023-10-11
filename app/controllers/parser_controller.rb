@@ -5,8 +5,8 @@ class ParserController < ApplicationController
   before_action :authenticate_user!
   before_action :is_admin?
   before_action :is_parser?, except: %i[index show edit create update download add_score]
-
-  FIELDS = %w[external_id phone passport last_name first_name middle_name birth_date is_phone_verified? is_passport_verified? is_card_verified? phone_score].freeze
+  before_action :load_csv_parser, only: %i[show edit]
+  before_action :new_score_service, only: %i[score_download score_retry score_destroy]
 
   def index
     @csv_parsers = CsvParser.all.order(id: :desc)
@@ -14,14 +14,13 @@ class ParserController < ApplicationController
   end
 
   def show
-    @csv_parser = CsvParser.find_by(file_id: params[:id])
     @csv_parser_logs = @csv_parser.csv_parser_logs.order(id: :desc)
     @csv_users = @csv_parser.csv_users
+    @score = ScoreService.new(params['id']).check if @csv_parser.score_uuid.present?
   end
 
   def edit
     @csv_user = CsvUser.new
-    @csv_parser = CsvParser.find_by(file_id: params[:id])
     @headers = @csv_parser.headers.split(@csv_parser.separator)
   end
 
@@ -90,11 +89,11 @@ class ParserController < ApplicationController
     array += [CsvParserSolarPasspJob, CsvParserInnJob]                     if params[:check2] == '1'
     array += [CsvParserCardJob]                                            if params[:check3] == '1'
     array += [CsvParserOkbJob]                                             if params[:check4] == '1'
-    array += []                                                            if params[:check5] == '1'
+    array += [CsvParserScoreJob]                                           if params[:check5] == '1'
     check(array)
   end
 
-  def add_score
+  def add_score # TODO remove after score_download
     id = 68
     file = ActiveStorage::Attachment.find_by(id: id)
     hash = {}
@@ -115,25 +114,21 @@ class ParserController < ApplicationController
   end
 
   def download
-    scope = CsvUser.where(file_id: params[:parser_id])
-    if params[:format] == 'xlsx'
-      name = ActiveStorage::Blob.find(params[:parser_id])
-      workbook = ::FastExcel.open
-      worksheet = workbook.add_worksheet(name.filename.to_s)
-      bold = workbook.bold_format
-      headers = FIELDS
-      headers.each_index { |i| worksheet.set_column_width(i, 15) }
-      worksheet.append_row(headers, bold)
-      scope.all.each { |d| worksheet.append_row(d.slice(*FIELDS).values) }
-      workbook.close
-      send_data(workbook.read_string, filename: "#{name.filename}_test_#{scope.count}.xlsx")
-    elsif params[:format] == 'csv'
-      data = CSV.generate do |csv|
-        csv << FIELDS
-        scope.each { |d| csv << d.slice(*FIELDS).values }
-      end
-      send_data(data, filename: "#{ActiveStorage::Blob.find(params[:parser_id]).filename}-#{Time.now.to_i}.csv", type: 'text/csv')
-    end
+    service = ParserDownloadService.new(params[:parser_id])
+    send_data(service.send(params[:format]), filename: service.send("#{params[:format]}_filename"))
+  end
+
+  def score_download
+    @service.download
+    # TODO add_score
+  end
+
+  def score_retry
+    @service.retry
+  end
+
+  def score_destroy
+    @service.destroy
   end
 
   private
@@ -149,5 +144,13 @@ class ParserController < ApplicationController
 
   def index_by(key)
     @headers.find_index(params[key])
+  end
+
+  def load_csv_parser
+    @csv_parser = CsvParser.find_by(file_id: params[:id])
+  end
+
+  def new_score_service
+    @service = ScoreService.new(params['id'])
   end
 end

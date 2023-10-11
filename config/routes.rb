@@ -27,6 +27,9 @@ Rails.application.routes.draw do
     post :add_score
     post :start
     get :download
+    get :score_download
+    get :score_retry
+    get :score_destroy
   end
 
   namespace :api do
