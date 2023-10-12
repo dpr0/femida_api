@@ -5,8 +5,6 @@ require_relative "config/application"
 
 Rails.application.load_tasks
 
-task "db:schema:dump": "strong_migrations:alphabetize_columns"
-
 task :faster_migrations do
   ActiveRecord::Base.dump_schema_after_migration = Rails.env.development? &&
     `git status db/migrate/ --porcelain`.present?

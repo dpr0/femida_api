@@ -18,15 +18,14 @@
 #  passport                   :integer
 #  phone                      :integer
 #  rows                       :integer
-#  score_uuid                 :string
 #  separator                  :string
 #  status                     :integer          default(0)
 #  external_id                :integer
 #  file_id                    :integer
 #
 class CsvParser < ApplicationRecord
-  has_many :csv_users,       foreign_key: :file_id,       primary_key: :file_id
-  has_many :csv_parser_logs, foreign_key: :csv_parser_id, primary_key: :file_id
+  has_many :csv_users,          foreign_key: :file_id,       primary_key: :file_id
+  has_many :csv_parser_logs,    foreign_key: :csv_parser_id, primary_key: :file_id
 
   STATUSES = [
     'Загружен',

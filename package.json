@@ -4,8 +4,8 @@
   "dependencies": {
     "@hotwired/stimulus": "^3.2.2",
     "@hotwired/turbo-rails": "^7.3.0",
-    "@rails/actioncable": "^7.1.0",
-    "@rails/activestorage": "^7.1.0",
+    "@rails/actioncable": "^7.1.1",
+    "@rails/activestorage": "^7.1.1",
     "@rails/request.js": "^0.0.9",
     "autoprefixer": "^10.4.16",
     "bulma": "^0.9.4",
@@ -16,7 +16,7 @@
     "postcss-cli": "^10.1.0",
     "postcss-import": "^15.1.0",
     "postcss-nesting": "^12.0.1",
-    "sass": "^1.69.2"
+    "sass": "^1.69.3"
   },
   "devDependencies": {
     "standard": "^17.1.0"

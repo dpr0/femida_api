@@ -31,7 +31,6 @@ gem 'sidekiq'
 gem 'slim-rails'
 gem 'sprockets-rails'
 gem 'stimulus-rails'
-gem 'strong_migrations'
 gem 'sucker_punch'
 gem 'turbo-rails'
 gem 'whenever', require: false

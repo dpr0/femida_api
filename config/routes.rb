@@ -17,19 +17,8 @@ Rails.application.routes.draw do
   resources :users
   resources :files
   resources :parser do
-    post :solar_phone_check
-    post :solar_passp_check
-    post :inn_check
-    post :cards_check
-    post :user_check
-    post :db_okb_check
-    post :okb_check
-    post :add_score
     post :start
     get :download
-    get :score_download
-    get :score_retry
-    get :score_destroy
   end
 
   namespace :api do

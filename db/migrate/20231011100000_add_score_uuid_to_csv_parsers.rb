@@ -2,6 +2,9 @@
 
 class AddScoreUuidToCsvParsers < ActiveRecord::Migration[7.0]
   def change
-    add_column :csv_parsers, :score_uuid, :string
+    # remove_column :csv_users, :phone_score_source
+    # remove_column :csv_users, :is_passport_verified_source
+    # remove_column :csv_users, :is_phone_verified_source
+    # remove_column :csv_users, :is_card_verified_source
   end
 end
