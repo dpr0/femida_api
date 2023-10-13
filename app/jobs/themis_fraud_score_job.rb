@@ -23,8 +23,11 @@ class ThemisFraudScoreJob < ApplicationJob
 
   def score(phone, version: 2)
     resp = RestClient.get("#{ENV['THEMIS_FRAUD_API_HOST']}/models/fraud/v#{version}/7#{phone}")
-    JSON.parse(resp.body)['score']
-  rescue StandardError
+    json = JSON.parse(resp.body)
+    Rails.logger.info("============== phone #{phone} : #{json}")
+    json['score']
+  rescue StandardError => e
+    Rails.logger.error("============== phone #{phone} score error: #{e}")
     nil
   end
 end
