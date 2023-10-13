@@ -1,0 +1,366 @@
+Layout/BeginEndAlignment:
+  Exclude:
+    - 'app/controllers/api/femida/egrul_controller.rb'
+    - 'app/services/arbitr_service.rb'
+    - 'app/services/debtors_service.rb'
+    - 'app/services/fsin_service.rb'
+
+Layout/CaseIndentation:
+  Exclude:
+    - 'app/controllers/api/femida/opendata_controller.rb'
+
+Layout/CommentIndentation:
+  Exclude:
+    - 'app/controllers/api/femida/parser_controller.rb'
+
+Layout/ElseAlignment:
+  Exclude:
+    - 'app/services/okb_service.rb'
+    - 'app/services/parser_service.rb'
+
+Layout/EmptyLineAfterGuardClause:
+  Exclude:
+    - 'app/controllers/api/femida/parser_controller.rb'
+    - 'bin/bundle'
+    - 'spec/system/support/better_rails_system_specs.rb'
+    - 'spec/system/support/capybara_setup.rb'
+
+Layout/EndAlignment:
+  Exclude:
+    - 'app/controllers/api/femida/opendata_controller.rb'
+    - 'app/services/okb_service.rb'
+    - 'app/services/parser_service.rb'
+
+Layout/ExtraSpacing:
+  Exclude:
+    - 'app/controllers/api/femida/esia_controller.rb'
+    - 'app/controllers/api/femida/opendata_controller.rb'
+    - 'config/deploy.rb'
+    - 'db/migrate/20201117110351_create_doorkeeper_tables.rb'
+
+Layout/FirstArgumentIndentation:
+  Exclude:
+    - 'app/controllers/api/femida/esia_controller.rb'
+
+Layout/FirstHashElementIndentation:
+  Exclude:
+    - 'config/deploy.rb'
+
+Layout/HashAlignment:
+  Exclude:
+    - 'app/controllers/api/femida/bonalog_controller.rb'
+    - 'app/controllers/api/femida/fedsfm_controller.rb'
+    - 'app/controllers/api/femida/fssp_wanted_controller.rb'
+    - 'app/controllers/api/femida/opendata_controller.rb'
+    - 'app/controllers/api/femida/parser_controller.rb'
+    - 'app/controllers/parser_controller.rb'
+    - 'app/jobs/csv_parser_parse_job.rb'
+    - 'app/services/okb_service.rb'
+    - 'config/environments/development.rb'
+    - 'config/environments/production.rb'
+
+Layout/IndentationWidth:
+  Exclude:
+    - 'app/controllers/api/femida/parser_controller.rb'
+    - 'app/services/okb_service.rb'
+    - 'app/services/parser_service.rb'
+
+Layout/MultilineMethodCallIndentation:
+  Exclude:
+    - 'app/controllers/api/femida/parser_controller.rb'
+
+Layout/MultilineOperationIndentation:
+  Exclude:
+    - 'Rakefile'
+    - 'bin/bundle'
+
+Layout/RescueEnsureAlignment:
+  Exclude:
+    - 'app/controllers/api/femida/egrul_controller.rb'
+    - 'app/controllers/api/femida/nalog_controller.rb'
+    - 'app/services/arbitr_service.rb'
+    - 'app/services/debtors_service.rb'
+    - 'app/services/fsin_service.rb'
+
+Layout/SpaceAfterComma:
+  Exclude:
+    - 'app/models/parsing_structure.rb'
+    - 'config/routes.rb'
+
+Layout/SpaceAroundOperators:
+  Exclude:
+    - 'app/controllers/api/femida/esia_controller.rb'
+    - 'app/controllers/api/femida/opendata_controller.rb'
+    - 'app/services/inn_service.rb'
+
+Layout/SpaceInsideBlockBraces:
+  Exclude:
+    - 'app/models/parsing_structure.rb'
+
+Layout/SpaceInsideHashLiteralBraces:
+  Exclude:
+    - 'config/initializers/asset_url_processor.rb'
+    - 'spec/system/support/cuprite_setup.rb'
+
+Layout/SpaceInsideReferenceBrackets:
+  Exclude:
+    - 'app/services/okb_service.rb'
+
+Layout/SpaceInsideStringInterpolation:
+  Exclude:
+    - 'app/controllers/api/femida/parser_controller.rb'
+
+Layout/TrailingEmptyLines:
+  Exclude:
+    - 'app/controllers/api/femida/driver_controller.rb'
+    - 'config/initializers/sidekiq.rb'
+
+Lint/EmptyConditionalBody:
+  Exclude:
+    - 'app/controllers/api/femida/opendata_controller.rb'
+
+Lint/RescueException:
+  Exclude:
+    - 'app/controllers/api/femida/debtors_controller.rb'
+    - 'app/controllers/api/femida/esia_controller.rb'
+    - 'app/services/arbitr_service.rb'
+
+Lint/ShadowingOuterLocalVariable:
+  Exclude:
+    - 'app/controllers/api/femida/nalog_controller.rb'
+
+Lint/SuppressedException:
+  Exclude:
+    - 'app/controllers/api/femida/nalog_controller.rb'
+
+Lint/UnusedBlockArgument:
+  Exclude:
+    - 'app/controllers/api/femida/parser_controller.rb'
+    - 'app/services/arbitr_service.rb'
+    - 'config/initializers/sentry.rb'
+
+Lint/UselessAssignment:
+  Exclude:
+    - 'app/controllers/api/femida/driver_controller.rb'
+    - 'app/controllers/api/femida/egrul_controller.rb'
+    - 'app/controllers/application_controller.rb'
+    - 'app/services/arbitr_service.rb'
+
+Metrics/AbcSize:
+  Max: 89
+
+Metrics/BlockLength:
+  Max: 1706
+
+Metrics/ClassLength:
+  Max: 267
+
+Metrics/CyclomaticComplexity:
+  Max: 55
+
+Metrics/MethodLength:
+  Max: 68
+
+Metrics/ParameterLists:
+  Max: 6
+
+Metrics/PerceivedComplexity:
+  Max: 22
+
+Naming/AccessorMethodName:
+  Exclude:
+    - 'app/controllers/api/femida/esia_controller.rb'
+    - 'app/models/parsing_structure.rb'
+
+Naming/MethodParameterName:
+  Exclude:
+    - 'app/controllers/api/femida/nalog_controller.rb'
+    - 'app/controllers/api/femida/parser_controller.rb'
+    - 'app/services/parser_service.rb'
+
+Naming/PredicateName:
+  Exclude:
+    - 'spec/**/*'
+    - 'app/controllers/application_controller.rb'
+
+Naming/VariableNumber:
+  Exclude:
+    - 'db/migrate/20230313000000_create_opendata_fsrar.rb'
+    - 'db/migrate/20230630040000_create_turbozaim_users.rb'
+    - 'db/migrate/20230818130000_add_fields_to_turbozaim_users.rb'
+    - 'db/migrate/20230821170000_create_sample02.rb'
+    - 'db/migrate/20230821180000_add_fields_to_sample2.rb'
+    - 'db/migrate/20230821190000_create_sample01.rb'
+    - 'db/migrate/20230824080000_add_info_to_sample2.rb'
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Style/ColonMethodCall:
+  Exclude:
+    - 'app/services/fsin_service.rb'
+
+Style/CommentAnnotation:
+  Exclude:
+    - 'app/jobs/csv_parser_solar_passp_job.rb'
+
+Style/CommentedKeyword:
+  Exclude:
+    - 'app/jobs/application_job.rb'
+
+Style/Documentation:
+  Enabled: false
+
+Style/EmptyMethod:
+  Exclude:
+    - 'app/workers/parser_worker.rb'
+
+Style/ExpandPathArguments:
+  Exclude:
+    - 'bin/bundle'
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/GuardClause:
+  Exclude:
+    - 'app/jobs/themis_fraud_score_job.rb'
+    - 'app/services/parser_service.rb'
+
+Style/IfUnlessModifier:
+  Exclude:
+    - 'app/controllers/api/femida/parser_controller.rb'
+    - 'app/models/parsing_structure.rb'
+    - 'bin/bundle'
+    - 'lib/tasks/app.rake'
+
+Style/Lambda:
+  Exclude:
+    - 'config/routes.rb'
+
+Style/LambdaCall:
+  Exclude:
+    - 'app/controllers/parser_controller.rb'
+
+Style/MultilineIfModifier:
+  Exclude:
+    - 'app/controllers/api/femida/parser_controller.rb'
+    - 'config/initializers/rails_performance.rb'
+
+Style/Next:
+  Exclude:
+    - 'app/controllers/api/femida/opendata_controller.rb'
+    - 'app/controllers/api/femida/parser_controller.rb'
+    - 'app/jobs/csv_parser_solar_passp_job.rb'
+
+Style/NumericLiterals:
+  Exclude:
+    - 'app/controllers/api/femida/parser_controller.rb'
+    - 'app/models/request.rb'
+    - 'db/schema.rb'
+
+Style/NumericPredicate:
+  Exclude:
+    - 'spec/**/*'
+    - 'app/controllers/api/femida/opendata_controller.rb'
+    - 'app/controllers/api/femida/parser_controller.rb'
+    - 'app/jobs/csv_parser_solar_passp_job.rb'
+    - 'app/services/parser_service.rb'
+
+Style/OptionalBooleanParameter:
+  Exclude:
+    - 'app/jobs/themis_fraud_score_job.rb'
+
+Style/ParallelAssignment:
+  Exclude:
+    - 'spec/system/support/better_rails_system_specs.rb'
+
+Style/PercentLiteralDelimiters:
+  Exclude:
+    - 'config/deploy/production.rb'
+    - 'config/deploy/staging.rb'
+
+Style/PerlBackrefs:
+  Exclude:
+    - 'bin/bundle'
+    - 'config/initializers/asset_url_processor.rb'
+
+Style/Proc:
+  Exclude:
+    - 'config/initializers/apipie.rb'
+
+Style/RedundantCondition:
+  Exclude:
+    - 'app/controllers/api/femida/nalog_controller.rb'
+
+Style/RedundantFreeze:
+  Exclude:
+    - 'app/controllers/api/femida/egrul_controller.rb'
+
+Style/RedundantReturn:
+  Exclude:
+    - 'app/models/parsing_structure.rb'
+
+Style/RescueStandardError:
+  Exclude:
+    - 'app/controllers/api/femida/parser_controller.rb'
+    - 'app/services/arbitr_service.rb'
+    - 'app/services/debtors_service.rb'
+    - 'app/services/fsin_service.rb'
+    - 'app/services/inn_service.rb'
+    - 'app/services/person_service.rb'
+
+Style/SafeNavigation:
+  Exclude:
+    - 'app/models/parsing_structure.rb'
+
+Style/SingleLineMethods:
+  Exclude:
+    - 'app/controllers/api/femida/esia_controller.rb'
+
+Style/SlicingWithRange:
+  Exclude:
+    - 'app/services/parser_service.rb'
+
+Style/SpecialGlobalVars:
+  EnforcedStyle: use_perl_names
+
+Style/StringConcatenation:
+  Exclude:
+    - 'app/controllers/api/femida/fssp_controller.rb'
+    - 'app/controllers/api/femida/opendata_controller.rb'
+    - 'app/services/okb_service.rb'
+
+Style/StringLiterals:
+  Enabled: false
+
+Style/StringLiteralsInInterpolation:
+  Exclude:
+    - 'app/controllers/api/femida/parser_controller.rb'
+    - 'spec/system/support/capybara_setup.rb'
+
+Style/SymbolArray:
+  EnforcedStyle: percent
+  MinSize: 10
+
+Style/SymbolProc:
+  Exclude:
+    - 'app/controllers/files_controller.rb'
+
+Style/TrailingCommaInArrayLiteral:
+  Exclude:
+
+Style/TrailingCommaInHashLiteral:
+  Exclude:
+    - 'app/controllers/api/femida/opendata_controller.rb'
+
+Style/WordArray:
+  EnforcedStyle: percent
+  MinSize: 13
+
+Style/ZeroLengthPredicate:
+  Exclude:
+    - 'app/controllers/api/femida/opendata_controller.rb'
+
+Layout/LineLength:
+  Max: 301

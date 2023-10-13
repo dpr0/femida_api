@@ -18,9 +18,6 @@ class Api::Femida::DriverController < ApplicationController
   end
 end
 
-
-# 6Ld33nEUAAAAAOwr4DVWNT5k0dnCBZCI8INqXIJ_
-
 # curl 'https://kbm-rsa.info/' \
 #   -H 'authority: kbm-rsa.info' \
 #   -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9' \
@@ -40,4 +37,3 @@ end
 #   -H 'upgrade-insecure-requests: 1' \
 #   -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36' \
 #   --data-raw 'lastname=%D0%90%D0%B1%D1%83%D0%BB%D0%BE%D0%B2&firstname=%D0%A5%D0%B0%D0%BA%D0%B0%D0%BD&middlename=%D0%93%D0%B0%D0%B4%D0%B6%D0%B8%D0%B0%D1%85%D0%BC%D0%B5%D0%B4+%D0%BE%D0%B3%D0%BB%D1%8B&birthday=05.04.1999&driverlicense_s=9902&driverlicense_n=355888&action='
-

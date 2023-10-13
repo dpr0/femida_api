@@ -11,7 +11,6 @@
 # Indexes
 #
 #  expired_passports_passp_series_index  (passp_series)
-#
-class ExpiredPassport < ApplicationRecord
 
+class ExpiredPassport < ApplicationRecord
 end

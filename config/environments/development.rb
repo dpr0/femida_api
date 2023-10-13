@@ -54,7 +54,6 @@ Rails.application.configure do
     enable_starttls_auto: true
   }
 
-
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 

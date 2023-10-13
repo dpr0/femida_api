@@ -8,7 +8,6 @@ class Api::Femida::InnController < ApplicationController
     with_error_handling { InnService.call(params) }
   end
 
-
   api :GET, '/inn/:inn', 'Проверка ИНН)'
   def show
     with_error_handling { InnService.get_inn(params[:id]) }

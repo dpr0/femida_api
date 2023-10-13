@@ -1,5 +1,4 @@
 class ParsingStructure
-
   def initialize(structure)
     @structure = structure
 

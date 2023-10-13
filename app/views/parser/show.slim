@@ -70,20 +70,28 @@ section.hero.is-lower-alpha
                         th Карта
                         th Начало
                         th Продолж.
+                        th Статус
                       tbody
                         - @csv_parser_logs.each do |log|
                           tr
-                            - min = Time.at(log.updated_at - log.created_at).to_i / 60
+                            - sec = Time.at(log.updated_at - log.created_at).to_i
+                            - min = sec / 60
                             td = log.info.sub('csv_parser_', '')
                             td = log.is_phone_verified_count
                             td = log.is_passport_verified_count
                             td = log.is_card_verified_count
                             td = log.created_at.in_time_zone('Moscow').strftime('%d.%m.%Y %H:%M')
                             td = min >= 60 ? "#{min / 60}ч #{min % 60}мин" : "#{min}мин"
+                            td
+                              - if sec > 1
+                                i.fa.fa-check
+                              - else
+                                i.fa.fa-spinner
                         tr
                           th Всего:
                           th = @csv_users.count(&:is_phone_verified?)
                           th = @csv_users.count(&:is_passport_verified?)
                           th = @csv_users.count(&:is_card_verified?)
+                          th =
                           th =
                           th =
