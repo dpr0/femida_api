@@ -7,9 +7,7 @@ class CsvParserScoreJob < ApplicationJob
     log.save(validate: false)
     @users = @parser.csv_users.where(phone_score: nil).order(id: :asc)
     @users.each do |user|
-      ThemisFraudScoreJob.perform_async(
-        user.id, user.phone, log_id: log.id, try: 3, last_user: @users.last.id == user.id
-      )
+      ThemisFraudScoreJob.perform_async(user.id, user.phone, log.id, 3, @users.last.id == user.id)
     end
   end
 end
