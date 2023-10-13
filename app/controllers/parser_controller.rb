@@ -4,7 +4,7 @@ class ParserController < ApplicationController
   protect_from_forgery with: :null_session
   before_action :authenticate_user!
   before_action :is_admin?
-  before_action :is_parser?, except: %i[index show edit create update download]
+  before_action :is_parser?, only: :start
   before_action :load_csv_parser, only: %i[show edit]
 
   def index
@@ -20,6 +20,7 @@ class ParserController < ApplicationController
   def edit
     @csv_user = CsvUser.new
     @headers = @csv_parser.headers.split(@csv_parser.separator)
+    @filename = ActiveStorage::Blob.find_by(id: params[:id]).filename
   end
 
   def create
@@ -49,7 +50,7 @@ class ParserController < ApplicationController
       external_id: index_by(:external_id),
       date_mask:   params[:date_mask]
     )
-    CsvParserParseJob.perform_later(id: params[:id], limit: params[:limit] || 100, encoding: params[:encoding])
+    CsvParserParseJob.perform_async(id: params[:id], limit: params[:limit] || 100, encoding: params[:encoding])
     redirect_to parser_path(csv_parser.file_id)
   end
 

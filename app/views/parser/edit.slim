@@ -3,7 +3,7 @@ section.hero.is-lower-alpha
     .container
       .columns
         .column.is-6.has-text-left
-          h3.title = ActiveStorage::Blob.find_by(id: params[:id]).filename
+          h3.title = @filename
         .column.is-6
 
       = form_for @csv_user, url: parser_path(params[:id]), method: :patch, data: { turbo: false } do |f|
