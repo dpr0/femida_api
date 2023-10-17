@@ -78,7 +78,7 @@ class ParserService
       name: u.first_name,
       patronymic: u.middle_name
     }
-    resp = Rails.env.production? ? OkbService.call(params) : FemidaProdService.instance.okb_search(params)
+    resp = ENV['HOST'] == 'femida-search.online' ? OkbService.call(params) : FemidaProdService.instance.okb_search(params)
     resp&.dig('score')&.> 2
   end
 
