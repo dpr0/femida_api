@@ -10,7 +10,7 @@
     "autoprefixer": "^10.4.16",
     "bulma": "^0.9.4",
     "bulma-extensions": "^6.2.7",
-    "esbuild": "^0.19.3",
+    "esbuild": "^0.19.5",
     "esbuild-plugin-import-glob": "^0.1.1",
     "esbuild-rails": "^1.0.7",
     "postcss-cli": "^10.1.0",

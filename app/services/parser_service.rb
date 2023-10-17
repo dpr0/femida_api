@@ -71,13 +71,15 @@ class ParserService
   def csv_parser_okb(u)
     return if u.slice(FIELDS).values.include? nil
 
-    OkbService.call(
+    params = {
       telephone_number: u.phone,
       birthday: u.birth_date,
       surname: u.last_name,
       name: u.first_name,
       patronymic: u.middle_name
-    )&.dig('score')&.> 2
+    }
+    resp = Rails.env.production? ? OkbService.call(params) : FemidaProdService.instance.okb_search(params)
+    resp&.dig('score')&.> 2
   end
 
   def csv_parser_card(u)

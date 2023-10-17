@@ -23,6 +23,10 @@ Rails.application.routes.draw do
   end
 
   namespace :api do
+    resources :users, only: [:show] do
+      post :login, on: :collection
+    end
+
     namespace :femida do
       resources :okb, only: :create do
         post :okb_req

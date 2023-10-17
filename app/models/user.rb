@@ -26,23 +26,23 @@
 #
 class User < ApplicationRecord
   devise :database_authenticatable, :registerable, :trackable, :recoverable, :rememberable, :validatable
-  has_many :access_grants, class_name: 'Doorkeeper::AccessGrant', foreign_key: :resource_owner_id, dependent: :delete_all
-  has_many :access_tokens, class_name: 'Doorkeeper::AccessToken', foreign_key: :resource_owner_id, dependent: :delete_all
   has_many :authorizations, dependent: :destroy
   has_many :user_roles
   has_many_attached :attachments
 
-  def self.find_for_oauth(auth)
-    authorization = Authorization.where(provider: auth[:provider], uid: auth[:uid]).first
-    return authorization.user if authorization
+  def self.auth_by_token(headers)
+    return unless headers['Authorization'].present?
 
-    user = User.where(email: auth[:email], provider: auth[:provider]).first
-    user ||= User.create!(auth)
-    user.create_authorization(auth)
-    user
+    hash = JsonWebToken.decode(headers['Authorization'].split(' ').last)
+    return if Time.at(hash['exp']) < Time.now
+
+    @current_user = User.find(hash[:user_id]) if hash && hash[:user_id]
   end
 
-  def create_authorization(auth)
-    authorizations.create(provider: auth[:provider], uid: auth[:uid])
+  def find_for_oauth
+    auth = authorizations.where(provider: provider, uid: uid).first
+    return auth.user if auth
+
+    authorizations.create(provider: provider, uid: uid)
   end
 end

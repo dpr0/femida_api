@@ -53,4 +53,9 @@ class ApplicationController < ActionController::Base
   def is_parser?
     redirect_to '/' unless current_user.user_roles.find { |role| role.role == 'parser' }
   end
+
+  def authenticate_request
+    @current_user = User.auth_by_token(request.headers)
+    render json: { error: 'Not Authorized' }, status: 401 unless @current_user
+  end
 end

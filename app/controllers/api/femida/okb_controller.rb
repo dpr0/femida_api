@@ -2,6 +2,7 @@
 
 class Api::Femida::OkbController < ApplicationController
   protect_from_forgery with: :null_session
+  # before_action :authenticate_request TODO разкоментить после добавления jwt в themis_server
 
   api :POST, '/okb', 'Проверка ОКБ'
   def create
